@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,9 +16,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import com.parse.Parse;
+import com.parse.FunctionCallback;
+import com.parse.LogInCallback;
+import com.parse.ParseAnonymousUtils;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
+
+import java.util.HashMap;
 
 
 public class MainActivity extends FragmentActivity implements LocationListener,
@@ -52,6 +59,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
     private static String APPTAG = "Critical Mass";
 
+    private MassUser mMassUser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +86,28 @@ public class MainActivity extends FragmentActivity implements LocationListener,
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
+        /*
+         * TODO
+         * To be changed after log-in feature is created
+         */
+        ParseAnonymousUtils.logIn(new LogInCallback() {
+            @Override
+            public void done(ParseUser user, ParseException e) {
+                if (e != null) {
+                    Log.d("MyApp", "Anonymous login failed.");
+                } else {
+                    Log.d("MyApp", "Anonymous user logged in.");
+                }
+            }
+        });
+        mCurrentLocation.setLatitude (0.0);
+        mCurrentLocation.setLongitude(0.0);
+
+        mMassUser.put("user",ParseUser.getCurrentUser());
+        mMassUser.put("location",mCurrentLocation);
+
+        mMassUser.saveInBackground();
 
     }
 
@@ -126,17 +157,17 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public void onConnected(Bundle bundle) {
-        mLastLocation = getLocation();
+        mCurrentLocation = getLocation();
         starterPeriodicLocationUpdates();
 
     }
 
-    @Override
+    // TODO
     public void onConnectionSuspended(int i) {
+        return;
 
     }
 
-    @Override
     public void onDisconnected() {
         return;
     }
@@ -163,7 +194,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         if (mLastLocation != null
                 && geoPointFromLocation(location)
                 .distanceInKilometersTo(geoPointFromLocation(mLastLocation)) < UPDATE_PIVOT) {
-            return;
+            updateUserLocation(location);
         }
         mLastLocation = location;
     }
@@ -172,20 +203,45 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         return new ParseGeoPoint(location.getLatitude(), location.getLongitude());
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
+    // TODO
+    // Call cloud function
+    protected void updateUserLocation(Location value) {
+        ParseGeoPoint parseGeoPointValue = geoPointFromLocation(value);
+        ParseUser user = ParseUser.getCurrentUser();
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("user", user);
+        params.put("location", parseGeoPointValue);
+
+        ParseCloud.callFunctionInBackground("updateUserLocation", params,new FunctionCallback<Object>() {
+            @Override
+            public void done(Object o, ParseException e) {
+                if(e == null){
+                    return;
+                }
+            }
+        });
+
+        return;
+
+        //ParseCloud.callFunctionInBackground("updateUserLocation", )
+
 
     }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
+//
+//    @Override
+//    public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//    }
+//
+//    @Override
+//    public void onProviderEnabled(String provider) {
+//
+//    }
+//
+//    @Override
+//    public void onProviderDisabled(String provider) {
+//
+//    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
