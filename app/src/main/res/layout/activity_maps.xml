@@ -1,4 +1,47 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
-    android:name="com.google.android.gms.maps.SupportMapFragment" />
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="85dp"
+            android:layout_height="15dp"
+            android:background="#FF112645"
+            android:padding="15dp"
+            android:id="@+id/map_left_bar"/>
+
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="15dp"
+            android:background="#535A8EF6"
+            android:padding="15dp"
+            android:id="@+id/map_top_bar"/>
+
+        <Button
+            android:layout_width="85dp"
+            android:layout_height="15dp"
+            android:background="#FF112645"
+            android:padding="15dp"
+            android:id="@+id/map_right_bar"/>
+
+        </LinearLayout>
+
+
+
+
+    <fragment  android:layout_width="match_parent"
+               android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
+               android:name="com.google.android.gms.maps.SupportMapFragment"
+               tools:layout="@layout/activity_maps"/>
+
+
+
+    </LinearLayout>
