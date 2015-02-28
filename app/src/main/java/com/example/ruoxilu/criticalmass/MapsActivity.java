@@ -3,6 +3,7 @@ package com.example.ruoxilu.criticalmass;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
@@ -15,28 +16,72 @@ public class MapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    Button mBar;
+    Button mMiddleBar;  // Directs to list activity
+    Button mLeftBar;    // Placeholder for login
+    Button mRightBar;   // Placeholder
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
-        mBar = (Button)findViewById(R.id.map_top_bar);
-        mBar.setOnClickListener(new View.OnClickListener() {
+        mMiddleBar = (Button)findViewById(R.id.map_middle_bar);
+        mMiddleBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+
+                // Change color if pressed and reset after release
+                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    mLeftBar.setBackgroundColor(0xffffffff);
+                } else {
+                    mLeftBar.setBackgroundColor(0xff9dadd6);
+                }
+
+                return true;
+            }
+        });
+        mMiddleBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mBar.setBackgroundColor(0xffffffff);
 
                 // Start ListActivity
                 Intent i = new Intent(MapsActivity.this, ListActivity.class);
                 startActivityForResult(i, 0);
+
             }
         });
 
+        mLeftBar = (Button)findViewById(R.id.map_left_bar);
+        mLeftBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
 
+                // Change color if pressed and reset after release
+                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    mLeftBar.setBackgroundColor(0xff2a4a90);
+                } else {
+                    mLeftBar.setBackgroundColor(0xff112645);
+                }
 
+                return true;
+            }
+        });
 
+        mRightBar = (Button)findViewById(R.id.map_right_bar);
+        mRightBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+
+                // Change color if pressed and reset after release
+                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    mRightBar.setBackgroundColor(0xff2a4a90);
+                } else {
+                    mRightBar.setBackgroundColor(0xff112645);
+                }
+
+                return true;
+            }
+        });
 
     }
 
@@ -45,7 +90,7 @@ public class MapsActivity extends FragmentActivity {
         super.onResume();
         setUpMapIfNeeded();
 
-        mBar.setBackgroundColor(0x535A8EF6);
+        mMiddleBar.setBackgroundColor(0x535A8EF6);
 
     }
 
