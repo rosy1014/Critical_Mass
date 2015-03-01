@@ -6,10 +6,12 @@
 
 
     <LinearLayout
+        android:id="@+id/activity_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
+
+        <!-- so far there is no need for this button -->
 
         <!--LinearLayout
             android:layout_width="match_parent"
@@ -28,45 +30,48 @@
 
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"
+        android:id="@+id/scroll_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        >
+        android:padding="10dp">
+
+        <!-- TODO
+                Change to ListView and add appropriate adaptor so that the activity list gets real time updates
+                No need for a ScrollView in that case -->
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="1"
-            android:gravity="center|center_vertical|center_horizontal"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/activity_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#ffffffff"
-                android:id="@+id/activity_1">
+                android:background="#ffffffff">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_1"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
+                    android:layout_gravity="center"
                     android:layout_weight="0.8"
+                    android:gravity="center_vertical|left"
+                    android:padding="20dp"
                     android:text="@string/event_1"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:layout_gravity="center"
-                    android:gravity="center_vertical|center_horizontal"/>
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -75,24 +80,24 @@
                 android:background="#ffadd3eb">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_2"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
+                    android:layout_gravity="center"
                     android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
                     android:text="@string/event_2"
-                    android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:gravity="center_vertical"/>
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -101,24 +106,24 @@
                 android:background="#ffffffff">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_3"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
+                    android:layout_gravity="center"
                     android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
                     android:text="@string/event_3"
-                    android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:gravity="center_vertical"/>
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -127,24 +132,24 @@
                 android:background="#ffadd3eb">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_4"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
+                    android:layout_gravity="center"
                     android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
                     android:text="@string/event_4"
-                    android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:gravity="center_vertical"/>
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -153,24 +158,24 @@
                 android:background="#ffffffff">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_5"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_weight="0.8"
-                    android:text="@string/event_5"
                     android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:gravity="center_vertical"/>
+                    android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
+                    android:text="@string/event_5"
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -179,24 +184,24 @@
                 android:background="#ffadd3eb">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_6"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_weight="0.8"
-                    android:text="@string/event_6"
                     android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:gravity="center_vertical"/>
+                    android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
+                    android:text="@string/event_6"
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -205,25 +210,25 @@
                 android:background="#ffffffff">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_7"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_weight="0.8"
-                    android:text="@string/event_7"
                     android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
+                    android:layout_weight="0.8"
                     android:background="#ffffffff"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
+                    android:text="@string/event_7"
+                    android:textSize="30sp"/>
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <LinearLayout
@@ -232,22 +237,22 @@
                 android:background="#ffadd3eb">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
                     android:id="@+id/event_8"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:layout_weight="0.2"
-                    android:src="@drawable/giraffe"
-                    android:padding="5dp"/>
+                    android:padding="5dp"
+                    android:src="@drawable/giraffe"/>
 
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:layout_weight="0.8"
-                    android:text="@string/event_8"
                     android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:padding="10dp"
-                    android:gravity="center_vertical"/>
+                    android:layout_weight="0.8"
+                    android:gravity="center_vertical"
+                    android:padding="20dp"
+                    android:text="@string/event_8"
+                    android:textSize="30sp"/>
 
             </LinearLayout>
 
