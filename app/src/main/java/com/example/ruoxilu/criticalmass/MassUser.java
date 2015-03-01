@@ -12,6 +12,10 @@ import com.parse.ParseUser;
 @ParseClassName("MassUser")
 public class MassUser extends ParseObject{
 
+    public MassUser(){
+
+    }
+
     public ParseUser getUser() {
         return getParseUser("user");
     }
