@@ -14,11 +14,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity {
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     Button mMiddleBar;  // Directs to list activity
     Button mLeftBar;    // Placeholder for login
     Button mRightBar;   // Placeholder
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,9 +31,12 @@ public class MapsActivity extends FragmentActivity {
 
                 // Change color if pressed and reset after release
                 if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
-                    mLeftBar.setBackgroundColor(0xffffffff);
+                    mMiddleBar.setBackgroundColor(0xffffffff);
+                    Intent i = new Intent(MapsActivity.this, ListActivity.class);
+                    startActivityForResult(i, 0);
+
                 } else {
-                    mLeftBar.setBackgroundColor(0xff9dadd6);
+                    mMiddleBar.setBackgroundColor(0xff9dadd6);
                 }
 
                 return true;
@@ -89,8 +91,6 @@ public class MapsActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-
-        mMiddleBar.setBackgroundColor(0x535A8EF6);
 
     }
 
