@@ -2,7 +2,9 @@ package com.example.ruoxilu.criticalmass;
 
 import android.app.Dialog;
 import android.content.IntentSender;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,9 +16,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
@@ -55,14 +59,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             FAST_INTERVAL_CEILING_IN_SECONDS * MILLISECONDS_PER_SECOND;
     private static final double UPDATE_PIVOT = 0.01;
 
+    /*
+ * Constants for handling location results
+ */
+    // Conversion from feet to meters
+    private static final float METERS_PER_FEET = 0.3048f;
+
+    // Conversion from kilometers to meters
+    private static final int METERS_PER_KILOMETER = 1000;
+
+    // Initial offset for calculating the map bounds
+    private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
+
+    // Accuracy for calculating the map bounds
+    private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
+    // Fields for the map radius in feet
+    private float radius;
+    private float lastRadius;
+
     private static final String APPTAG = "CriticalMass";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(APPTAG,"onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        setUpMapIfNeeded();
         // Create a new global location parameters object
         mLocationRequest = LocationRequest.create();
         Log.i(APPTAG,"LOCATION REQUEST CREATED");
@@ -82,6 +102,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(APPTAG,"GOOGLE API CLIENT CREATED");
         mMassUser = new MassUser();
         Log.i(APPTAG, "mMassUser " + mMassUser);
+        setContentView(R.layout.activity_maps);
+        setUpMapIfNeeded();
+
+
     }
 
     @Override
@@ -89,7 +113,26 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         super.onResume();
         mGoogleApiClient.connect();
         Log.i(APPTAG,"On Resume, Google Api Client connect");
-        setUpMapIfNeeded();
+        Log.i(APPTAG,"On Resume, my current location is " + mCurrentLocation);
+        if(mCurrentLocation != null){
+            double latitude = mCurrentLocation.getLatitude();
+
+            // Get longitude of the current location
+            double longitude = mCurrentLocation.getLongitude();
+            Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
+            // Create a LatLng object for the current location
+            LatLng latLng = new LatLng(latitude,longitude);
+            // Get the bounds to zoom to
+            //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
+            // Zoom to the given bounds
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            Log.i(APPTAG, "update camera on resume");
+
+            // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
+        }
+
     }
 
     @Override
@@ -137,7 +180,39 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        mMap.setMyLocationEnabled(true);
+        // Get LocationManager object from System Service LOCATION_SERVICE
+        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        // Create a criteria object to retrieve provider
+        Criteria criteria = new Criteria();
+
+        // Get the name of the best provider
+        String provider = mLocationManager.getBestProvider(criteria, true);
+
+        // Get Current Location
+        Location mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
+
+        Log.i(APPTAG,"mCurrentLocation is " + mCurrentLocation );
+        double latitude = mCurrentLocation.getLatitude();
+
+        // Get longitude of the current location
+        double longitude = mCurrentLocation.getLongitude();
+        Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
+        // Create a LatLng object for the current location
+        LatLng latLng = new LatLng(latitude,longitude);
+        // Get the bounds to zoom to
+     //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
+        // Zoom to the given bounds
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        Log.i(APPTAG, "update camera");
+
+       // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
+        //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
+
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
     @Override
@@ -159,6 +234,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             });
             Log.i(APPTAG,"ANONYMOUS USER LOGGED IN");
         }
+
 
 
         ParseACL defaultACL = new ParseACL();
@@ -211,6 +287,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
         mLastLocation = location;
         updateUserLocation(location);
+        updateZoom(location);
 
     }
 
@@ -255,24 +332,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 }
             }
         });
-//        ParseGeoPoint parseGeoPointValue = geoPointFromLocation(value);
-//        ParseUser user = mMassUser.getUser();
-//        String objectId = mMassUser.getObjectId();
-//        HashMap<String, Object> params = new HashMap<String, Object>();
-//        params.put("objectId", objectId);
-//        params.put("user", user);
-//        params.put("location", parseGeoPointValue);
-//
-//        ParseCloud.callFunctionInBackground("updateUserLocation", params, new FunctionCallback<Object>() {
-//            @Override
-//            public void done(Object o, ParseException e) {
-//                if (e == null) {
-//                    Log.i(APPTAG,"done with updateUserLocation.");
-//                    return;
-//                }
-//            }
-//        });
-
         return;
     }
     private void starterPeriodicLocationUpdates() {
@@ -290,6 +349,87 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         } else {
             return null;
         }
+    }
+    /*
+      /*
+   * Zooms the map to show the area of interest based on the search radius
+   */
+    private void updateZoom(Location location) {
+        LatLng myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 17));
+    }
+
+    /* Helper method to calculate the bounds for map zooming
+ */
+    LatLngBounds calculateBoundsWithCenter(LatLng mLatLng) {
+        // Create a bounds
+        LatLngBounds.Builder builder = LatLngBounds.builder();
+
+        // Calculate east/west points that should to be included
+        // in the bounds
+        double lngDifference = calculateLatLngOffset(mLatLng, false);
+        LatLng east = new LatLng(mLatLng.latitude, mLatLng.longitude + lngDifference);
+        builder.include(east);
+        LatLng west = new LatLng(mLatLng.latitude, mLatLng.longitude - lngDifference);
+        builder.include(west);
+
+        // Calculate north/south points that should to be included
+        // in the bounds
+        double latDifference = calculateLatLngOffset(mLatLng, true);
+        LatLng north = new LatLng(mLatLng.latitude + latDifference, mLatLng.longitude);
+        builder.include(north);
+        LatLng south = new LatLng(mLatLng.latitude - latDifference, mLatLng.longitude);
+        builder.include(south);
+
+        return builder.build();
+    }
+
+
+    /*
+     * Helper method to calculate the offset for the bounds used in map zooming
+     */
+    private double calculateLatLngOffset(LatLng myLatLng, boolean bLatOffset) {
+        // The return offset, initialized to the default difference
+        double latLngOffset = OFFSET_CALCULATION_INIT_DIFF;
+        // Set up the desired offset distance in meters
+        float desiredOffsetInMeters = radius * METERS_PER_FEET;
+        // Variables for the distance calculation
+        float[] distance = new float[1];
+        boolean foundMax = false;
+        double foundMinDiff = 0;
+        // Loop through and get the offset
+        do {
+            // Calculate the distance between the point of interest
+            // and the current offset in the latitude or longitude direction
+            if (bLatOffset) {
+                Location.distanceBetween(myLatLng.latitude, myLatLng.longitude, myLatLng.latitude
+                        + latLngOffset, myLatLng.longitude, distance);
+            } else {
+                Location.distanceBetween(myLatLng.latitude, myLatLng.longitude, myLatLng.latitude,
+                        myLatLng.longitude + latLngOffset, distance);
+            }
+            // Compare the current difference with the desired one
+            float distanceDiff = distance[0] - desiredOffsetInMeters;
+            if (distanceDiff < 0) {
+                // Need to catch up to the desired distance
+                if (!foundMax) {
+                    foundMinDiff = latLngOffset;
+                    // Increase the calculated offset
+                    latLngOffset *= 2;
+                } else {
+                    double tmp = latLngOffset;
+                    // Increase the calculated offset, at a slower pace
+                    latLngOffset += (latLngOffset - foundMinDiff) / 2;
+                    foundMinDiff = tmp;
+                }
+            } else {
+                // Overshot the desired distance
+                // Decrease the calculated offset
+                latLngOffset -= (latLngOffset - foundMinDiff) / 2;
+                foundMax = true;
+            }
+        } while (Math.abs(distance[0] - desiredOffsetInMeters) > OFFSET_CALCULATION_ACCURACY);
+        return latLngOffset;
     }
 
     /*
