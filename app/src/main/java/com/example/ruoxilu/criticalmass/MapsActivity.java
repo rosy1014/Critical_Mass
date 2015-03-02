@@ -39,17 +39,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    Button mMiddleBar;  // Directs to list activity
-    Button mLeftBar;    // Placeholder for login
-    Button mRightBar;   // Placeholder
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
-    private LocationRequest mLocationRequest;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mCurrentLocation;
-    private Location mLastLocation;
-    private MassUser mMassUser;
-
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     /*
      * Constants for location update parameters
@@ -65,7 +54,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             FAST_INTERVAL_CEILING_IN_SECONDS * MILLISECONDS_PER_SECOND;
     private static final double UPDATE_PIVOT = 0.01;
     private static final int ZOOM_LEVEL = 17; //city level
-
     /*
      * Constants for handling location results
      */
@@ -77,11 +65,19 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
+    private static final String APPTAG = "CriticalMass";
+    Button mMiddleBar;  // Directs to list activity
+    Button mLeftBar;    // Placeholder for login
+    Button mRightBar;   // Placeholder
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mCurrentLocation;
+    private Location mLastLocation;
+    private MassUser mMassUser;
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
-
-    private static final String APPTAG = "CriticalMass";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -477,6 +473,21 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
+    private boolean servicesConnected() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+        if (ConnectionResult.SUCCESS == resultCode) {
+            return true;
+        } else {
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
+            if (dialog != null) {
+                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
+                errorFragment.setDialog(dialog);
+                errorFragment.show(this.getSupportFragmentManager(), APPTAG);
+            }
+            return false;
+        }
+    }
 
     public static class ErrorDialogFragment extends DialogFragment {
         /*
@@ -497,22 +508,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             return mDialog;
-        }
-    }
-
-    private boolean servicesConnected() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-
-        if (ConnectionResult.SUCCESS == resultCode) {
-            return true;
-        } else {
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
-            if(dialog != null) {
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                errorFragment.setDialog(dialog);
-                errorFragment.show(this.getSupportFragmentManager(), APPTAG);
-            }
-            return false;
         }
     }
 }
