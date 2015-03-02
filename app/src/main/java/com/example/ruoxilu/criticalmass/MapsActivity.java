@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
@@ -66,17 +67,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final int ZOOM_LEVEL = 17; //city level
 
     /*
- * Constants for handling location results
- */
+     * Constants for handling location results
+     */
     // Conversion from feet to meters
     private static final float METERS_PER_FEET = 0.3048f;
-
     // Conversion from kilometers to meters
     private static final int METERS_PER_KILOMETER = 1000;
-
     // Initial offset for calculating the map bounds
     private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
-
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
     // Fields for the map radius in feet
@@ -89,25 +87,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(APPTAG,"onCreate");
         super.onCreate(savedInstanceState);
-        // Create a new global location parameters object
-        mLocationRequest = LocationRequest.create();
-        Log.i(APPTAG,"LOCATION REQUEST CREATED");
 
-        // Set the update interval
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        initLocationRequest();
+        initGoogleApiClient();
 
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        mLocationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLLISECONDS);
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        Log.i(APPTAG,"GOOGLE API CLIENT CREATED");
         mMassUser = new MassUser();
         Log.i(APPTAG, "mMassUser " + mMassUser);
+
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
@@ -171,8 +157,37 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 return true;
             }
         });
+    }
 
+    /*
+     * Helper function for onCreate
+     * Initialize the location request for maps activity
+     */
 
+    protected void initLocationRequest(){
+        // Create a new global location parameters object
+        mLocationRequest = LocationRequest.create();
+        Log.i(APPTAG,"LOCATION REQUEST CREATED");
+
+        // Set the update interval
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationRequest.setFastestInterval(FAST_INTERVAL_CEILING_IN_MILLLISECONDS);
+
+    }
+    /*
+     * Helper function for onCreate
+     * Initialize the Goolge Api Client for maps activity
+     */
+    protected void initGoogleApiClient(){
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        Log.i(APPTAG,"GOOGLE API CLIENT CREATED");
     }
 
     @Override
@@ -276,6 +291,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
         Log.i(APPTAG, "update camera");
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                // TODO
+            }
+        });
 
        // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
         //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
