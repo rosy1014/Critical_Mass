@@ -53,6 +53,20 @@
             </intent-filter>
         </activity>
 
+<<<<<<< HEAD
+=======
+
+        <activity android:name=".ListActivity"
+                  android:label="List">
+
+        </activity>
+
+        <activity android:name=".EventActivity"
+                  android:label="Event">
+
+        </activity>
+
+>>>>>>> remotes/origin/master
     </application>
 
 </manifest>

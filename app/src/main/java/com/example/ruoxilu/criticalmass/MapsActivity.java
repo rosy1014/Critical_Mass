@@ -1,6 +1,7 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Criteria;
 import android.location.Location;
@@ -9,6 +10,9 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -35,6 +39,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    Button mMiddleBar;  // Directs to list activity
+    Button mLeftBar;    // Placeholder for login
+    Button mRightBar;   // Placeholder
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     private LocationRequest mLocationRequest;
@@ -105,6 +112,67 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
+        mMiddleBar = (Button)findViewById(R.id.map_middle_bar);
+        mMiddleBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+
+                // Change color if pressed and reset after release
+                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    mMiddleBar.setBackgroundColor(0xffffffff);
+                    Intent i = new Intent(MapsActivity.this, ListActivity.class);
+                    startActivityForResult(i, 0);
+
+                } else {
+                    mMiddleBar.setBackgroundColor(0xff9dadd6);
+                }
+
+                return true;
+            }
+        });
+        mMiddleBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Start ListActivity
+                Intent i = new Intent(MapsActivity.this, ListActivity.class);
+                startActivityForResult(i, 0);
+
+            }
+        });
+
+        mLeftBar = (Button)findViewById(R.id.map_left_bar);
+        mLeftBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+
+                // Change color if pressed and reset after release
+                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    mLeftBar.setBackgroundColor(0xff2a4a90);
+                } else {
+                    mLeftBar.setBackgroundColor(0xff112645);
+                }
+
+                return true;
+            }
+        });
+
+        mRightBar = (Button)findViewById(R.id.map_right_bar);
+        mRightBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent ev) {
+
+                // Change color if pressed and reset after release
+                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    mRightBar.setBackgroundColor(0xff2a4a90);
+                } else {
+                    mRightBar.setBackgroundColor(0xff112645);
+                }
+
+                return true;
+            }
+        });
+
 
     }
 
@@ -143,6 +211,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mGoogleApiClient.disconnect();
 
         super.onStop();
+        setUpMapIfNeeded();
+
     }
 
     /**
@@ -424,7 +494,5 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return false;
         }
     }
-
-
 }
 
