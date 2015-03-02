@@ -20,7 +20,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
@@ -58,6 +57,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final int FAST_INTERVAL_CEILING_IN_MILLLISECONDS =
             FAST_INTERVAL_CEILING_IN_SECONDS * MILLISECONDS_PER_SECOND;
     private static final double UPDATE_PIVOT = 0.01;
+    private static final int ZOOM_LEVEL = 17; //city level
 
     /*
  * Constants for handling location results
@@ -126,7 +126,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
             // Zoom to the given bounds
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
             Log.i(APPTAG, "update camera on resume");
 
             // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
@@ -205,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
         // Zoom to the given bounds
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
         Log.i(APPTAG, "update camera");
 
        // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
@@ -359,78 +359,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 17));
     }
 
-    /* Helper method to calculate the bounds for map zooming
- */
-    LatLngBounds calculateBoundsWithCenter(LatLng mLatLng) {
-        // Create a bounds
-        LatLngBounds.Builder builder = LatLngBounds.builder();
 
-        // Calculate east/west points that should to be included
-        // in the bounds
-        double lngDifference = calculateLatLngOffset(mLatLng, false);
-        LatLng east = new LatLng(mLatLng.latitude, mLatLng.longitude + lngDifference);
-        builder.include(east);
-        LatLng west = new LatLng(mLatLng.latitude, mLatLng.longitude - lngDifference);
-        builder.include(west);
-
-        // Calculate north/south points that should to be included
-        // in the bounds
-        double latDifference = calculateLatLngOffset(mLatLng, true);
-        LatLng north = new LatLng(mLatLng.latitude + latDifference, mLatLng.longitude);
-        builder.include(north);
-        LatLng south = new LatLng(mLatLng.latitude - latDifference, mLatLng.longitude);
-        builder.include(south);
-
-        return builder.build();
-    }
-
-
-    /*
-     * Helper method to calculate the offset for the bounds used in map zooming
-     */
-    private double calculateLatLngOffset(LatLng myLatLng, boolean bLatOffset) {
-        // The return offset, initialized to the default difference
-        double latLngOffset = OFFSET_CALCULATION_INIT_DIFF;
-        // Set up the desired offset distance in meters
-        float desiredOffsetInMeters = radius * METERS_PER_FEET;
-        // Variables for the distance calculation
-        float[] distance = new float[1];
-        boolean foundMax = false;
-        double foundMinDiff = 0;
-        // Loop through and get the offset
-        do {
-            // Calculate the distance between the point of interest
-            // and the current offset in the latitude or longitude direction
-            if (bLatOffset) {
-                Location.distanceBetween(myLatLng.latitude, myLatLng.longitude, myLatLng.latitude
-                        + latLngOffset, myLatLng.longitude, distance);
-            } else {
-                Location.distanceBetween(myLatLng.latitude, myLatLng.longitude, myLatLng.latitude,
-                        myLatLng.longitude + latLngOffset, distance);
-            }
-            // Compare the current difference with the desired one
-            float distanceDiff = distance[0] - desiredOffsetInMeters;
-            if (distanceDiff < 0) {
-                // Need to catch up to the desired distance
-                if (!foundMax) {
-                    foundMinDiff = latLngOffset;
-                    // Increase the calculated offset
-                    latLngOffset *= 2;
-                } else {
-                    double tmp = latLngOffset;
-                    // Increase the calculated offset, at a slower pace
-                    latLngOffset += (latLngOffset - foundMinDiff) / 2;
-                    foundMinDiff = tmp;
-                }
-            } else {
-                // Overshot the desired distance
-                // Decrease the calculated offset
-                latLngOffset -= (latLngOffset - foundMinDiff) / 2;
-                foundMax = true;
-            }
-        } while (Math.abs(distance[0] - desiredOffsetInMeters) > OFFSET_CALCULATION_ACCURACY);
-        return latLngOffset;
-    }
 
     /*
      * Show a dialog returned by Google Play services for the connection error code
