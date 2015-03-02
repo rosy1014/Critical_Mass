@@ -24,7 +24,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseACL;
@@ -198,7 +197,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Log.i(APPTAG, "update camera on resume");
 
             // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-            mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
+           // mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
         }
 
     }
@@ -279,10 +278,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(APPTAG, "update camera");
 
        // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-        mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
+        //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
         //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
 
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
     @Override
@@ -392,9 +390,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         final ParseGeoPoint geoPointValue = geoPointFromLocation(value);
         ParseQuery<MassUser> query = MassUser.getQuery();
         query.whereEqualTo("user",mMassUser.getUser());
+        Log.i(APPTAG,"Mass User in updateUserLocation is " + mMassUser.getUser());
         query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
+                Log.i(APPTAG,"massuser in updateUserLocation after query is " + massUser.getUser());
                 massUser.setLocation(geoPointValue);
                 massUser.saveInBackground();
                 if(e==null){

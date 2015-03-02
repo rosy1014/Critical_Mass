@@ -2,13 +2,10 @@
 <resources>
 
     <string name="app_name">Critical Mass</string>
-<<<<<<< HEAD
-    <string name="title_activity_maps">Map</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_application">Application</string>
-=======
     <string name="title_activity_maps">Critical Mass</string>
 
     <string name="event_1">Giraffe watching in the 5Cs!</string>
@@ -28,6 +25,5 @@
         \nHomework extensions available!
         \nGreat app susurri free for download!
         </string>
->>>>>>> remotes/origin/master
 
 </resources>

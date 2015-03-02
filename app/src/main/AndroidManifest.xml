@@ -53,9 +53,6 @@
             </intent-filter>
         </activity>
 
-<<<<<<< HEAD
-=======
-
         <activity android:name=".ListActivity"
                   android:label="List">
 
@@ -65,8 +62,6 @@
                   android:label="Event">
 
         </activity>
-
->>>>>>> remotes/origin/master
     </application>
 
 </manifest>
