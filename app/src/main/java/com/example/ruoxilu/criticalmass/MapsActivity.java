@@ -33,7 +33,6 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -53,6 +52,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final int FAST_INTERVAL_CEILING_IN_MILLLISECONDS =
             FAST_INTERVAL_CEILING_IN_SECONDS * MILLISECONDS_PER_SECOND;
     private static final double UPDATE_PIVOT = 0.01;
+    private static final int SEARCH_DISTANCE = 5;
     private static final int ZOOM_LEVEL = 17; //city level
     /*
      * Constants for handling location results
@@ -319,19 +319,19 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
         }
         mMassUser.setUser(ParseUser.getCurrentUser());
+        updateUserLocation(mMassUser.getLocation());
 
-        // Upload mMassUser to Parse Cloud
-        mMassUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d(APPTAG, "MassUser saved successfully.");
-                } else {
-                    Log.d(APPTAG, "MassUser failed to save.");
-                }
-            }
-        });
-        Log.i(APPTAG, "saved mMassuser");
+//        // Upload mMassUser to Parse Cloud
+//        mMassUser.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (e == null) {
+//                    Log.d(APPTAG, "MassUser saved successfully.");
+//                } else {
+//                    Log.d(APPTAG, "MassUser failed to save.");
+//                }
+//            }
+//        });
 
 
     }
@@ -341,6 +341,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     protected void setParseACL(){
         ParseACL defaultACL = new ParseACL();
+
         // Optionally enable public read access.
         defaultACL.setPublicReadAccess(true);
         defaultACL.setPublicWriteAccess(true);
@@ -414,14 +415,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
 
     private ParseGeoPoint geoPointFromLocation(Location location) {
-        Log.i(APPTAG,"Latitude = "+ location.getLatitude() + " Longitude = " + location.getLongitude());
         ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        Log.i(APPTAG, "geoPoint is " + geoPoint);
+       // Log.i(APPTAG, "geoPoint is " + geoPoint);
         return geoPoint;
     }
 
-    // TODO
-    // Call cloud function
+    // TODO - update location, avoid duplicated entry in cloud
+    // update the user's location by Location type data
     protected void updateUserLocation(Location value) {
         final ParseGeoPoint geoPointValue = geoPointFromLocation(value);
         ParseQuery<MassUser> query = MassUser.getQuery();
@@ -430,11 +430,39 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
-                Log.i(APPTAG,"massuser in updateUserLocation after query is " + massUser.getUser());
-                massUser.setLocation(geoPointValue);
-                massUser.saveInBackground();
                 if(e==null){
-                    return;
+                    Log.i(APPTAG,"massuser in updateUserLocation after query is " + massUser.getUser());
+                    massUser.setLocation(geoPointValue);
+                    massUser.saveInBackground();
+                    Log.i(APPTAG, "Updated the parse user's location");
+                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND){
+                    mMassUser.saveInBackground();
+                    Log.i(APPTAG,"Saved new MassUser.");
+                } else {
+                    // Do nothing
+                }
+            }
+        });
+        return;
+    }
+    // TODO
+    // update the user's location by ParseGeoPoint type data
+    protected void updateUserLocation(ParseGeoPoint value) {
+        final ParseGeoPoint geoPointValue = value;
+        ParseQuery<MassUser> query = MassUser.getQuery();
+        query.whereEqualTo("user",mMassUser.getUser());
+        Log.i(APPTAG,"Mass User in updateUserLocation is " + mMassUser.getUser());
+        query.getFirstInBackground(new GetCallback<MassUser>() {
+            @Override
+            public void done(MassUser massUser, ParseException e) {
+                if(e==null){
+                    Log.i(APPTAG,"massuser in updateUserLocation after query is " + massUser.getUser());
+                    massUser.setLocation(geoPointValue);
+                    massUser.saveInBackground();
+                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND){
+                    mMassUser.saveInBackground();
+                } else {
+                    // Do nothing
                 }
             }
         });
@@ -456,14 +484,40 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return null;
         }
     }
+
     /*
-      /*
-   * Zooms the map to show the area of interest based on the search radius
-   */
+     * Zooms the map to show the area of interest based on the search radius
+     */
     private void updateZoom(Location location) {
         LatLng myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 17));
     }
+
+//    private void doMapQuery() {
+//        // 1
+//        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+//        if (myLoc == null) {
+//            cleanUpMarkers(new HashSet<String>());
+//            return;
+//        }
+//        // 2
+//        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+//        // 3
+//        ParseQuery<MassUser> mapQuery = MassUser.getQuery();
+//        // 4
+//        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
+//        // 5
+//        mapQuery.include("user");
+//        mapQuery.orderByDescending("createdAt");
+//       // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
+//        // 6
+//        mapQuery.findInBackground(new FindCallback<AnywallPost>() {
+//            @Override
+//            public void done(List<MassUser> objects, ParseException e) {
+//                // Handle the results
+//            }
+//        });
+//    }
 
 
 
