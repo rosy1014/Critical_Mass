@@ -25,6 +25,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseACL;
@@ -33,6 +36,12 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -78,6 +87,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
+
+    // Fields for helping process the map and location changes
+    private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
+    private String selectedPostObjectId;
+    private int mostRecentMapUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -290,7 +304,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
-                // TODO
+                doMapQuery();
             }
         });
 
@@ -394,6 +408,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mLastLocation = location;
         updateUserLocation(location);
         updateZoom(location);
+        doMapQuery();
 
     }
 
@@ -493,31 +508,81 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 17));
     }
 
-//    private void doMapQuery() {
-//        // 1
-//        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-//        if (myLoc == null) {
-//            cleanUpMarkers(new HashSet<String>());
-//            return;
-//        }
-//        // 2
-//        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
-//        // 3
-//        ParseQuery<MassUser> mapQuery = MassUser.getQuery();
-//        // 4
-//        mapQuery.whereWithinKilometers("location", myPoint, MAX_POST_SEARCH_DISTANCE);
-//        // 5
-//        mapQuery.include("user");
-//        mapQuery.orderByDescending("createdAt");
-//       // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
-//        // 6
-//        mapQuery.findInBackground(new FindCallback<AnywallPost>() {
-//            @Override
-//            public void done(List<MassUser> objects, ParseException e) {
-//                // Handle the results
-//            }
-//        });
-//    }
+    private void doMapQuery() {
+        final int myUpdateNumber = ++mostRecentMapUpdate;
+        // 1
+        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+        if (myLoc == null) {
+            cleanUpMarkers(new HashSet<String>());
+            return;
+        }
+        // 2
+        final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+        // 3
+        ParseQuery<MassUser> mapQuery = MassUser.getQuery();
+        // 4
+        mapQuery.whereWithinKilometers("location", myPoint, SEARCH_DISTANCE);
+        // 5
+        mapQuery.include("user");
+        mapQuery.orderByDescending("createdAt");
+       // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
+        // 6
+        mapQuery.findInBackground(new FindCallback<MassUser>() {
+            @Override
+            public void done(List<MassUser> objects, ParseException e) {
+                if (e != null) {
+                    Log.d(APPTAG, "An error occurred while querying for map posts.", e);
+                    return;
+                }
+
+                if (myUpdateNumber != mostRecentMapUpdate) {
+                    return;
+                }
+                // Handle the results
+                Set<String> toKeep = new HashSet<String>();
+                // 2
+                for (MassUser mUser : objects) {
+                    // 3
+                    toKeep.add(mUser.getObjectId());
+                    // 4
+                    Marker oldMarker = mapMarkers.get(mUser.getObjectId());
+                    // 5
+                    MarkerOptions markerOpts =
+                            new MarkerOptions().position(new LatLng(mUser.getLocation().getLatitude(), mUser
+                                    .getLocation().getLongitude()));
+                    // 6
+                    if (mUser.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                            / METERS_PER_KILOMETER) {
+                        // Set up an out-of-range marker
+                    }
+                    else {
+                        // Set up an in-range marker
+                    }
+                    // 7
+                    Marker marker = mMap.addMarker(markerOpts);
+                    mapMarkers.put(mUser.getObjectId(), marker);
+                    // 8
+                    if (mUser.getObjectId().equals(selectedPostObjectId)) {
+                        marker.showInfoWindow();
+                        selectedPostObjectId = null;
+                    }
+                }
+                // 9
+                cleanUpMarkers(toKeep);
+            }
+        });
+    }
+
+    private void cleanUpMarkers(Set<String> markersToKeep) {
+        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
+            if (!markersToKeep.contains(objId)) {
+                Marker marker = mapMarkers.get(objId);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+                mapMarkers.remove(objId);
+            }
+        }
+    }
 
 
 
