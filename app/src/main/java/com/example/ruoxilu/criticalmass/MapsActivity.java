@@ -305,6 +305,60 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mGoogleApiClient.connect();
         mCurrentLocation = getLocation();
         Log.i(APPTAG,"ONCONNECTED");
+
+        anonymousUserLogin();
+        starterPeriodicLocationUpdates();// connect googleFused api services
+
+        // set up mMassUser
+        Log.i(APPTAG, "Current massuser is " + mMassUser);
+        if(mCurrentLocation == null){
+            Log.i(APPTAG,"mCurrentlocation is null");
+            mMassUser.setLocation(null);
+        } else {
+            Log.i(APPTAG,"mCurrentlocation is NOT null");
+            mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
+        }
+        mMassUser.setUser(ParseUser.getCurrentUser());
+
+        // Upload mMassUser to Parse Cloud
+        mMassUser.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d(APPTAG, "MassUser saved successfully.");
+                } else {
+                    Log.d(APPTAG, "MassUser failed to save.");
+                }
+            }
+        });
+        Log.i(APPTAG, "saved mMassuser");
+
+
+    }
+    /*
+     * Helper Function
+     * Set up the ParseACL for the current user
+     */
+    protected void setParseACL(){
+        ParseACL defaultACL = new ParseACL();
+        // Optionally enable public read access.
+        defaultACL.setPublicReadAccess(true);
+        defaultACL.setPublicWriteAccess(true);
+
+        ParseACL.setDefaultACL(defaultACL, true);
+
+        // allows read and write access to all users
+        ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
+        postACL.setPublicReadAccess(true);
+        postACL.setPublicWriteAccess(true);
+    }
+
+    /*
+     * Helper Function
+     * Anonymous User login for phase 1, to be replaced with actual log-in activity
+     * TODO
+     */
+    protected void anonymousUserLogin(){
         ParseUser.enableAutomaticUser();
         if(ParseUser.getCurrentUser()== null) {
             ParseAnonymousUtils.logIn(new LogInCallback() {
@@ -319,43 +373,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             });
             Log.i(APPTAG,"ANONYMOUS USER LOGGED IN");
         }
-
-
-
-        ParseACL defaultACL = new ParseACL();
-//        Optionally enable public read access.
-        defaultACL.setPublicReadAccess(true);
-        defaultACL.setPublicWriteAccess(true);
-
-        ParseACL.setDefaultACL(defaultACL, true);
-
-        // allows read and write access to all users
-        ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
-        postACL.setPublicReadAccess(true);
-        postACL.setPublicWriteAccess(true);
-        starterPeriodicLocationUpdates();
-        Log.i(APPTAG, "Current massuser is " + mMassUser);
-        if(mCurrentLocation == null){
-            Log.i(APPTAG,"mCurrentlocation is null");
-            mMassUser.setLocation(null);
-        } else {
-            Log.i(APPTAG,"mCurrentlocation is NOT null");
-            mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
-        }
-        mMassUser.setUser(ParseUser.getCurrentUser());
-        mMassUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d(APPTAG, "MassUser saved successfully.");
-                } else {
-                    Log.d(APPTAG, "MassUser failed to save.");
-                }
-            }
-        });
-        Log.i(APPTAG, "saved mMassuser");
-
+        setParseACL();
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -388,7 +408,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
 
     }
-
 
     /*
      * private helper functions
