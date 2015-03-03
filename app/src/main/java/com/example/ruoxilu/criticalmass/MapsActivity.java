@@ -36,6 +36,7 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,7 +61,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final int FAST_INTERVAL_CEILING_IN_SECONDS = 1;
     private static final int FAST_INTERVAL_CEILING_IN_MILLLISECONDS =
             FAST_INTERVAL_CEILING_IN_SECONDS * MILLISECONDS_PER_SECOND;
-    private static final double UPDATE_PIVOT = 0.01;
+    private static final double UPDATE_PIVOT = 0.005; //update if move more than 5 meters
     private static final int SEARCH_DISTANCE = 5;
     private static final int ZOOM_LEVEL = 17; //city level
     /*
@@ -333,16 +334,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
         }
         mMassUser.setUser(ParseUser.getCurrentUser());
-        updateUserLocation(mMassUser.getLocation());
+       // updateUserLocation(mMassUser.getLocation());
 
-//        // Upload mMassUser to Parse Cloud
+        // Upload mMassUser to Parse Cloud
 //        mMassUser.saveInBackground(new SaveCallback() {
 //            @Override
 //            public void done(ParseException e) {
 //                if (e == null) {
 //                    Log.d(APPTAG, "MassUser saved successfully.");
 //                } else {
-//                    Log.d(APPTAG, "MassUser failed to save.");
+//                    Log.d(APPTAG, "MassUser failed to save." + e);
 //                }
 //            }
 //        });
@@ -439,20 +440,50 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // update the user's location by Location type data
     protected void updateUserLocation(Location value) {
         final ParseGeoPoint geoPointValue = geoPointFromLocation(value);
+        ParseQuery<ParseUser> innerQuery = ParseUser.getQuery();
         ParseQuery<MassUser> query = MassUser.getQuery();
-        query.whereEqualTo("user",mMassUser.getUser());
+        innerQuery.whereEqualTo("objectId",mMassUser.getUser());
+        //Log.i(APPTAG, "In innerQuery, mMassUser.getUser() returns " +String.valueOf(mMassUser.getUser()));
+        //Log.i(APPTAG, "In innerQuery, mMassUser.getUser() returns " +String.valueOf(ParseUser.getCurrentUser()));
+        //ParseQuery<ParseUser> query = ParseUser.getQuery();
+        //query.whereEqualTo("user", String.valueOf(mMassUser.getUser()));
+        query.whereMatchesQuery("user", innerQuery);
         Log.i(APPTAG,"Mass User in updateUserLocation is " + mMassUser.getUser());
+        //Log.i(APPTAG, "Query key should match: " +ParseObject.createWithoutData("_User", String.valueOf(mMassUser.getUser())));
         query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
-                if(e==null){
-                    Log.i(APPTAG,"massuser in updateUserLocation after query is " + massUser.getUser());
+                Log.i(APPTAG, "Done with getFirstInBackground loc " + e);
+
+                if (e == null) {
+                    Log.i(APPTAG, "massuser in updateUserLocation after query is " + massUser.getUser());
                     massUser.setLocation(geoPointValue);
-                    massUser.saveInBackground();
+                    massUser.saveInBackground(new SaveCallback() {
+
+                        @Override
+                        public void done(ParseException e) {
+                            Log.i(APPTAG, "Done with getFirstInBackground loc");
+
+                            if (e==null){
+                                Log.i(APPTAG, "MassUser update saved successfully");
+                            } else {
+                                Log.i(APPTAG, "MassUser update were not saved");
+                            }
+                        }
+                    });
                     Log.i(APPTAG, "Updated the parse user's location");
-                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND){
-                    mMassUser.saveInBackground();
-                    Log.i(APPTAG,"Saved new MassUser.");
+                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                    mMassUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e==null){
+                                Log.i(APPTAG, "New MassUser saved successfully");
+                            } else {
+                                Log.i(APPTAG, "New MassUser were not saved");
+                            }
+                        }
+                    });
+                    Log.i(APPTAG, "Saved new MassUser.");
                 } else {
                     // Do nothing
                 }
@@ -460,29 +491,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         });
         return;
     }
-    // TODO
-    // update the user's location by ParseGeoPoint type data
-    protected void updateUserLocation(ParseGeoPoint value) {
-        final ParseGeoPoint geoPointValue = value;
-        ParseQuery<MassUser> query = MassUser.getQuery();
-        query.whereEqualTo("user",mMassUser.getUser());
-        Log.i(APPTAG,"Mass User in updateUserLocation is " + mMassUser.getUser());
-        query.getFirstInBackground(new GetCallback<MassUser>() {
-            @Override
-            public void done(MassUser massUser, ParseException e) {
-                if(e==null){
-                    Log.i(APPTAG,"massuser in updateUserLocation after query is " + massUser.getUser());
-                    massUser.setLocation(geoPointValue);
-                    massUser.saveInBackground();
-                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND){
-                    mMassUser.saveInBackground();
-                } else {
-                    // Do nothing
-                }
-            }
-        });
-        return;
-    }
+
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
                 .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
