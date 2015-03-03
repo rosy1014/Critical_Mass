@@ -28,5 +28,5 @@ Changelog
 -------------
 
 
-
+[^android]: We may provide the application on other platforms in the future. But we will focus on the Android platform for now!
 
