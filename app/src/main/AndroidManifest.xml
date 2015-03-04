@@ -48,20 +48,23 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" >
-            <intent-filter>
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait">
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity android:name=".ListActivity"
-                  android:label="List">
+                  android:label="List"
+                  android:screenOrientation="portrait">
 
         </activity>
 
         <activity android:name=".EventActivity"
-                  android:label="Event">
+                  android:label="Event"
+                  android:screenOrientation="portrait">
 
         </activity>
     </application>
