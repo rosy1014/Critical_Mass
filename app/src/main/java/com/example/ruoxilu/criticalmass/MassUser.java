@@ -16,12 +16,12 @@ public class MassUser extends ParseObject{
 
     }
 
-    public ParseUser getUser() {
-        return getParseUser("user");
+    public String getUser() {
+        return getString("user");
     }
-
+    // user field takes ObjectId of Parse User
     public void setUser(ParseUser value) {
-        put("user", value);
+        put("user", value.getObjectId());
     }
 
     public ParseGeoPoint getLocation() {
@@ -31,6 +31,7 @@ public class MassUser extends ParseObject{
     public void setLocation(ParseGeoPoint value) {
         put("location", value);
     }
+
 
     public static ParseQuery<MassUser> getQuery(){
         return ParseQuery.getQuery(MassUser.class);

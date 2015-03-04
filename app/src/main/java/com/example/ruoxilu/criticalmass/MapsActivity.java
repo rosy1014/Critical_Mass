@@ -333,20 +333,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Log.i(APPTAG,"mCurrentlocation is NOT null");
             mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
         }
-        mMassUser.setUser(ParseUser.getCurrentUser());
-       // updateUserLocation(mMassUser.getLocation());
 
-        // Upload mMassUser to Parse Cloud
-//        mMassUser.saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                if (e == null) {
-//                    Log.d(APPTAG, "MassUser saved successfully.");
-//                } else {
-//                    Log.d(APPTAG, "MassUser failed to save." + e);
-//                }
-//            }
-//        });
+        Log.i(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
+        mMassUser.setUser(ParseUser.getCurrentUser());
+        updateUserLocation(mMassUser.getLocation());
 
 
     }
@@ -390,6 +380,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Log.i(APPTAG,"ANONYMOUS USER LOGGED IN");
         }
         setParseACL();
+        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
     }
 
 
@@ -407,7 +398,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return;
         }
         mLastLocation = location;
-        updateUserLocation(location);
+        updateUserLocation(geoPointFromLocation(location));
         updateZoom(location);
         doMapQuery();
 
@@ -438,16 +429,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     // TODO - update location, avoid duplicated entry in cloud
     // update the user's location by Location type data
-    protected void updateUserLocation(Location value) {
-        final ParseGeoPoint geoPointValue = geoPointFromLocation(value);
-        ParseQuery<ParseUser> innerQuery = ParseUser.getQuery();
+    protected void updateUserLocation(ParseGeoPoint value) {
+        final ParseGeoPoint geoPointValue = value;
+        //ParseQuery<ParseUser> innerQuery = ParseUser.getQuery();
         ParseQuery<MassUser> query = MassUser.getQuery();
-        innerQuery.whereEqualTo("objectId",mMassUser.getUser());
-        //Log.i(APPTAG, "In innerQuery, mMassUser.getUser() returns " +String.valueOf(mMassUser.getUser()));
-        //Log.i(APPTAG, "In innerQuery, mMassUser.getUser() returns " +String.valueOf(ParseUser.getCurrentUser()));
-        //ParseQuery<ParseUser> query = ParseUser.getQuery();
-        //query.whereEqualTo("user", String.valueOf(mMassUser.getUser()));
-        query.whereMatchesQuery("user", innerQuery);
+        query.whereEqualTo("user",mMassUser.getUser());
         Log.i(APPTAG,"Mass User in updateUserLocation is " + mMassUser.getUser());
         //Log.i(APPTAG, "Query key should match: " +ParseObject.createWithoutData("_User", String.valueOf(mMassUser.getUser())));
         query.getFirstInBackground(new GetCallback<MassUser>() {
@@ -532,7 +518,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // 4
         mapQuery.whereWithinKilometers("location", myPoint, SEARCH_DISTANCE);
         // 5
-        mapQuery.include("user");
+        //mapQuery.include("objectId");
         mapQuery.orderByDescending("createdAt");
        // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
         // 6
@@ -563,9 +549,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     if (mUser.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
                             / METERS_PER_KILOMETER) {
                         // Set up an out-of-range marker
+                        // Check for an existing out of range marker
+                        if (oldMarker != null) {
+                            if (oldMarker.getSnippet() == null) {
+                                // Out of range marker already exists, skip adding it
+                                continue;
+                            } else {
+                                // Marker now out of range, needs to be refreshed
+                                oldMarker.remove();
+                            }
+                        }
+
                     }
                     else {
                         // Set up an in-range marker
+                        // Check for an existing in range marker
+                        if (oldMarker != null) {
+                            if (oldMarker.getSnippet() != null) {
+                                // In range marker already exists, skip adding it
+                                continue;
+                            } else {
+                                // Marker now in range, needs to be refreshed
+                                oldMarker.remove();
+                            }
+                        }
                     }
                     // 7
                     Marker marker = mMap.addMarker(markerOpts);
