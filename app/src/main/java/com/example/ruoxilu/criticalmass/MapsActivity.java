@@ -76,15 +76,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
     private static final String APPTAG = "CriticalMass";
-    Button mMiddleBar;  // Directs to list activity
-    Button mLeftBar;    // Placeholder for login
-    Button mRightBar;   // Placeholder
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
     private Location mLastLocation;
-    private MassUser mMassUser;
+    private MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
@@ -94,16 +91,23 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private String selectedPostObjectId;
     private int mostRecentMapUpdate;
 
+    /*
+     * UI
+     */
+    Button mMiddleBar;  // Directs to list activity
+    Button mLeftBar;    // Placeholder for login
+    Button mRightBar;   // Placeholder
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(APPTAG,"onCreate");
         super.onCreate(savedInstanceState);
 
-        initLocationRequest();
-        initGoogleApiClient();
+        initLocationRequest(); // Helper function to initiate location request
+        initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
-        mMassUser = new MassUser();
-        Log.i(APPTAG, "mMassUser " + mMassUser);
+        mMassUser = new MassUser(); // Initialize mMassUser data object
+        //Log.d(APPTAG, "mMassUser " + mMassUser);
 
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
@@ -205,25 +209,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
-        Log.i(APPTAG,"On Resume, Google Api Client connect");
-        Log.i(APPTAG,"On Resume, my current location is " + mCurrentLocation);
+        //Log.d(APPTAG,"On Resume, Google Api Client connect");
+        //Log.d(APPTAG,"On Resume, my current location is " + mCurrentLocation);
         if(mCurrentLocation != null){
-            double latitude = mCurrentLocation.getLatitude();
-
-            // Get longitude of the current location
-            double longitude = mCurrentLocation.getLongitude();
-            Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
             // Create a LatLng object for the current location
+            double latitude = mCurrentLocation.getLatitude();
+            double longitude = mCurrentLocation.getLongitude();
             LatLng latLng = new LatLng(latitude,longitude);
-            // Get the bounds to zoom to
-            //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
-            // Zoom to the given bounds
+
+            // Move the camera to the place in interest
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
-            Log.i(APPTAG, "update camera on resume");
-
-            // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-           // mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
+            //Log.d(APPTAG, "update camera on resume");
         }
 
     }
@@ -288,20 +285,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Get Current Location
         Location mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
 
-        Log.i(APPTAG,"mCurrentLocation is " + mCurrentLocation );
-        double latitude = mCurrentLocation.getLatitude();
+        updateZoom(mCurrentLocation);
 
-        // Get longitude of the current location
-        double longitude = mCurrentLocation.getLongitude();
-        Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
-        // Create a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude,longitude);
-        // Get the bounds to zoom to
-     //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
-        // Zoom to the given bounds
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
-        Log.i(APPTAG, "update camera");
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -309,34 +294,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
 
-       // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-        //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
-        //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
-
     }
 
     @Override
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
         mCurrentLocation = getLocation();
-        Log.i(APPTAG,"ONCONNECTED");
+        //Log.d(APPTAG,"ONCONNECTED");
 
-        anonymousUserLogin();
+        anonymousUserLogin(); // Helper function to log in the user anonymously if not alreadly logged in
         starterPeriodicLocationUpdates();// connect googleFused api services
 
         // set up mMassUser
-        Log.i(APPTAG, "Current massuser is " + mMassUser);
+        mMassUser.setUser(ParseUser.getCurrentUser());
+        Log.d(APPTAG, "Current massuser is " + mMassUser);
         if(mCurrentLocation == null){
-            Log.i(APPTAG,"mCurrentlocation is null");
+            Log.d(APPTAG,"mCurrentlocation is null");
             mMassUser.setLocation(null);
         } else {
-            Log.i(APPTAG,"mCurrentlocation is NOT null");
+            Log.d(APPTAG,"mCurrentlocation is NOT null");
             mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
         }
+        Log.d(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
 
-        Log.i(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
-        mMassUser.setUser(ParseUser.getCurrentUser());
-        updateUserLocation(mMassUser.getLocation());
+        updateUserLocation(mMassUser.getLocation()); // update user's location in the MassUser table in Parse Cloud
 
 
     }
@@ -426,50 +407,51 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
        // Log.i(APPTAG, "geoPoint is " + geoPoint);
         return geoPoint;
     }
-
-    // TODO - update location, avoid duplicated entry in cloud
-    // update the user's location by Location type data
+    /*
+     * Helper function to update user's location in the MassUser table in cloud
+     *    if the user is not found in the table, save it to the cloud with the current location
+     *    if the user is already in the table, then replace the obsolete location with the current location.
+     */
     protected void updateUserLocation(ParseGeoPoint value) {
-        final ParseGeoPoint geoPointValue = value;
-        //ParseQuery<ParseUser> innerQuery = ParseUser.getQuery();
+        final ParseGeoPoint geoPointValue = value; // need "final" type to pass in the callback function
         ParseQuery<MassUser> query = MassUser.getQuery();
         query.whereEqualTo("user",mMassUser.getUser());
-        Log.i(APPTAG,"Mass User in updateUserLocation is " + mMassUser.getUser());
-        //Log.i(APPTAG, "Query key should match: " +ParseObject.createWithoutData("_User", String.valueOf(mMassUser.getUser())));
         query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
-                Log.i(APPTAG, "Done with getFirstInBackground loc " + e);
+                Log.d(APPTAG, "Done with getFirstInBackground loc " + e);
 
                 if (e == null) {
-                    Log.i(APPTAG, "massuser in updateUserLocation after query is " + massUser.getUser());
+                    // no error exception, the user is found in the cloud, update the location in the cloud
+                    Log.d(APPTAG, "massuser in updateUserLocation after query is " + massUser.getUser());
                     massUser.setLocation(geoPointValue);
                     massUser.saveInBackground(new SaveCallback() {
 
                         @Override
                         public void done(ParseException e) {
-                            Log.i(APPTAG, "Done with getFirstInBackground loc");
+                            Log.d(APPTAG, "Done with getFirstInBackground loc");
 
                             if (e==null){
-                                Log.i(APPTAG, "MassUser update saved successfully");
+                                Log.d(APPTAG, "MassUser update saved successfully");
                             } else {
-                                Log.i(APPTAG, "MassUser update were not saved");
+                                Log.d(APPTAG, "MassUser update were not saved");
                             }
                         }
                     });
-                    Log.i(APPTAG, "Updated the parse user's location");
+                    Log.d(APPTAG, "Updated the parse user's location");
                 } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                    // The user has not been saved into the cloud, save it with current location
                     mMassUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e==null){
-                                Log.i(APPTAG, "New MassUser saved successfully");
+                                Log.d(APPTAG, "New MassUser saved successfully");
                             } else {
-                                Log.i(APPTAG, "New MassUser were not saved");
+                                Log.d(APPTAG, "New MassUser were not saved");
                             }
                         }
                     });
-                    Log.i(APPTAG, "Saved new MassUser.");
+                    Log.d(APPTAG, "Saved new MassUser.");
                 } else {
                     // Do nothing
                 }
@@ -477,6 +459,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         });
         return;
     }
+
+    /*
+     * API calls to start/stop periodic location update, and get the current location.
+     */
 
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
@@ -486,7 +472,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         LocationServices.FusedLocationApi
                 .removeLocationUpdates(mGoogleApiClient, this);
     }
-
     private Location getLocation() {
         if(servicesConnected()) {
             return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -500,9 +485,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     private void updateZoom(Location location) {
         LatLng myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 17));
+        // Move the camera to the location in interest and zoom to appropriate level
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, ZOOM_LEVEL));
     }
-
+    /*
+     * Fetch data from the cloud and add markers to map.
+     */
     private void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
         // 1
@@ -588,7 +576,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
     }
-
+    /*
+     * Remove markers that are not in the Hashmap markersToKeep
+     */
     private void cleanUpMarkers(Set<String> markersToKeep) {
         for (String objId : new HashSet<String>(mapMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
@@ -599,7 +589,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         }
     }
-
 
 
     /*
