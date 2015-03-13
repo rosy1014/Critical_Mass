@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:id="@+id/map_screen"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/button_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/map_left_bar"
+            android:layout_width="135dp"
+            android:layout_height="20dp"
+            android:background="#FF112645"/>
+
+        <Button
+            android:id="@+id/map_middle_bar"
+            android:layout_width="335dp"
+            android:layout_height="20dp"
+            android:background="#FF9DADD6"/>
+
+        <Button
+            android:id="@+id/map_right_bar"
+            android:layout_width="135dp"
+            android:layout_height="20dp"
+            android:background="#FF112645"/>
+
+    </LinearLayout>
+
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="600dp"
+        android:layout_height="865dp"
+        tools:context=".MapsActivity"
+               tools:layout="@layout/activity_maps"/>
+
+
+
+    </LinearLayout><!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/layout/activity_maps.xml -->
