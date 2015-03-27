@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.LogInCallback;
@@ -75,12 +76,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
-    private static final String APPTAG = "CriticalMass";
+    public static final String APPTAG = "CriticalMass";
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private Location mCurrentLocation;
-    private Location mLastLocation;
+    public static Location mCurrentLocation;
+    public static Location mLastLocation;
     private MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
     // Fields for the map radius in feet
     private float radius;
