@@ -29,7 +29,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -324,20 +323,20 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Helper Function
      * Set up the ParseACL for the current user
      */
-    protected void setParseACL(){
-        ParseACL defaultACL = new ParseACL();
-
-        // Optionally enable public read access.
-        defaultACL.setPublicReadAccess(true);
-        defaultACL.setPublicWriteAccess(true);
-
-        ParseACL.setDefaultACL(defaultACL, true);
-
-        // allows read and write access to all users
-        ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
-        postACL.setPublicReadAccess(true);
-        postACL.setPublicWriteAccess(true);
-    }
+//    protected void setParseACL(){
+//        ParseACL defaultACL = new ParseACL();
+//
+//        // Optionally enable public read access.
+//        defaultACL.setPublicReadAccess(true);
+//        defaultACL.setPublicWriteAccess(true);
+//
+//        ParseACL.setDefaultACL(defaultACL, true);
+//
+//        // allows read and write access to all users
+//        ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
+//        postACL.setPublicReadAccess(true);
+//        postACL.setPublicWriteAccess(true);
+//    }
 
     /*
      * Helper Function
@@ -370,7 +369,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 //                }
 //            });
             Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
-            //Log.i(APPTAG,"ANONYMOUS USER LOGGED IN");
+
         }
        // setParseACL();
         Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
