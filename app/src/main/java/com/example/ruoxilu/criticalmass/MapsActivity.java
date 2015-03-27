@@ -29,7 +29,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.LogInCallback;
 import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
@@ -347,20 +346,33 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     protected void anonymousUserLogin(){
         ParseUser.enableAutomaticUser();
-        if(ParseUser.getCurrentUser()== null) {
-            ParseAnonymousUtils.logIn(new LogInCallback() {
-                @Override
-                public void done(ParseUser user, ParseException e) {
-                    if (e != null) {
-                        Log.d(APPTAG, "Anonymous login failed.");
-                    } else {
-                        Log.d(APPTAG, "Anonymous user logged in.");
-                    }
-                }
-            });
-            Log.i(APPTAG,"ANONYMOUS USER LOGGED IN");
+        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser());
+        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
+        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
+        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getUsername());
+        ParseUser puser = ParseUser.getCurrentUser();
+        String pid = puser.getObjectId();
+        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ pid);
+        if(pid == null) {
+            Log.d(APPTAG,  " In anonymousUserLogin, in if!!!!");
+            ParseAnonymousUtils.logInInBackground();
+//            ParseAnonymousUtils.logIn(new LogInCallback() {
+//
+//                @Override
+//                public void done(ParseUser user, ParseException e) {
+//                    if (e != null) {
+//                        Log.d(APPTAG, "Anonymous login failed.");
+//                    } else {
+//                        Log.d(APPTAG, "Anonymous user logged in.");
+//                        Log.d(APPTAG,  " in callback, ParseUser is "+ user.getObjectId());
+//                        Log.d(APPTAG,  " in callback, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
+//                    }
+//                }
+//            });
+            Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
+            //Log.i(APPTAG,"ANONYMOUS USER LOGGED IN");
         }
-        setParseACL();
+       // setParseACL();
         Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
     }
 
