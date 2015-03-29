@@ -76,7 +76,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
-    public static final String APPTAG = "CriticalMass";
+    private static final String APPTAG = "CriticalMass";
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;

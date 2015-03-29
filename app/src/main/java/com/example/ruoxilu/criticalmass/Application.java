@@ -6,6 +6,8 @@ import com.parse.ParseObject;
 
 public class Application extends android.app.Application {
 
+    public static final String APPTAG = "CriticalMass";
+
     @Override
     public void onCreate() {
         super.onCreate();

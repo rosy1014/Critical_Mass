@@ -47,215 +47,62 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/activity_1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffffffff">
 
-                <ImageView
-                    android:id="@+id/event_1"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
+            <ListView
+                android:id="@+id/simple_list-view"
+                android:layout_width="@dimen/abc_text_size_body_1_material"
+                android:layout_height="@dimen/abc_action_bar_default_height_material"></ListView>
+            <!--<LinearLayout-->
+                <!--android:id="@+id/activity_1"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:background="#ffffffff">-->
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical|left"
-                    android:padding="20dp"
-                    android:text="@string/event_1"
-                    android:textSize="30sp"/>
+                <!--<ImageView-->
+                    <!--android:id="@+id/event_1"-->
+                    <!--android:layout_width="120dp"-->
+                    <!--android:layout_height="120dp"-->
+                    <!--android:layout_weight="0.2"-->
+                    <!--android:padding="5dp"-->
+                    <!--android:src="@drawable/giraffe"/>-->
 
-            </LinearLayout>
+                <!--<TextView-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="fill_parent"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:layout_weight="0.8"-->
+                    <!--android:gravity="center_vertical|left"-->
+                    <!--android:padding="20dp"-->
+                    <!--android:text="@string/event_1"-->
+                    <!--android:textSize="30sp"/>-->
 
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffadd3eb">
-
-                <ImageView
-                    android:id="@+id/event_2"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_2"
-                    android:textSize="30sp"/>
-
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffffffff">
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:background="#ffadd3eb">-->
 
-                <ImageView
-                    android:id="@+id/event_3"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
+                <!--<ImageView-->
+                    <!--android:id="@+id/event_2"-->
+                    <!--android:layout_width="120dp"-->
+                    <!--android:layout_height="120dp"-->
+                    <!--android:layout_weight="0.2"-->
+                    <!--android:padding="5dp"-->
+                    <!--android:src="@drawable/giraffe"/>-->
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_3"
-                    android:textSize="30sp"/>
+                <!--<TextView-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="fill_parent"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:layout_weight="0.8"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:padding="20dp"-->
+                    <!--android:text="@string/event_2"-->
+                    <!--android:textSize="30sp"/>-->
 
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffadd3eb">
-
-                <ImageView
-                    android:id="@+id/event_4"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_4"
-                    android:textSize="30sp"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffffffff">
-
-                <ImageView
-                    android:id="@+id/event_5"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_5"
-                    android:textSize="30sp"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffadd3eb">
-
-                <ImageView
-                    android:id="@+id/event_6"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_6"
-                    android:textSize="30sp"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffffffff">
-
-                <ImageView
-                    android:id="@+id/event_7"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:background="#ffffffff"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_7"
-                    android:textSize="30sp"/>
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#ffadd3eb">
-
-                <ImageView
-                    android:id="@+id/event_8"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_weight="0.2"
-                    android:padding="5dp"
-                    android:src="@drawable/giraffe"/>
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.8"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
-                    android:text="@string/event_8"
-                    android:textSize="30sp"/>
-
-            </LinearLayout>
-
+            <!--</LinearLayout>-->
 
 
 

@@ -9,11 +9,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.util.Log;
+import android.widget.AdapterView.OnItemClickListener;
 
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.widget.ListView;
+import android.widget.Toolbar;
 
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -24,39 +26,19 @@ import java.text.ParseException;
 
 /**
  * Created by tingyu on 2/23/15.
+ * The ListActivity class displays a list of masses nearby. ListActivity fetches data from parse
+ * through the ParseQueryAdapter and bind it to the ListView.
  */
 public class ListActivity extends Activity {
 
-    private ParseQueryAdapter<ParseObject> eventListAdapter;
+    private ListActivityAdapter eventListAdapter;
     ListView mActivityOne;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        ParseQueryAdapter.QueryFactory<ParseObject> factoryNearbyPost =
-                new ParseQueryAdapter.QueryFactory<ParseObject>() {
-                    public ParseQuery create() {
-                        Location userCurrentLocation = MapsActivity.mCurrentLocation;
-                        Location userLastLocation = MapsActivity.mLastLocation;
-
-                        if (userCurrentLocation == null) {
-                            Log.i(MapsActivity.APPTAG, "the current location is null");
-                            userCurrentLocation = userLastLocation;
-                        }
-
-                        ParseQuery queryNearbyEvents = new ParseQuery("MassEvent");
-                        queryNearbyEvents.whereNear("location",
-                                geoPointFromLocation(userCurrentLocation));
-
-                        queryNearbyEvents.setLimit(10);
-
-                        return queryNearbyEvents;
-
-                    }
-                };
-
-        eventListAdapter = new ParseQueryAdapter<ParseObject>(this, factoryNearbyPost);
+        eventListAdapter = new ListActivityAdapter(this);
 
 //        eventListAdapter.
 //                addOnQueryLoadListener(
@@ -79,24 +61,21 @@ public class ListActivity extends Activity {
         // Disable paignation.
         eventListAdapter.setPaginationEnabled(false);
 
-        mActivityOne = (ListView) findViewById(R.id.activity_1);
+        mActivityOne = (ListView) findViewById(R.id.simple_list_view);
 
-//        mActivityOne.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(ListActivity.this, EventActivity.class);
-//                startActivityForResult(i, 0);
-//            }
-//        });
+        // Bind data from adapter to ListView.
+        mActivityOne.setAdapter(eventListAdapter);
+        eventListAdapter.loadObjects();
+
+        // Load EventActivity when user clicks on a mass in the list
+        mActivityOne.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                
+            }
+        });
     }
 
 
-
-
-    private ParseGeoPoint geoPointFromLocation(Location location) {
-        ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        // Log.i(APPTAG, "geoPoint is " + geoPoint);
-        return geoPoint;
-    }
 
 }
