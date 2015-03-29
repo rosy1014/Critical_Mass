@@ -29,8 +29,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.LogInCallback;
-import com.parse.ParseACL;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -293,6 +291,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         // Get longitude of the current location
         double longitude = mCurrentLocation.getLongitude();
+        double latitude = mCurrentLocation.getLatitude();
         Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
         // Create a LatLng object for the current location
         LatLng latLng = new LatLng(latitude,longitude);
@@ -396,7 +395,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
 
         }
-        setParseACL();
+        //setParseACL();
         Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
     }
 
