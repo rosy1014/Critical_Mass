@@ -85,6 +85,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private Location mCurrentLocation;
     private Location mLastLocation;
     private MassUser mMassUser;
+
+    private MassEvent mMassEvent; //
+    private String mEventID;
+
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
@@ -319,6 +323,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
         mCurrentLocation = getLocation();
+        mEventID = mMassUser.getEvent();//find the last event
+
+        // EventSize = 1;// temporary event size for now
         Log.i(APPTAG,"ONCONNECTED");
 
         anonymousUserLogin();
@@ -332,6 +339,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         } else {
             Log.i(APPTAG,"mCurrentlocation is NOT null");
             mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
+            //
+            // mMassEvent.setLocation(geoPointFromLocation(mCurrentLocation));
+            // mMassEvent.setEventSize(EventSize);
+
         }
 
         Log.i(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
@@ -339,7 +350,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         updateUserLocation(mMassUser.getLocation());
 
 
+        // update MassEvent
+        Log.i(APPTAG, "Event ID of current user is " + mEventID);
+        updateUserEvent(geoPointFromLocation(mCurrentLocation));
     }
+
+
+
+
     /*
      * Helper Function
      * Set up the ParseACL for the current user
@@ -390,6 +408,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
 
     @Override
+    // passes in the user current location as input
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         if (mLastLocation != null
@@ -402,7 +421,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         updateZoom(location);
         doMapQuery();
 
+        updateUserEvent(geoPointFromLocation(mCurrentLocation));//helper function to update event as location changes
     }
+
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -478,6 +499,76 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         return;
     }
 
+
+    // helper function to update the user's event by event type data(Xin)
+    protected void updateUserEvent(ParseGeoPoint value){
+        // Find by ID the user's last event
+        mEventID = mMassUser.getEvent();
+
+        // the user current location
+        final ParseGeoPoint currentLocation = value;
+
+        //This is the first query to validate the user's last event
+        final ParseQuery<MassEvent> query1 = MassEvent.getQuery();
+
+        // This is the second query to find the user's new event
+        final ParseQuery<MassEvent> query2 = MassEvent.getQuery();
+
+        // check if the user's old event exists
+        query1.whereEqualTo("event",mEventID);
+
+        Log.i(APPTAG,"Mass User in updateUserEvent is " + mEventID);
+
+        query1.getFirstInBackground(new GetCallback<MassEvent>() {
+            @Override
+            public void done(MassEvent massEvent, ParseException e) {
+                Log.i(APPTAG, "Done with getFirstInBackground loc " + e);
+                // the event ID is found
+                if (e == null) {
+                    Log.i(APPTAG, "massevent in updateUserLocation after query is " + massEvent.getEvent());
+
+                    // check if the user is still within the event radius
+                    double distance = currentLocation
+                            .distanceInKilometersTo(massEvent.getLocation());
+                    // the user is no longer inside the event
+                    if (distance > massEvent.getRadius()) {
+                        // decrement the old event size as the user is no longer there
+                        int size = massEvent.getEventSize();
+                        size = size - 1;
+                        massEvent.setEventSize(size);
+
+                        // search for new event, if any,  that includes the user
+                        double maxDistance = 10;
+
+                        // finding objects in "event" near the point given and within the maximum distance given.
+                        query2.whereWithinKilometers("location", currentLocation, maxDistance);
+
+                        // Since the user can only be in one event at a time, use getFirstInBackground
+                        query2.getFirstInBackground(new GetCallback<MassEvent>() {
+                            @Override
+                            public void done(MassEvent massEvent, ParseException e) {
+                                if (e == null) {
+                                    Log.i(APPTAG, "the current massevent is " + massEvent.getEvent());
+                                    int size = massEvent.getEventSize();
+                                    size = size - 1;
+                                    massEvent.setEventSize(size);
+                                } else {
+                                    // No new event found
+                                    Log.i(APPTAG, "new event not found ");
+                                }
+                            }
+                        });
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
+
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
                 .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -513,6 +604,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
         // 2
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
+
         // 3
         ParseQuery<MassUser> mapQuery = MassUser.getQuery();
         // 4
