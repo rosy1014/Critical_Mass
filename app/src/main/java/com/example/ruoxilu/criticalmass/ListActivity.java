@@ -23,16 +23,28 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQueryAdapter.OnQueryLoadListener;
 import java.text.ParseException;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 /**
  * Created by tingyu on 2/23/15.
  * The ListActivity class displays a list of masses nearby. ListActivity fetches data from parse
  * through the ParseQueryAdapter and bind it to the ListView.
  */
-public class ListActivity extends Activity {
+public class ListActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
+
+    Button mButton;
+    EditText mEditText;
+    // ListView mListView;
 
     private ListActivityAdapter eventListAdapter;
     ListView mActivityOne;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,5 +89,34 @@ public class ListActivity extends Activity {
     }
 
 
+    @Override
+    public void onClick(View v) {
+
+        mEventlist.add(mEditText.getText().toString());
+        mArrayAdapter.notifyDataSetChanged();
+
+        // After a mass event is created, set EditText to empty
+        // so that the user does not have to delete the text manually
+        mEditText.setText(R.string.empty);
+
+        // Notify the user that the event has been created successfully
+        Toast.makeText(this,
+                R.string.creation_toast,
+                Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+>>>>>>> user-interface
+
+        // When a mass event is clicked, open the event activity
+        // Currently the event activity is static
+
+<<<<<<< HEAD
+=======
+        Intent i = new Intent(ListActivity.this, EventActivity.class);
+        startActivityForResult(i, 0);
+    }
 
 }

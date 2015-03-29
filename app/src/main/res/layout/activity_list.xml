@@ -28,21 +28,10 @@
 
             <!-- /LinearLayout -->
 
-
-    <ScrollView
-        android:id="@+id/scroll_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:padding="10dp">
-
-        <!-- TODO
-                Change to ListView and add appropriate adaptor so that the activity list gets real time updates
-                No need for a ScrollView in that case -->
-
-        <LinearLayout
+        <ListView
+            android:id="@+id/event_listview"
             android:layout_width="match_parent"
+<<<<<<< HEAD
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -113,6 +102,35 @@
 
 
         </ScrollView>
+=======
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <!-- Displays keyboard when touched -->
+            <EditText
+                android:id="@+id/add_event_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:hint="@string/hint"/>
+
+            <Button
+                android:id="@+id/create_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/enter_text"/>
+
+
+        </LinearLayout>
+>>>>>>> user-interface
 
 
     </LinearLayout>
