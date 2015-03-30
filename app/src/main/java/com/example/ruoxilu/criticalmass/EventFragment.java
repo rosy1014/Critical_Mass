@@ -6,12 +6,15 @@ import android.os.Bundle;
 /**
  * Created by tingyu on 2/26/15.
  */
-public class EventActivity extends Fragment {
+public class EventFragment extends Fragment {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_event);
+
+
     }
 
 }

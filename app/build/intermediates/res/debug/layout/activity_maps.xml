@@ -4,12 +4,18 @@
     android:id="@+id/map_screen"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+<<<<<<< HEAD
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+=======
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+>>>>>>> master
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/button_panel"
+<<<<<<< HEAD
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -19,18 +25,43 @@
             android:id="@+id/map_left_bar"
             android:layout_width="135dp"
             android:layout_height="20dp"
+=======
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <Button
+            android:id="@+id/map_left_bar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+>>>>>>> master
             android:background="#FF112645"/>
 
         <Button
             android:id="@+id/map_middle_bar"
+<<<<<<< HEAD
             android:layout_width="335dp"
             android:layout_height="20dp"
+=======
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+>>>>>>> master
             android:background="#FF9DADD6"/>
 
         <Button
             android:id="@+id/map_right_bar"
+<<<<<<< HEAD
             android:layout_width="135dp"
             android:layout_height="20dp"
+=======
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_weight="1"
+>>>>>>> master
             android:background="#FF112645"/>
 
     </LinearLayout>
@@ -39,6 +70,7 @@
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
+<<<<<<< HEAD
         android:layout_width="600dp"
         android:layout_height="865dp"
         tools:context=".MapsActivity"
@@ -47,3 +79,12 @@
 
 
     </LinearLayout><!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/layout/activity_maps.xml -->
+=======
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity"
+        tools:layout="@layout/activity_maps"/>
+
+
+</LinearLayout><!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/layout/activity_maps.xml -->
+>>>>>>> master

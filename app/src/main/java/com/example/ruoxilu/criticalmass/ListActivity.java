@@ -17,6 +17,8 @@ import android.location.LocationManager;
 import android.widget.ListView;
 import android.widget.Toolbar;
 
+import android.app.Fragment;
+
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -38,9 +40,6 @@ import java.util.ArrayList;
  */
 public class ListActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
-    Button mButton;
-    EditText mEditText;
-    // ListView mListView;
 
     private ListActivityAdapter eventListAdapter;
     ListView mActivityOne;
@@ -49,6 +48,7 @@ public class ListActivity extends Activity implements View.OnClickListener, Adap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
 
         eventListAdapter = new ListActivityAdapter(this);
 
@@ -65,15 +65,17 @@ public class ListActivity extends Activity implements View.OnClickListener, Adap
 //                        }
 //                );
 
-        // TODO Depend on whether we assign name to events.
-        // eventListAdapter.setTextKey("name");
-        // TODO Disable this until new icons are created
+        // TODO Depend on whether we assign name to events. For now it uses ObjectId.
+        eventListAdapter.setTextKey("objectId");
+        // TODO Disable this until new icons are created. A good way to do this is if each user is
+        // given a default profile image and an event image is created with users' images.
         // eventListAdapter.setImageKey("icons");
+
 
         // Disable paignation.
         eventListAdapter.setPaginationEnabled(false);
 
-        mActivityOne = (ListView) findViewById(R.id.simple_list_view);
+        mActivityOne = (ListView) findViewById(R.id.event_list);
 
         // Bind data from adapter to ListView.
         mActivityOne.setAdapter(eventListAdapter);
@@ -83,40 +85,10 @@ public class ListActivity extends Activity implements View.OnClickListener, Adap
         mActivityOne.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                Fragment detailEvent = EventFragment.newInstance(id);
             }
         });
     }
 
-
-    @Override
-    public void onClick(View v) {
-
-        mEventlist.add(mEditText.getText().toString());
-        mArrayAdapter.notifyDataSetChanged();
-
-        // After a mass event is created, set EditText to empty
-        // so that the user does not have to delete the text manually
-        mEditText.setText(R.string.empty);
-
-        // Notify the user that the event has been created successfully
-        Toast.makeText(this,
-                R.string.creation_toast,
-                Toast.LENGTH_SHORT).show();
-
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
->>>>>>> user-interface
-
-        // When a mass event is clicked, open the event activity
-        // Currently the event activity is static
-
-<<<<<<< HEAD
-=======
-        Intent i = new Intent(ListActivity.this, EventActivity.class);
-        startActivityForResult(i, 0);
-    }
 
 }

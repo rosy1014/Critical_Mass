@@ -68,6 +68,12 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
 
         super.getItemView(object, v, parent);
 
+        TextView titleTextView = (TextView) v.findViewById(R.id.title_text);
+        titleTextView.setText(object.getString("objectId"));
+
+        TextView eventSizeTextView = (TextView) v.findViewById(R.id.event_size);
+        eventSizeTextView.setText(object.getString("EventSize"));
+
         return v;
     }
 

@@ -262,7 +262,11 @@
     <string name="event_8">This is a placeholder for event 8.</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/debug/res/values/google_maps_api.xml -->
     <eat-comment/>
+<<<<<<< HEAD
     <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyAbfWVDbNrOS29uBQpeXYSnrY_sKNEx3SA</string>
+=======
+    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyBLw-IlRkg2rLKxlf_EN5_PApSiuSrGGws</string>
+>>>>>>> master
     <string name="google_maps_key_instructions" templateMergeStrategy="replace"><!--
 
     TODO: Before you run your application, you need a Google Maps API key.

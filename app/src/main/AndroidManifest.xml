@@ -60,7 +60,7 @@
                   android:label="List">
         </activity>
 
-        <activity android:name=".EventActivity"
+        <activity android:name=".EventFragment"
                   android:label="Event">
         </activity>
 
