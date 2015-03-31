@@ -11,8 +11,9 @@ import com.parse.ParseQuery;
 @ParseClassName("MassEvent")
 public class MassEvent extends ParseObject{
 
+    // The constructor is currently not used
     public MassEvent(){
-
+        
     }
 
     // Every event is associated with an event ID
