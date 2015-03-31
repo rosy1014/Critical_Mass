@@ -609,7 +609,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // 2
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         // 3
-        ParseQuery<MassUser> mapQuery = MassUser.getQuery();
+        ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
         // 4
         mapQuery.whereWithinKilometers("location", myPoint, SEARCH_DISTANCE);
         // 5
@@ -617,9 +617,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mapQuery.orderByDescending("createdAt");
        // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
         // 6
-        mapQuery.findInBackground(new FindCallback<MassUser>() {
+        mapQuery.findInBackground(new FindCallback<MassEvent>() {
             @Override
-            public void done(List<MassUser> objects, ParseException e) {
+            public void done(List<MassEvent> objects, ParseException e) {
                 if (e != null) {
                     Log.d(APPTAG, "An error occurred while querying for map posts.", e);
                     return;
@@ -631,17 +631,17 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 // Handle the results
                 Set<String> toKeep = new HashSet<String>();
                 // 2
-                for (MassUser mUser : objects) {
+                for (MassEvent mEvent : objects) {
                     // 3
-                    toKeep.add(mUser.getObjectId());
+                    toKeep.add(mEvent.getObjectId());
                     // 4
-                    Marker oldMarker = mapMarkers.get(mUser.getObjectId());
+                    Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
                     // 5
                     MarkerOptions markerOpts =
-                            new MarkerOptions().position(new LatLng(mUser.getLocation().getLatitude(), mUser
+                            new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
                                     .getLocation().getLongitude()));
                     // 6
-                    if (mUser.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                    if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
                             / METERS_PER_KILOMETER) {
                         // Set up an out-of-range marker
                         // Check for an existing out of range marker
@@ -671,9 +671,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     }
                     // 7
                     Marker marker = mMap.addMarker(markerOpts);
-                    mapMarkers.put(mUser.getObjectId(), marker);
+                    mapMarkers.put(mEvent.getObjectId(), marker);
                     // 8
-                    if (mUser.getObjectId().equals(selectedPostObjectId)) {
+                    if (mEvent.getObjectId().equals(selectedPostObjectId)) {
                         marker.showInfoWindow();
                         selectedPostObjectId = null;
                     }
