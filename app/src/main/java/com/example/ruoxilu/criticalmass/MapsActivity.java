@@ -239,6 +239,25 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
+    @Override
+    //TODO
+    // Must call super.onDestroy() at the end.
+    protected void onDestroy(){
+        ParseQuery<MassUser> query = MassUser.getQuery();
+        query.whereEqualTo("user", mMassUser.getUser());
+        query.getFirstInBackground(new GetCallback<MassUser>(){
+            @Override
+            public void done(MassUser massUser, ParseException e) {
+                if(e==null){
+                    massUser.deleteInBackground();
+                } else {
+                    Log.d(APPTAG, "Failed to find the current mass user");
+                }
+            }
+        });
+        super.onDestroy();
+    }
+
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
