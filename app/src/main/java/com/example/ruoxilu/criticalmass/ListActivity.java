@@ -16,7 +16,7 @@ import android.app.Fragment;
  * The ListActivity class displays a list of masses nearby. ListActivity fetches data from parse
  * through the ParseQueryAdapter and bind it to the ListView.
  */
-public class ListActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class ListActivity extends Activity {
 
 
     private ListActivityAdapter eventListAdapter;
