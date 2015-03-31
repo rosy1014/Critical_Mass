@@ -44,7 +44,7 @@ public class ListActivity extends Activity {
 //                );
 
         // TODO Depend on whether we assign name to events. For now it uses ObjectId.
-        eventListAdapter.setTextKey("objectId");
+        // eventListAdapter.setTextKey("objectId");
         // TODO Disable this until new icons are created. A good way to do this is if each user is
         // given a default profile image and an event image is created with users' images.
         // eventListAdapter.setImageKey("icons");
@@ -59,16 +59,17 @@ public class ListActivity extends Activity {
         mActivityOne.setAdapter(eventListAdapter);
         eventListAdapter.loadObjects();
 
-        // Load EventActivity when user clicks on a mass in the list
-        mActivityOne.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent eventDetailIntent = new Intent();
-                eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                eventDetailIntent.putExtra("objectId", id);
-                startActivity(eventDetailIntent);
-            }
-        });
+
+//        // Load EventActivity when user clicks on a mass in the list
+//        mActivityOne.setOnItemClickListener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Intent eventDetailIntent = new Intent();
+//                eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+//                eventDetailIntent.putExtra("objectId", id);
+//                startActivity(eventDetailIntent);
+//            }
+//        });
     }
 
 

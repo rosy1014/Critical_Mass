@@ -261,7 +261,7 @@
     <string name="enter_text">Create!</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/debug/res/values/google_maps_api.xml -->
     <eat-comment/>
-    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyBLw-IlRkg2rLKxlf_EN5_PApSiuSrGGws</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyCrAtLzNs50HDKE6ZFXLKd2Uy9GMmy3dYQ</string>
     <string name="google_maps_key_instructions" templateMergeStrategy="replace"><!--
 
     TODO: Before you run your application, you need a Google Maps API key.

@@ -16,8 +16,6 @@
         <dex dex="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/classes-15c6ce4c393bd343c0e8c6945f1bd23b2431a288.jar" />
     </item>
     <item
-<<<<<<< HEAD
-=======
         jar="/Users/angeloliao/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-android/1.2.0/6ee2953ccf51ce72b6d548c30c4633b99eb4f9dd/bolts-android-1.2.0.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -32,7 +30,6 @@
         <dex dex="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/classes-c9743ef4d23e22b3ae61522c9827749c2b7fbbff.jar" />
     </item>
     <item
->>>>>>> master
         jar="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -53,22 +50,5 @@
         sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
         <dex dex="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-e29db490f1cec427a03a3c84fa78dd65e63ac3b7.jar" />
     </item>
-<<<<<<< HEAD
-    <item
-        jar="/Users/angeloliao/.gradle/caches/modules-2/files-2.1/com.parse.bolts/bolts-android/1.2.0/6ee2953ccf51ce72b6d548c30c4633b99eb4f9dd/bolts-android-1.2.0.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="6ee2953ccf51ce72b6d548c30c4633b99eb4f9dd">
-        <dex dex="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/bolts-android-1.2.0-6fc125cce677bdc2506d4701ac5320e425dab408.jar" />
-    </item>
-    <item
-        jar="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
-        <dex dex="/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/classes-c9743ef4d23e22b3ae61522c9827749c2b7fbbff.jar" />
-    </item>
-=======
->>>>>>> master
 
 </items>

@@ -20,6 +20,7 @@ import android.widget.Toolbar;
 import android.content.Context;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -54,6 +55,22 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
 
                         queryNearbyEvents.setLimit(10);
 
+//                        queryNearbyEvents.findInBackground(new FindCallback() {
+//                            @Override
+//                            public void done(List list, com.parse.ParseException e) {
+//
+//                                if (e == null) {
+//                                    Log.d(Application.APPTAG, list.toString());
+//                                }
+//                                else {
+//                                    Log.d(Application.APPTAG, e.getMessage());
+//                                }
+//
+//                            }
+//                        });
+
+                        //Log.d(Application.APPTAG, "finish the query");
+
                         return queryNearbyEvents;
                     }
                 }
@@ -63,7 +80,7 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
     // Customize the layout by overriding getItemView
     public View getItemView(ParseObject object, View v, ViewGroup parent) {
         if (v == null) {
-            v = View.inflate(getContext(), R.layout.activity_list, null);
+            v = View.inflate(getContext(), R.layout.list_item, null);
         }
 
         super.getItemView(object, v, parent);
