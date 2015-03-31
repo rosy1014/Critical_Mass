@@ -172,10 +172,10 @@ public final class R {
 		public static final int common_signin_button_text_long = 0x7f0b0030;
 		public static final int create_calendar_message = 0x7f0b0031;
 		public static final int create_calendar_title = 0x7f0b0032;
-		public static final int decline = 0x7f0b0033;
-		public static final int store_picture_message = 0x7f0b003f;
-		public static final int store_picture_title = 0x7f0b0040;
-		public static final int wallet_buy_button_place_holder = 0x7f0b0044;
+		public static final int decline = 0x7f0b0034;
+		public static final int store_picture_message = 0x7f0b003b;
+		public static final int store_picture_title = 0x7f0b003c;
+		public static final int wallet_buy_button_place_holder = 0x7f0b0040;
 	}
 	public static final class style {
 		public static final int Theme_IAPTheme = 0x7f0c00a8;

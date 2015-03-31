@@ -249,24 +249,19 @@
     <eat-comment/>
     <string name="create_calendar_message">Allow Ad to create a calendar event?</string>
     <string name="create_calendar_title">Create calendar event</string>
+    <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="creation_toast">New mass event has been created!</string>
+    <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/res/values/admob_strings.xml -->
+    <eat-comment/>
     <string name="decline">Decline</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="event_1">Giraffe watching in the 5Cs!</string>
-    <string name="event_2">This is a placeholder for event 2.</string>
-    <string name="event_3">This is a placeholder for event 3.</string>
-    <string name="event_4">This is a placeholder for event 4.</string>
-    <string name="event_5">This is a placeholder for event 5.</string>
-    <string name="event_6">This is a placeholder for event 6.</string>
-    <string name="event_7">This is a placeholder for event 7.</string>
-    <string name="event_8">This is a placeholder for event 8.</string>
+    <string name="empty"/>
+    <string name="enter_text">Create!</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/debug/res/values/google_maps_api.xml -->
     <eat-comment/>
-<<<<<<< HEAD
-    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyAbfWVDbNrOS29uBQpeXYSnrY_sKNEx3SA</string>
-=======
     <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyBLw-IlRkg2rLKxlf_EN5_PApSiuSrGGws</string>
->>>>>>> master
     <string name="google_maps_key_instructions" templateMergeStrategy="replace"><!--
 
     TODO: Before you run your application, you need a Google Maps API key.
@@ -284,6 +279,7 @@ https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="hello_world">Hello world!</string>
+    <string name="hint">Create your mass event here!</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/res/values/admob_strings.xml -->
     <eat-comment/>
     <string name="store_picture_message">"Allow Ad to store image in Picture gallery?"</string>

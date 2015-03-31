@@ -75,11 +75,6 @@ MERGED from com.android.support:appcompat-v7:21.0.3:16:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
 MERGED from com.google.android.gms:play-services:6.5.87:20:5
 MERGED from com.android.support:support-v4:21.0.3:16:5
-<<<<<<< HEAD
-	android:screenOrientation
-		ADDED from AndroidManifest.xml:40:9
-=======
->>>>>>> master
 	android:label
 		ADDED from AndroidManifest.xml:39:9
 	android:allowBackup
@@ -87,46 +82,6 @@ MERGED from com.android.support:support-v4:21.0.3:16:5
 	android:icon
 		ADDED from AndroidManifest.xml:38:9
 	android:theme
-<<<<<<< HEAD
-		ADDED from AndroidManifest.xml:41:9
-	android:name
-		ADDED from AndroidManifest.xml:36:9
-meta-data#com.google.android.gms.version
-ADDED from AndroidManifest.xml:42:5
-MERGED from com.google.android.gms:play-services:6.5.87:21:9
-	android:value
-		ADDED from AndroidManifest.xml:44:13
-	android:name
-		ADDED from AndroidManifest.xml:43:13
-meta-data#com.google.android.maps.v2.API_KEY
-ADDED from AndroidManifest.xml:45:9
-	android:value
-		ADDED from AndroidManifest.xml:47:13
-	android:name
-		ADDED from AndroidManifest.xml:46:13
-activity#com.example.ruoxilu.criticalmass.MapsActivity
-ADDED from AndroidManifest.xml:49:9
-	android:screenOrientation
-		ADDED from AndroidManifest.xml:52:13
-	android:label
-		ADDED from AndroidManifest.xml:51:13
-	android:name
-		ADDED from AndroidManifest.xml:50:13
-intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:53:9
-action#android.intent.action.MAIN
-ADDED from AndroidManifest.xml:54:17
-	android:name
-		ADDED from AndroidManifest.xml:54:25
-category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:55:17
-	android:name
-		ADDED from AndroidManifest.xml:55:27
-activity#com.example.ruoxilu.criticalmass.ListActivity
-ADDED from AndroidManifest.xml:59:9
-	android:screenOrientation
-		ADDED from AndroidManifest.xml:61:19
-=======
 		ADDED from AndroidManifest.xml:40:9
 	android:name
 		ADDED from AndroidManifest.xml:36:9
@@ -161,24 +116,13 @@ ADDED from AndroidManifest.xml:54:17
 		ADDED from AndroidManifest.xml:54:27
 activity#com.example.ruoxilu.criticalmass.ListActivity
 ADDED from AndroidManifest.xml:59:9
->>>>>>> master
 	android:label
 		ADDED from AndroidManifest.xml:60:19
 	android:name
 		ADDED from AndroidManifest.xml:59:19
 activity#com.example.ruoxilu.criticalmass.EventActivity
-<<<<<<< HEAD
-ADDED from AndroidManifest.xml:65:9
-	android:screenOrientation
-		ADDED from AndroidManifest.xml:67:19
-	android:label
-		ADDED from AndroidManifest.xml:66:19
-	android:name
-		ADDED from AndroidManifest.xml:65:19
-=======
 ADDED from AndroidManifest.xml:63:9
 	android:label
 		ADDED from AndroidManifest.xml:64:19
 	android:name
 		ADDED from AndroidManifest.xml:63:19
->>>>>>> master

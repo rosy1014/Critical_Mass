@@ -1,37 +1,15 @@
 package com.example.ruoxilu.criticalmass;
 
-import java.util.List;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
-import android.util.Log;
 import android.widget.AdapterView.OnItemClickListener;
 
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.widget.ListView;
-import android.widget.Toolbar;
+import android.content.Intent;
 
 import android.app.Fragment;
-
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseQueryAdapter;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseQueryAdapter.OnQueryLoadListener;
-import java.text.ParseException;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 /**
  * Created by tingyu on 2/23/15.
@@ -85,7 +63,10 @@ public class ListActivity extends Activity implements View.OnClickListener, Adap
         mActivityOne.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Fragment detailEvent = EventFragment.newInstance(id);
+                Intent eventDetailIntent = new Intent();
+                eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+                eventDetailIntent.putExtra("objectId", id);
+                startActivity(eventDetailIntent);
             }
         });
     }

@@ -84,7 +84,8 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
 //
 //    }
 
-    private ParseGeoPoint geoPointFromLocation(Location location) {
+    // The "static" keyword was added so that the constructor can call this function.
+    private static ParseGeoPoint geoPointFromLocation(Location location) {
         ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
         Log.i(Application.APPTAG, "geoPoint is " + geoPoint);
         return geoPoint;

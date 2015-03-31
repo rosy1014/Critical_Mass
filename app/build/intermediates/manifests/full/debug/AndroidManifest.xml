@@ -36,10 +36,6 @@
         android:allowBackup="true"
         android:icon="@drawable/pinicon"
         android:label="@string/app_name"
-<<<<<<< HEAD
-        android:screenOrientation="portrait"
-=======
->>>>>>> master
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.google.android.gms.version"
@@ -50,12 +46,7 @@
 
         <activity
             android:name="com.example.ruoxilu.criticalmass.MapsActivity"
-<<<<<<< HEAD
-            android:label="@string/title_activity_maps"
-            android:screenOrientation="portrait" >
-=======
             android:label="@string/title_activity_maps" >
->>>>>>> master
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,21 +55,11 @@
         </activity>
         <activity
             android:name="com.example.ruoxilu.criticalmass.ListActivity"
-<<<<<<< HEAD
-            android:label="List"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name="com.example.ruoxilu.criticalmass.EventActivity"
-            android:label="Event"
-            android:screenOrientation="portrait" >
-=======
             android:label="List" >
         </activity>
         <activity
             android:name="com.example.ruoxilu.criticalmass.EventActivity"
             android:label="Event" >
->>>>>>> master
         </activity>
     </application>
 
