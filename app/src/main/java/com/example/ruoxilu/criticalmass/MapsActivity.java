@@ -504,6 +504,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
 
     // helper function to update the user's event by event type data(Xin)
+    // pass in the current location
     protected void updateUserEvent(ParseGeoPoint value){
         // Find by ID the user's last event
         mEventID = mMassUser.getEvent();
@@ -533,15 +534,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     // check if the user is still within the event radius
                     double distance = currentLocation
                             .distanceInKilometersTo(massEvent.getLocation());
-                    // the user is no longer inside the event
+                    // the user is no longer inside the old event
                     if (distance > massEvent.getRadius()) {
                         // decrement the old event size as the user is no longer there
                         int size = massEvent.getEventSize();
                         size = size - 1;
                         massEvent.setEventSize(size);
+                        massEvent.saveInBackground();
 
                         // search for new event, if any,  that includes the user
-                        double maxDistance = 10;
+                        double maxDistance = 5;
 
                         // finding objects in "event" near the point given and within the maximum distance given.
                         query2.whereWithinKilometers("location", currentLocation, maxDistance);
@@ -553,8 +555,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                                 if (e == null) {
                                     Log.i(APPTAG, "the current massevent is " + massEvent.getEvent());
                                     int size = massEvent.getEventSize();
-                                    size = size - 1;
+                                    size = size + 1;
                                     massEvent.setEventSize(size);
+                                    massEvent.saveInBackground();
                                 } else {
                                     // No new event found
                                     Log.i(APPTAG, "new event not found ");
@@ -598,6 +601,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, ZOOM_LEVEL));
     }
 
+    // display events by markers on the map
     private void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
         // 1
@@ -623,6 +627,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 if (e != null) {
                     Log.d(APPTAG, "An error occurred while querying for map posts.", e);
                     return;
+                }   else {
+                    Log.d(APPTAG, "Find Mass Event" + objects.get(0).getObjectId());
                 }
 
                 if (myUpdateNumber != mostRecentMapUpdate) {
@@ -632,52 +638,57 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 Set<String> toKeep = new HashSet<String>();
                 // 2
                 for (MassEvent mEvent : objects) {
-                    // 3
-                    toKeep.add(mEvent.getObjectId());
-                    // 4
-                    Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
-                    // 5
-                    MarkerOptions markerOpts =
-                            new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                                    .getLocation().getLongitude()));
-                    // 6
-                    if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
-                            / METERS_PER_KILOMETER) {
-                        // Set up an out-of-range marker
-                        // Check for an existing out of range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() == null) {
-                                // Out of range marker already exists, skip adding it
-                                continue;
-                            } else {
-                                // Marker now out of range, needs to be refreshed
-                                oldMarker.remove();
-                            }
-                        }
+                    // 3 check if the event size exceeds the threshold, tentatively set to 0
+                    if (mEvent.getEventSize() > 10){
+                        //Log.d(APPTAG, "valid mass event"+mEvent.getEventSize());
 
-                    }
-                    else {
-                        // Set up an in-range marker
-                        // Check for an existing in range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() != null) {
-                                // In range marker already exists, skip adding it
-                                continue;
-                            } else {
-                                // Marker now in range, needs to be refreshed
-                                oldMarker.remove();
+                        toKeep.add(mEvent.getObjectId());
+                        // 4
+                        Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
+                        // 5
+                        MarkerOptions markerOpts =
+                                new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                                        .getLocation().getLongitude()));
+                        // 6
+                        if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                                / METERS_PER_KILOMETER) {
+                            // Set up an out-of-range marker
+                            // Check for an existing out of range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() == null) {
+                                    // Out of range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now out of range, needs to be refreshed
+                                    oldMarker.remove();
+                                }
+                            }
+
+                        }
+                        else {
+                            // Set up an in-range marker
+                            // Check for an existing in range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() != null) {
+                                    // In range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now in range, needs to be refreshed
+                                    oldMarker.remove();
+                                }
                             }
                         }
-                    }
-                    // 7
-                    Marker marker = mMap.addMarker(markerOpts);
-                    mapMarkers.put(mEvent.getObjectId(), marker);
-                    // 8
-                    if (mEvent.getObjectId().equals(selectedPostObjectId)) {
-                        marker.showInfoWindow();
-                        selectedPostObjectId = null;
+                        // 7
+                        Marker marker = mMap.addMarker(markerOpts);
+                        mapMarkers.put(mEvent.getObjectId(), marker);
+                        // 8
+                        if (mEvent.getObjectId().equals(selectedPostObjectId)) {
+                            marker.showInfoWindow();
+                            selectedPostObjectId = null;
+                        }
                     }
                 }
+
                 // 9
                 cleanUpMarkers(toKeep);
             }
