@@ -25,7 +25,9 @@ What to get it all at once? No problem. Critical Mass has an event list view tha
 You can view other participants' comments about each mass event and make an informed decision.
 
 >Note that this is the only way you get subjective information from Critical Mass, as we want to keep unnecessary influences on your decision making as few as possible.
+
 ###Leave a comment
+
 Like it or not, leave a comment! You can choose to sign up and log in to Critical Mass, or you will be assigned a unique ID to keep a consistent profile when using Critical Mass. However, your comments will be anonymous regardless.
 
 ##FAQ
