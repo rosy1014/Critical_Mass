@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseAnonymousUtils;
@@ -75,12 +76,20 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
     private static final String APPTAG = "CriticalMass";
+    Button mMiddleBar;  // Directs to list activity
+    Button mLeftBar;    // Placeholder for login
+    Button mRightBar;   // Placeholder
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
+    // Made static so that other activity can access location.
     public static Location mCurrentLocation;
     public static Location mLastLocation;
     private MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
+
+    private MassEvent mMassEvent; //
+    private String mEventID;
+
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
@@ -89,13 +98,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     private String selectedPostObjectId;
     private int mostRecentMapUpdate;
-
-    /*
-     * UI
-     */
-    Button mMiddleBar;  // Directs to list activity
-    Button mLeftBar;    // Placeholder for login
-    Button mRightBar;   // Placeholder
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +142,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
 
+        //TODO Logout and delete mass user
+//        deleteMassUser();
+//        ParseUser.logOut();
+
         mLeftBar = (Button)findViewById(R.id.map_left_bar);
         mLeftBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -147,7 +153,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
                 // Change color if pressed and reset after release
                 if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    deleteMassUser();
+                    ParseUser.logOut();
                     mLeftBar.setBackgroundColor(0xff2a4a90);
+                    Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
+                    startActivityForResult(i,0);
                 } else {
                     mLeftBar.setBackgroundColor(0xff112645);
                 }
@@ -171,8 +181,56 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 return true;
             }
         });
+
+
+
+        //(Xin)
+        // determine whether the current user is an anonymous user and
+        // if the user has previously signed up and logged into the application
+        if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+            // If user is anonymous, send the user to LoginSignupActivity.class
+            Intent intent = new Intent(MapsActivity.this,
+                    LoginSignupActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            // If current user is NOT anonymous user
+            // Get current user data from Parse.com
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            if (currentUser == null) {
+                Intent intent = new Intent(MapsActivity.this,
+                        LoginSignupActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 
+    protected void deleteMassUser(){
+        ParseQuery<MassUser> query = MassUser.getQuery();
+        final String user_id = mMassUser.getUser();
+//        Log.d(APPTAG, obj_id);
+        query.whereEqualTo("user", user_id);
+        query.getFirstInBackground(new GetCallback<MassUser>(){
+            @Override
+            public void done(final MassUser massUser, ParseException e) {
+                if(e==null){
+                    massUser.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                Log.d(APPTAG, "Successfully deleted mass user " + user_id );
+                            } else {
+                                Log.d(APPTAG, "Failed to delete mass user " + e);
+                            }
+                        }
+                    });
+                } else {
+                    Log.d(APPTAG, "Failed to find the current mass user");
+                }
+            }
+        });
+    }
     /*
      * Helper function for onCreate
      * Initialize the location request for maps activity
@@ -213,7 +271,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         if(mCurrentLocation != null){
             // Create a LatLng object for the current location
             double latitude = mCurrentLocation.getLatitude();
+
+            // Get longitude of the current location
             double longitude = mCurrentLocation.getLongitude();
+            Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
+            // Create a LatLng object for the current location
             LatLng latLng = new LatLng(latitude,longitude);
 
             // Move the camera to the place in interest
@@ -234,6 +296,25 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         super.onStop();
         setUpMapIfNeeded();
 
+    }
+
+    @Override
+    //TODO
+    // Must call super.onDestroy() at the end.
+    protected void onDestroy(){
+        ParseQuery<MassUser> query = MassUser.getQuery();
+        query.whereEqualTo("user", mMassUser.getUser());
+        query.getFirstInBackground(new GetCallback<MassUser>(){
+            @Override
+            public void done(MassUser massUser, ParseException e) {
+                if(e==null){
+                    massUser.deleteInBackground();
+                } else {
+                    Log.d(APPTAG, "Failed to find the current mass user");
+                }
+            }
+        });
+        super.onDestroy();
     }
 
     /**
@@ -286,12 +367,28 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         updateZoom(mCurrentLocation);
 
+        // Get longitude of the current location
+        double longitude = mCurrentLocation.getLongitude();
+        double latitude = mCurrentLocation.getLatitude();
+        Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
+        // Create a LatLng object for the current location
+        LatLng latLng = new LatLng(latitude,longitude);
+        // Get the bounds to zoom to
+     //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
+        // Zoom to the given bounds
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
+        Log.i(APPTAG, "update camera");
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
                 doMapQuery();
             }
         });
+
+       // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
+        //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
 
     }
 
@@ -314,11 +411,15 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Log.d(APPTAG,"mCurrentlocation is NOT null");
             mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
         }
-        Log.d(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
 
-        updateUserLocation(mMassUser.getLocation()); // update user's location in the MassUser table in Parse Cloud
+        Log.i(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
+        mMassUser.setUser(ParseUser.getCurrentUser());
+        updateUserLocation(mMassUser.getLocation());
 
 
+        // update MassEvent
+        Log.i(APPTAG, "Event ID of current user is " + mEventID);
+        updateUserEvent(geoPointFromLocation(mCurrentLocation));
     }
     /*
      * Helper Function
@@ -372,7 +473,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
 
         }
-       // setParseACL();
+        //setParseACL();
         Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
     }
 
@@ -383,6 +484,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
 
     @Override
+    // passes in the user current location as input
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         if (mLastLocation != null
@@ -395,7 +497,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         updateZoom(location);
         doMapQuery();
 
+        updateUserEvent(geoPointFromLocation(mCurrentLocation));//helper function to update event as location changes
     }
+
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -476,6 +580,79 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * API calls to start/stop periodic location update, and get the current location.
      */
 
+
+    // helper function to update the user's event by event type data(Xin)
+    // pass in the current location
+    protected void updateUserEvent(ParseGeoPoint value){
+        // Find by ID the user's last event
+        mEventID = mMassUser.getEvent();
+
+        // the user current location
+        final ParseGeoPoint currentLocation = value;
+
+        //This is the first query to validate the user's last event
+        final ParseQuery<MassEvent> query1 = MassEvent.getQuery();
+
+        // This is the second query to find the user's new event
+        final ParseQuery<MassEvent> query2 = MassEvent.getQuery();
+
+        // check if the user's old event exists
+        query1.whereEqualTo("event",mEventID);
+
+        Log.i(APPTAG,"Mass User in updateUserEvent is " + mEventID);
+
+        query1.getFirstInBackground(new GetCallback<MassEvent>() {
+            @Override
+            public void done(MassEvent massEvent, ParseException e) {
+                Log.i(APPTAG, "Done with getFirstInBackground loc " + e);
+                // the event ID is found
+                if (e == null) {
+                    Log.i(APPTAG, "massevent in updateUserLocation after query is " + massEvent.getEvent());
+
+                    // check if the user is still within the event radius
+                    double distance = currentLocation
+                            .distanceInKilometersTo(massEvent.getLocation());
+                    // the user is no longer inside the old event
+                    if (distance > massEvent.getRadius()) {
+                        // decrement the old event size as the user is no longer there
+                        int size = massEvent.getEventSize();
+                        size = size - 1;
+                        massEvent.setEventSize(size);
+                        massEvent.saveInBackground();
+
+                        // search for new event, if any,  that includes the user
+                        double maxDistance = 5;
+
+                        // finding objects in "event" near the point given and within the maximum distance given.
+                        query2.whereWithinKilometers("location", currentLocation, maxDistance);
+
+                        // Since the user can only be in one event at a time, use getFirstInBackground
+                        query2.getFirstInBackground(new GetCallback<MassEvent>() {
+                            @Override
+                            public void done(MassEvent massEvent, ParseException e) {
+                                if (e == null) {
+                                    Log.i(APPTAG, "the current massevent is " + massEvent.getEvent());
+                                    int size = massEvent.getEventSize();
+                                    size = size + 1;
+                                    massEvent.setEventSize(size);
+                                    massEvent.saveInBackground();
+                                } else {
+                                    // No new event found
+                                    Log.i(APPTAG, "new event not found ");
+                                }
+                            }
+                        });
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
+
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
                 .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
@@ -484,6 +661,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         LocationServices.FusedLocationApi
                 .removeLocationUpdates(mGoogleApiClient, this);
     }
+
     private Location getLocation() {
         if(servicesConnected()) {
             return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -500,9 +678,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Move the camera to the location in interest and zoom to appropriate level
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, ZOOM_LEVEL));
     }
-    /*
-     * Fetch data from the cloud and add markers to map.
-     */
+
+    // display events by markers on the map
     private void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
         // 1
@@ -514,7 +691,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // 2
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         // 3
-        ParseQuery<MassUser> mapQuery = MassUser.getQuery();
+        ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
         // 4
         mapQuery.whereWithinKilometers("location", myPoint, SEARCH_DISTANCE);
         // 5
@@ -522,12 +699,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mapQuery.orderByDescending("createdAt");
        // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
         // 6
-        mapQuery.findInBackground(new FindCallback<MassUser>() {
+        mapQuery.findInBackground(new FindCallback<MassEvent>() {
             @Override
-            public void done(List<MassUser> objects, ParseException e) {
+            public void done(List<MassEvent> objects, ParseException e) {
                 if (e != null) {
                     Log.d(APPTAG, "An error occurred while querying for map posts.", e);
                     return;
+                }   else {
+                    Log.d(APPTAG, "Find Mass Event" + objects.get(0).getObjectId());
                 }
 
                 if (myUpdateNumber != mostRecentMapUpdate) {
@@ -536,53 +715,58 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 // Handle the results
                 Set<String> toKeep = new HashSet<String>();
                 // 2
-                for (MassUser mUser : objects) {
-                    // 3
-                    toKeep.add(mUser.getObjectId());
-                    // 4
-                    Marker oldMarker = mapMarkers.get(mUser.getObjectId());
-                    // 5
-                    MarkerOptions markerOpts =
-                            new MarkerOptions().position(new LatLng(mUser.getLocation().getLatitude(), mUser
-                                    .getLocation().getLongitude()));
-                    // 6
-                    if (mUser.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
-                            / METERS_PER_KILOMETER) {
-                        // Set up an out-of-range marker
-                        // Check for an existing out of range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() == null) {
-                                // Out of range marker already exists, skip adding it
-                                continue;
-                            } else {
-                                // Marker now out of range, needs to be refreshed
-                                oldMarker.remove();
-                            }
-                        }
+                for (MassEvent mEvent : objects) {
+                    // 3 check if the event size exceeds the threshold, tentatively set to 0
+                    if (mEvent.getEventSize() > 10){
+                        //Log.d(APPTAG, "valid mass event"+mEvent.getEventSize());
 
-                    }
-                    else {
-                        // Set up an in-range marker
-                        // Check for an existing in range marker
-                        if (oldMarker != null) {
-                            if (oldMarker.getSnippet() != null) {
-                                // In range marker already exists, skip adding it
-                                continue;
-                            } else {
-                                // Marker now in range, needs to be refreshed
-                                oldMarker.remove();
+                        toKeep.add(mEvent.getObjectId());
+                        // 4
+                        Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
+                        // 5
+                        MarkerOptions markerOpts =
+                                new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                                        .getLocation().getLongitude()));
+                        // 6
+                        if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
+                                / METERS_PER_KILOMETER) {
+                            // Set up an out-of-range marker
+                            // Check for an existing out of range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() == null) {
+                                    // Out of range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now out of range, needs to be refreshed
+                                    oldMarker.remove();
+                                }
+                            }
+
+                        }
+                        else {
+                            // Set up an in-range marker
+                            // Check for an existing in range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() != null) {
+                                    // In range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now in range, needs to be refreshed
+                                    oldMarker.remove();
+                                }
                             }
                         }
-                    }
-                    // 7
-                    Marker marker = mMap.addMarker(markerOpts);
-                    mapMarkers.put(mUser.getObjectId(), marker);
-                    // 8
-                    if (mUser.getObjectId().equals(selectedPostObjectId)) {
-                        marker.showInfoWindow();
-                        selectedPostObjectId = null;
+                        // 7
+                        Marker marker = mMap.addMarker(markerOpts);
+                        mapMarkers.put(mEvent.getObjectId(), marker);
+                        // 8
+                        if (mEvent.getObjectId().equals(selectedPostObjectId)) {
+                            marker.showInfoWindow();
+                            selectedPostObjectId = null;
+                        }
                     }
                 }
+
                 // 9
                 cleanUpMarkers(toKeep);
             }
@@ -601,6 +785,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         }
     }
+
 
 
     /*

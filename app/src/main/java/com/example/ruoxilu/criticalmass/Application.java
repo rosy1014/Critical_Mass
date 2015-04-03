@@ -16,6 +16,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         ParseObject.registerSubclass(MassUser.class);
+        ParseObject.registerSubclass(MassEvent.class);
 
         Parse.initialize(this, "ADIzf9tA1P4KQFL1AyyAKoCjLKhgaCmaZTmp96CL", "PcefekoiDoE3uR2yUd932HRbPPqrEGJyaE61aPVF");
         ParseUser.enableAutomaticUser();
@@ -37,6 +38,7 @@ public class Application extends android.app.Application {
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getUsername());
+
     }
 }
 
