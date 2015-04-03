@@ -261,7 +261,7 @@
     <string name="enter_text">Create!</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/debug/res/values/google_maps_api.xml -->
     <eat-comment/>
-    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyCrAtLzNs50HDKE6ZFXLKd2Uy9GMmy3dYQ</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve">AIzaSyAY0UAto63ZOiZRGVMLgVctvpsygGsppvE</string>
     <string name="google_maps_key_instructions" templateMergeStrategy="replace"><!--
 
     TODO: Before you run your application, you need a Google Maps API key.
@@ -280,6 +280,7 @@ https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend
     <eat-comment/>
     <string name="hello_world">Hello world!</string>
     <string name="hint">Create your mass event here!</string>
+    <string name="hint_enter_comment">Share your thoughts on this event!</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/res/values/admob_strings.xml -->
     <eat-comment/>
     <string name="store_picture_message">"Allow Ad to store image in Picture gallery?"</string>

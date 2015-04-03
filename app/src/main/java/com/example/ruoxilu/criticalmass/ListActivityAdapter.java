@@ -55,22 +55,6 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
 
                         queryNearbyEvents.setLimit(10);
 
-//                        queryNearbyEvents.findInBackground(new FindCallback() {
-//                            @Override
-//                            public void done(List list, com.parse.ParseException e) {
-//
-//                                if (e == null) {
-//                                    Log.d(Application.APPTAG, list.toString());
-//                                }
-//                                else {
-//                                    Log.d(Application.APPTAG, e.getMessage());
-//                                }
-//
-//                            }
-//                        });
-
-                        //Log.d(Application.APPTAG, "finish the query");
-
                         return queryNearbyEvents;
                     }
                 }
@@ -78,6 +62,7 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
     }
 
     // Customize the layout by overriding getItemView
+    @Override
     public View getItemView(ParseObject object, View v, ViewGroup parent) {
         if (v == null) {
             v = View.inflate(getContext(), R.layout.list_item, null);
@@ -86,6 +71,9 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
         super.getItemView(object, v, parent);
 
         TextView titleTextView = (TextView) v.findViewById(R.id.title_text);
+        String eventObjectId = object.getString("objectId");
+        Log.d (Application.APPTAG, "the object id is "+ eventObjectId);
+
         titleTextView.setText(object.getString("objectId"));
 
         TextView eventSizeTextView = (TextView) v.findViewById(R.id.event_size);

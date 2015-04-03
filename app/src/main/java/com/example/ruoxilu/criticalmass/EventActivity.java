@@ -72,7 +72,8 @@ public class EventActivity extends Activity {
                 if (e == null) {
                     // Set event size
                     eventSize = object.getInt("EventSize");
-                    mEventSizeView.setText(eventSize);
+                    // mEventSizeView.setText(eventSize);
+                    Log.d(Application.APPTAG, "event size is "+eventSize);
                 }
                 else {
                     Log.d(Application.APPTAG, e.getMessage());
@@ -115,6 +116,7 @@ public class EventActivity extends Activity {
                         @Override
                         public void done(ParseException e) {
                             // Add an comment to the list view.
+                         mEventComments.invalidateViews();
                         }
                     });
                 }
