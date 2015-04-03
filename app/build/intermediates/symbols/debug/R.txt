@@ -448,7 +448,7 @@ int id action_menu_presenter 0x7f090003
 int id action_mode_bar 0x7f090042
 int id action_mode_bar_stub 0x7f090041
 int id action_mode_close_button 0x7f090034
-int id action_settings 0x7f090063
+int id action_settings 0x7f090062
 int id activity_chooser_view_content 0x7f090035
 int id activity_image 0x7f090054
 int id activity_name 0x7f090055
@@ -475,7 +475,6 @@ int id end 0x7f090014
 int id event_brief 0x7f090053
 int id event_comments 0x7f090056
 int id event_list 0x7f09005a
-int id event_size 0x7f090062
 int id expand_activities_button 0x7f090036
 int id expanded_menu 0x7f09003c
 int id grayscale 0x7f090030

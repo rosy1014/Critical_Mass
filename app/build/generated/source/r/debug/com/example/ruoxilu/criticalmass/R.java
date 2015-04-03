@@ -1710,7 +1710,7 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f090042;
         public static final int action_mode_bar_stub=0x7f090041;
         public static final int action_mode_close_button=0x7f090034;
-        public static final int action_settings=0x7f090063;
+        public static final int action_settings=0x7f090062;
         public static final int activity_chooser_view_content=0x7f090035;
         public static final int activity_image=0x7f090054;
         public static final int activity_name=0x7f090055;
@@ -1737,7 +1737,6 @@ containing a value of this type.
         public static final int event_brief=0x7f090053;
         public static final int event_comments=0x7f090056;
         public static final int event_list=0x7f09005a;
-        public static final int event_size=0x7f090062;
         public static final int expand_activities_button=0x7f090036;
         public static final int expanded_menu=0x7f09003c;
         public static final int grayscale=0x7f090030;

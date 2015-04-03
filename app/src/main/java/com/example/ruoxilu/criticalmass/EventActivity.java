@@ -1,26 +1,18 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Button;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
 import android.view.View;
 
-import android.content.Intent;
-
-import android.app.Fragment;
-
 import android.util.Log;
 
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -34,7 +26,7 @@ import com.parse.SaveCallback;
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-    private int eventSize;
+//    private int mEventSize;
     private String messageBody;
 
     private TextView mTitleTextView;
@@ -54,7 +46,7 @@ public class EventActivity extends Activity {
 
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
-        mEventSizeView = (TextView) findViewById(R.id.event_size);
+//        mEventSizeView = (TextView) findViewById(R.id.event_size);
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
         mEventComments = (ListView) findViewById(R.id.event_comments);
@@ -65,21 +57,16 @@ public class EventActivity extends Activity {
 
         mTitleTextView.setText(eventObjectId);
 
-        ParseQuery<ParseObject> queryMassEvent = ParseQuery.getQuery("MassEvent");
-        queryMassEvent.getInBackground(eventObjectId, new GetCallback<ParseObject>() {
-            @Override
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    // Set event size
-                    eventSize = object.getInt("EventSize");
-                    // mEventSizeView.setText(eventSize);
-                    Log.d(Application.APPTAG, "event size is "+eventSize);
-                }
-                else {
-                    Log.d(Application.APPTAG, e.getMessage());
-                }
-            }
-        });
+//        ParseQuery<ParseObject> queryMassEvent = ParseQuery.getQuery("MassEvent");
+//
+//        try {
+//            // Use find instead of findInBackground because of a potential thread problem.
+//            ParseObject object = queryMassEvent.get(eventObjectId);
+//            mEventSize = object.getInt("EventSize");
+//            mEventSizeView.setText(mEventSize);
+//        } catch (ParseException e) {
+//            Log.d(Application.APPTAG, e.getMessage());
+//        }
 
         // Populating event comments
         ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
