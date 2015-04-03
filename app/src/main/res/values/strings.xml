@@ -2,6 +2,31 @@
 <resources>
 
     <string name="app_name">Critical Mass</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_application">Application</string>
+    <string name="title_activity_maps">Critical Mass</string>
+
+    <!-- Event List Activity -->
+    <string name="hint">Create your mass event here!</string>
+    <string name="enter_text">Create!</string>
+    <string name="creation_toast">New mass event has been created!</string>
+
+    <!-- Event Info Activity -->
+    <string name="activity_name">Giraffe watching!</string>
+    <string name="activity_description">
+        \nA great chance to watch giraffes in the 5Cs.
+        \n
+        \nFree Boba tea available!
+        \nHomework extensions available!
+        \nGreat app susurri free for download!
+        </string>
+
+    <string name="hint_enter_comment">Share your thoughts on this event!</string>
+
+    <string name="empty"></string>
+
+
 
 </resources>
