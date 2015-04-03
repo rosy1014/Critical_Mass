@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseAnonymousUtils;
@@ -139,6 +140,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
 
+        //TODO Logout and delete mass user
+//        deleteMassUser();
+//        ParseUser.logOut();
+
         mLeftBar = (Button)findViewById(R.id.map_left_bar);
         mLeftBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -146,7 +151,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
                 // Change color if pressed and reset after release
                 if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                    deleteMassUser();
+                    ParseUser.logOut();
                     mLeftBar.setBackgroundColor(0xff2a4a90);
+                    Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
+                    startActivityForResult(i,0);
                 } else {
                     mLeftBar.setBackgroundColor(0xff112645);
                 }
@@ -170,8 +179,56 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 return true;
             }
         });
+
+
+
+        //(Xin)
+        // determine whether the current user is an anonymous user and
+        // if the user has previously signed up and logged into the application
+        if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+            // If user is anonymous, send the user to LoginSignupActivity.class
+            Intent intent = new Intent(MapsActivity.this,
+                    LoginSignupActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            // If current user is NOT anonymous user
+            // Get current user data from Parse.com
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            if (currentUser == null) {
+                Intent intent = new Intent(MapsActivity.this,
+                        LoginSignupActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 
+    protected void deleteMassUser(){
+        ParseQuery<MassUser> query = MassUser.getQuery();
+        final String user_id = mMassUser.getUser();
+//        Log.d(APPTAG, obj_id);
+        query.whereEqualTo("user", user_id);
+        query.getFirstInBackground(new GetCallback<MassUser>(){
+            @Override
+            public void done(final MassUser massUser, ParseException e) {
+                if(e==null){
+                    massUser.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if(e == null){
+                                Log.d(APPTAG, "Successfully deleted mass user " + user_id );
+                            } else {
+                                Log.d(APPTAG, "Failed to delete mass user " + e);
+                            }
+                        }
+                    });
+                } else {
+                    Log.d(APPTAG, "Failed to find the current mass user");
+                }
+            }
+        });
+    }
     /*
      * Helper function for onCreate
      * Initialize the location request for maps activity
