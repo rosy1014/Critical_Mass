@@ -1709,7 +1709,7 @@ containing a value of this type.
         public static final int action_mode_close_button=0x7f090034;
         public static final int action_settings=0x7f09005f;
         public static final int activity_chooser_view_content=0x7f090035;
-        public static final int activity_description=0x7f090056;
+        public static final int event_comments =0x7f090056;
         public static final int activity_image=0x7f090053;
         public static final int activity_name=0x7f090054;
         public static final int adjust_height=0x7f090016;

@@ -23,7 +23,10 @@
         \nGreat app susurri free for download!
         </string>
 
+    <string name="hint_enter_comment">Share your thoughts on this event!</string>
+
     <string name="empty"></string>
+
 
 
 </resources>
