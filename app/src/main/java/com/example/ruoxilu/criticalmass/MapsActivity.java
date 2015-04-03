@@ -1,6 +1,8 @@
 package com.example.ruoxilu.criticalmass;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Criteria;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -75,8 +78,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
     private static final String APPTAG = "CriticalMass";
+    // Fields for helping process the map and location changes
+    private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     Button mMiddleBar;  // Directs to list activity
-    Button mLeftBar;    // Placeholder for login
+    Button mLeftBar;    // Directs to login page
     Button mRightBar;   // Placeholder
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
@@ -84,16 +89,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private Location mCurrentLocation;
     private Location mLastLocation;
     private MassUser mMassUser;
-
     private MassEvent mMassEvent; //
     private String mEventID;
-
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
-
-    // Fields for helping process the map and location changes
-    private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     private String selectedPostObjectId;
     private int mostRecentMapUpdate;
 
@@ -151,11 +151,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
                 // Change color if pressed and reset after release
                 if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
-                    deleteMassUser();
-                    ParseUser.logOut();
+                    confirmLogOut();
+
                     mLeftBar.setBackgroundColor(0xff2a4a90);
-                    Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
-                    startActivityForResult(i,0);
+//                    ParseUser.logOut();
+//                    Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
+//                    startActivityForResult(i,0);
                 } else {
                     mLeftBar.setBackgroundColor(0xff112645);
                 }
@@ -827,6 +828,38 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
+    public void confirmLogOut() {
+
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Are you sure you want to log out?");
+        alert.setMessage("Logged out users will no longer be shown on the map.");
+
+        // Make an "OK" button to confirm log out
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                deleteMassUser();
+                ParseUser.logOut();
+                Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
+                startActivityForResult(i, 0);
+
+                Toast.makeText(getApplicationContext(), "You have successfully logged out!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Make a "Cancel" button
+        // that simply dismisses the alert
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+
+        alert.show();
+    }
+
     public static class ErrorDialogFragment extends DialogFragment {
         /*
          * Show user a message if Google Play services are not enabled on the
@@ -848,5 +881,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return mDialog;
         }
     }
+
 }
 
