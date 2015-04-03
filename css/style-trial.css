@@ -1,0 +1,74 @@
+b, strong { font-weight: bold }
+i, em { font-style: italic }
+
+.no-support-message {
+    display:none;
+}
+
+.impress-not-supported .no-support-messgae {
+    display:block;
+}
+
+
+/*
+    Now let's style the presentation steps.
+
+    We start with basics to make sure it displays correctly in everywhere ...
+*/
+
+.step {
+    position: relative;
+    width: 900px;
+    padding: 40px;
+    margin: 0;
+    opacity: 0.2;
+
+    font-family: 'PT Serif', georgia, serif;
+    font-size: 48px;
+    line-height: 1.5;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+
+#title {
+    padding: 0;
+}
+
+#title .try {
+    font-size: 35px;
+    position: absolute;
+    top: 7.5em;
+    left: 70px;
+}
+
+#title .ear {
+    font-size: 64px;
+    position: absolute;
+    top: -0.5em;
+    left: 1em;
+}
+
+#title h1 {
+    font-size: 100px;
+    padding-left: 60px;
+    padding-bottom: 0px;
+
+}
+
+#title .footnote {
+    font-size: 20px;
+    padding-left: 60px;
+    padding-top: 0px;
+
+}
+
+.positioning {
+    -webkit-transform: translateY(-10px);
+    -moz-transform:    translateY(-10px);
+    -ms-transform:     translateY(-10px);
+    -o-transform:      translateY(-10px);
+    transform:         translateY(-10px);
+}
