@@ -116,7 +116,9 @@ public class EventActivity extends Activity {
                         @Override
                         public void done(ParseException e) {
                             // Add an comment to the list view.
-                         mEventComments.invalidateViews();
+                            queryEventComment.loadObjects();
+                            queryEventComment.notifyDataSetChanged();
+                            mMessageBodyField.setText(" ");
                         }
                     });
                 }

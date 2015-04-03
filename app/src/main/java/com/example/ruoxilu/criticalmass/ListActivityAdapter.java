@@ -27,6 +27,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQueryAdapter.OnQueryLoadListener;
+import com.parse.ParseUser;
+
 import java.text.ParseException;
 
 
@@ -74,10 +76,15 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
         String eventObjectId = object.getString("objectId");
         Log.d (Application.APPTAG, "the object id is "+ eventObjectId);
 
+        String userObjectId = ParseUser.getCurrentUser().toString();
+        Log.d(Application.APPTAG, "ListActivityAdapter, user object id is "+userObjectId);
+
         titleTextView.setText(object.getString("objectId"));
 
-        TextView eventSizeTextView = (TextView) v.findViewById(R.id.event_size);
-        eventSizeTextView.setText(object.getString("EventSize"));
+//        TextView eventSizeTextView = (TextView) v.findViewById(R.id.event_size);
+//        eventSizeTextView.setText(object.getString("EventSize"));
+
+
 
         return v;
     }
