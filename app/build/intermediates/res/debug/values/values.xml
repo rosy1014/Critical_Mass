@@ -182,6 +182,14 @@
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/res/values/version.xml -->
     <eat-comment/>
     <integer name="google_play_services_version">6587000</integer>
+    <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="LoginBtn">Login</string>
+    <string name="LogoutBtn">Log Out</string>
+    <string name="Password">Password</string>
+    <string name="SignupBtn">Sign Up</string>
+    <string name="Username">Username</string>
+    <string name="Welcome">Welcome!</string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/res/values/values.xml -->
     <eat-comment/>
     <string name="abc_action_bar_home_description">Navigate home</string>
@@ -278,6 +286,7 @@ https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend
     --></string>
     <!-- From: file:/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="hello">Hello World, ParseStarterProjectActivity!</string>
     <string name="hello_world">Hello world!</string>
     <string name="hint">Create your mass event here!</string>
     <string name="hint_enter_comment">Share your thoughts on this event!</string>

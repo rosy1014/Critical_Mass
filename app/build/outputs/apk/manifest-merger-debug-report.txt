@@ -104,25 +104,29 @@ ADDED from AndroidManifest.xml:48:9
 		ADDED from AndroidManifest.xml:50:13
 	android:name
 		ADDED from AndroidManifest.xml:49:13
-intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:52:13
-action#android.intent.action.MAIN
-ADDED from AndroidManifest.xml:53:13
-	android:name
-		ADDED from AndroidManifest.xml:53:21
-category#android.intent.category.LAUNCHER
-ADDED from AndroidManifest.xml:54:17
-	android:name
-		ADDED from AndroidManifest.xml:54:27
 activity#com.example.ruoxilu.criticalmass.ListActivity
+ADDED from AndroidManifest.xml:55:9
+	android:label
+		ADDED from AndroidManifest.xml:56:19
+	android:name
+		ADDED from AndroidManifest.xml:55:19
+activity#com.example.ruoxilu.criticalmass.EventActivity
 ADDED from AndroidManifest.xml:59:9
 	android:label
 		ADDED from AndroidManifest.xml:60:19
 	android:name
 		ADDED from AndroidManifest.xml:59:19
-activity#com.example.ruoxilu.criticalmass.EventActivity
+activity#com.example.ruoxilu.criticalmass.LoginSignupActivity
 ADDED from AndroidManifest.xml:63:9
-	android:label
-		ADDED from AndroidManifest.xml:64:19
 	android:name
 		ADDED from AndroidManifest.xml:63:19
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:65:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:66:17
+	android:name
+		ADDED from AndroidManifest.xml:66:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:67:17
+	android:name
+		ADDED from AndroidManifest.xml:67:27
