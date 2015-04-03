@@ -24,6 +24,11 @@ public class MassUser extends ParseObject{
         put("user", value.getObjectId());
     }
 
+    // Every MassUser has an event ID (Xin)
+    public String getEvent() { return getString("event"); }
+    public void setEvent(MassEvent value){ put("event", value.getEvent()); }
+
+    // User Location
     public ParseGeoPoint getLocation() {
         return getParseGeoPoint("location");
     }
