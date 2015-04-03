@@ -3,6 +3,7 @@ package com.example.ruoxilu.criticalmass;
 /**
  * Created by SEAN on 4/1/15.
  */
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +27,9 @@ public class LoginSignupActivity extends Activity {
     EditText password;
     EditText username;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get the view from main.xml

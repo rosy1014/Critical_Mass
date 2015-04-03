@@ -182,7 +182,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         });
 
 
-
         //(Xin)
         // determine whether the current user is an anonymous user and
         // if the user has previously signed up and logged into the application
@@ -205,20 +204,20 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
-    protected void deleteMassUser(){
+    protected void deleteMassUser() {
         ParseQuery<MassUser> query = MassUser.getQuery();
         final String user_id = mMassUser.getUser();
 //        Log.d(APPTAG, obj_id);
         query.whereEqualTo("user", user_id);
-        query.getFirstInBackground(new GetCallback<MassUser>(){
+        query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(final MassUser massUser, ParseException e) {
-                if(e==null){
+                if (e == null) {
                     massUser.deleteInBackground(new DeleteCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if(e == null){
-                                Log.d(APPTAG, "Successfully deleted mass user " + user_id );
+                            if (e == null) {
+                                Log.d(APPTAG, "Successfully deleted mass user " + user_id);
                             } else {
                                 Log.d(APPTAG, "Failed to delete mass user " + e);
                             }
@@ -273,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
             // Get longitude of the current location
             double longitude = mCurrentLocation.getLongitude();
-            Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
+            Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude);
             // Create a LatLng object for the current location
             LatLng latLng = new LatLng(latitude,longitude);
 
@@ -300,13 +299,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     @Override
     //TODO
     // Must call super.onDestroy() at the end.
-    protected void onDestroy(){
+    protected void onDestroy() {
         ParseQuery<MassUser> query = MassUser.getQuery();
         query.whereEqualTo("user", mMassUser.getUser());
-        query.getFirstInBackground(new GetCallback<MassUser>(){
+        query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
-                if(e==null){
+                if (e == null) {
                     massUser.deleteInBackground();
                 } else {
                     Log.d(APPTAG, "Failed to find the current mass user");
@@ -369,11 +368,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Get longitude of the current location
         double longitude = mCurrentLocation.getLongitude();
         double latitude = mCurrentLocation.getLatitude();
-        Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
+        Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude);
         // Create a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude,longitude);
+        LatLng latLng = new LatLng(latitude, longitude);
         // Get the bounds to zoom to
-     //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
+        //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
         // Zoom to the given bounds
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
@@ -385,7 +384,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
 
-       // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+        // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
         //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
         //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
 
@@ -582,7 +581,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     // helper function to update the user's event by event type data(Xin)
     // pass in the current location
-    protected void updateUserEvent(ParseGeoPoint value){
+    protected void updateUserEvent(ParseGeoPoint value) {
         // Find by ID the user's last event
         mEventID = mMassUser.getEvent();
 
@@ -596,9 +595,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         final ParseQuery<MassEvent> query2 = MassEvent.getQuery();
 
         // check if the user's old event exists
-        query1.whereEqualTo("event",mEventID);
+        query1.whereEqualTo("event", mEventID);
 
-        Log.i(APPTAG,"Mass User in updateUserEvent is " + mEventID);
+        Log.i(APPTAG, "Mass User in updateUserEvent is " + mEventID);
 
         query1.getFirstInBackground(new GetCallback<MassEvent>() {
             @Override
@@ -704,7 +703,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 if (e != null) {
                     Log.d(APPTAG, "An error occurred while querying for map posts.", e);
                     return;
-                }   else {
+                } else {
                     Log.d(APPTAG, "Find Mass Event" + objects.get(0).getObjectId());
                 }
 
@@ -716,7 +715,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 // 2
                 for (MassEvent mEvent : objects) {
                     // 3 check if the event size exceeds the threshold, tentatively set to 0
-                    if (mEvent.getEventSize() > 10){
+                    if (mEvent.getEventSize() > 10) {
                         //Log.d(APPTAG, "valid mass event"+mEvent.getEventSize());
 
                         toKeep.add(mEvent.getObjectId());
@@ -741,8 +740,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                                 }
                             }
 
-                        }
-                        else {
+                        } else {
                             // Set up an in-range marker
                             // Check for an existing in range marker
                             if (oldMarker != null) {
