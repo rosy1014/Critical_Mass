@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.util.Log;
 import android.widget.AdapterView.OnItemClickListener;
@@ -22,12 +23,14 @@ import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQueryAdapter.OnQueryLoadListener;
 import com.parse.ParseUser;
+import com.parse.ParseFile;
 
 import java.text.ParseException;
 
@@ -57,7 +60,26 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
 
                         queryNearbyEvents.setLimit(10);
 
-                        return queryNearbyEvents;
+                        queryNearbyEvents.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> parseObjects, com.parse.ParseException e) {
+                                for (ParseObject mass : parseObjects) {
+                                    String eventObjectId = mass.getObjectId();
+                                    int eventSize = mass.getInt("EventSize");
+                                    Log.d(Application.APPTAG, "ListActivityAdapter, create(), event object id is "+eventObjectId);
+                                    Log.d(Application.APPTAG, "ListActivityAdapter, create(), event size is "+eventSize);
+                                }
+                            }
+                        });
+
+
+                        ParseQuery queryEvents = new ParseQuery("MassEvent");
+//                        queryEvents.whereNear("location",
+//                                geoPointFromLocation(userCurrentLocation));
+//
+//                        queryEvents.setLimit(10);
+
+                        return queryEvents;
                     }
                 }
         );
@@ -74,16 +96,19 @@ public class ListActivityAdapter extends ParseQueryAdapter<ParseObject> {
 
         TextView titleTextView = (TextView) v.findViewById(R.id.title_text);
         String eventObjectId = object.getString("objectId");
-        Log.d (Application.APPTAG, "the object id is "+ eventObjectId);
+        Log.d (Application.APPTAG, "getItemView, the object id is "+ eventObjectId);
 
-        String userObjectId = ParseUser.getCurrentUser().toString();
-        Log.d(Application.APPTAG, "ListActivityAdapter, user object id is "+userObjectId);
+//        String userObjectId = ParseUser.getCurrentUser().toString();
+//        Log.d(Application.APPTAG, "ListActivityAdapter, getItemView, user object id is "+userObjectId);
 
         titleTextView.setText(object.getString("objectId"));
 
+//        titleTextView.setText("iED9ctulkS");
+
 //        TextView eventSizeTextView = (TextView) v.findViewById(R.id.event_size);
 //        eventSizeTextView.setText(object.getString("EventSize"));
-
+        ParseImageView giraffeView = (ParseImageView) v.findViewById(R.id.activity_image);
+        ParseFile imageFile = object.getParseFile("image");
 
 
         return v;

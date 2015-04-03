@@ -7,6 +7,7 @@ import android.view.View;
 
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import android.content.Intent;
@@ -26,6 +27,7 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by tingyu on 2/23/15.
@@ -35,7 +37,7 @@ import java.util.List;
 public class ListActivity extends Activity {
 
 
-    private ListActivityAdapter eventListAdapter;
+//    private ListActivityAdapter eventListAdapter;
     ListView mActivityOne;
 
 
@@ -64,8 +66,19 @@ public class ListActivity extends Activity {
 
 
 
-        eventListAdapter = new ListActivityAdapter(this);
-//        final ParseQueryAdapter<ParseObject> eventListAdapter = new ParseQueryAdapter<ParseObject>(this, "MassUser");
+//        eventListAdapter = new ListActivityAdapter(this);
+
+//        ParseQueryAdapter.QueryFactory<ParseObject> factory =
+//                new ParseQueryAdapter.QueryFactory<ParseObject>() {
+//                    public ParseQuery create() {
+//                        ParseQuery query = new ParseQuery("MassUser");
+//                        query.whereEqualTo("objectId", "VZnXROBaKO");
+//                        return query;
+//                    }
+//                };
+
+//        ParseQueryAdapter<ParseObject> eventListAdapter = new ParseQueryAdapter<ParseObject>(this, "MassUser");
+//        ParseQueryAdapter<ParseObject> eventListAdapter = new ParseQueryAdapter<ParseObject>(this, factory);
 //        eventListAdapter.setTextKey("objectId");
 
 
@@ -79,32 +92,75 @@ public class ListActivity extends Activity {
             userCurrentLocation = userLastLocation;
         }
 
+        final ArrayList<String> list = new ArrayList<String>();
+        list.add("helloimfirst");
+
         testQuery.whereNear("location", geoPointFromLocation(userCurrentLocation));
-        testQuery.setLimit(5);
-        testQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                for (ParseObject mass : parseObjects) {
-                    String eventObjectId = mass.getObjectId();
-                    int eventSize = mass.getInt("EventSize");
-                    Log.d(Application.APPTAG, "event object id is "+eventObjectId);
-                    Log.d(Application.APPTAG, "event size is "+eventSize);
+        testQuery.setLimit(10);
+//        testQuery.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> parseObjects, ParseException e) {
+//                int i = 0;
+//                for (ParseObject mass : parseObjects) {
+//                    String eventObjectId = mass.getObjectId();
+//                    int eventSize = mass.getInt("EventSize");
+//                    Log.d(Application.APPTAG, "event object id is "+eventObjectId);
+//                    Log.d(Application.APPTAG, "event size is "+eventSize);
+//                    list.add(eventObjectId);
+//                    if (i < list.size()) {
+//                        Log.d(Application.APPTAG, "list size "+list.size()+" list "+i+" now has "+list.get(i));
+//                    }
+////                    System.out.println("list now has  " + list.get(i));
+//                    i++;
+//                }
+//            }
+//        });
+
+        List<ParseObject> parseObjects;
+
+        try {
+            parseObjects = testQuery.find();
+            int k = 0;
+            for (ParseObject mass : parseObjects) {
+                String eventObjectId = mass.getObjectId();
+                list.add(eventObjectId);
+                if (k < list.size()) {
+                    Log.d(Application.APPTAG, "list size "+list.size()+" list "+k+" now has "+list.get(k));
                 }
             }
-        });
+        } catch (ParseException e) {
+            Log.d(Application.APPTAG, e.getMessage());
+        }
+
+
+        //String[] simplest = new String[] {"iPhone"};
+        String[] listArray = new String[(list.size())];
+        System.out.println("list.size is now " + list.size());
+        for (int i = 0; i < (list.size()); i++) {
+            listArray[i] = list.get(i);
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            Log.d(Application.APPTAG, "listArray has "+listArray[i]);
+        }
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, list);
+
+
 
         // Disable paignation.
-        eventListAdapter.setPaginationEnabled(false);
+//        eventListAdapter.setPaginationEnabled(false);
 
         mActivityOne = (ListView) findViewById(R.id.event_list);
 
-        String userObjectId = ParseUser.getCurrentUser().toString();
-        Log.d(Application.APPTAG, "user object id is "+userObjectId);
+//        String userObjectId = ParseUser.getCurrentUser().getObjectId();
+//        Log.d(Application.APPTAG, "user object id is "+userObjectId);
 
         // Bind data from adapter to ListView.
-        mActivityOne.setAdapter(eventListAdapter);
-        eventListAdapter.loadObjects();
-        eventListAdapter.setAutoload(true);
+        mActivityOne.setAdapter(adapter);
+
+        // eventListAdapter.setAutoload(true);
 
 
 

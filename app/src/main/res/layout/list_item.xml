@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <com.parse.ParseImageView
         android:id="@+id/activity_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:padding="5dp"
-        android:src="@drawable/giraffe"
         />
+    <!--android:src="@drawable/giraffe"-->
 
     <TextView
         android:id="@+id/title_text"
