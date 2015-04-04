@@ -79,6 +79,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
     private static final String APPTAG = "CriticalMass";
+    // Made static so that other activity can access location.
+    public static Location mCurrentLocation;
+    public static Location mLastLocation;
     // Fields for helping process the map and location changes
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     Button mMiddleBar;  // Directs to list activity
@@ -87,17 +90,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-<<<<<<< HEAD
-    // Made static so that other activity can access location.
-    public static Location mCurrentLocation;
-    public static Location mLastLocation;
     private MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
 
-=======
-    private Location mCurrentLocation;
-    private Location mLastLocation;
-    private MassUser mMassUser;
->>>>>>> create-mass
     private MassEvent mMassEvent; //
     private String mEventID;
     // Fields for the map radius in feet
