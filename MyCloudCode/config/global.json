@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Critical Mass": {
+            "applicationId": "ADIzf9tA1P4KQFL1AyyAKoCjLKhgaCmaZTmp96CL", 
+            "masterKey": "PP7F8m70AdjzsUl8MSfSubg9z4maNejBdGhn1MJI"
+        }, 
+        "_default": {
+            "link": "Critical Mass"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.3.4"
+    }
+}
