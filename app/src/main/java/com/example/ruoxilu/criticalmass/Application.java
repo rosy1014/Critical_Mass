@@ -10,6 +10,8 @@ import com.parse.ParseUser;
 
 public class Application extends android.app.Application {
 
+    public static final String APPTAG = "CriticalMass";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -33,6 +35,7 @@ public class Application extends android.app.Application {
         ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
         postACL.setPublicReadAccess(true);
         postACL.setPublicWriteAccess(true);
+        
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getUsername());

@@ -1,8 +1,0 @@
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/classes/debug
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-e9e8464e2f4cbde9b04d9adc13f4d73a502a69a4.jar
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/bolts-android-1.2.0-6fc125cce677bdc2506d4701ac5320e425dab408.jar
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-e29db490f1cec427a03a3c84fa78dd65e63ac3b7.jar
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/classes-c9743ef4d23e22b3ae61522c9827749c2b7fbbff.jar
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/Parse-1.8.2-a51a47da8eef88fc003ede1baf3ec05fa8eb1fdd.jar
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/classes-8e69aba872286b1401c9548e8a8d97ab2d881b4c.jar
-/Users/angeloliao/AndroidStudioProjects/Critical_Mass/app/build/intermediates/pre-dexed/debug/classes-15c6ce4c393bd343c0e8c6945f1bd23b2431a288.jar
