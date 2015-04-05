@@ -26,11 +26,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,
+public class MapsActivity extends FragmentActivity implements LocationListener,GoogleMap.OnMarkerClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -84,6 +84,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public static Location mLastLocation;
     // Fields for helping process the map and location changes
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
+    private final Map<Marker, String> markerIDs = new HashMap<Marker, String>();
     Button mMiddleBar;  // Directs to list activity
     Button mLeftBar;    // Directs to login page
     Button mRightBar;   // Placeholder
@@ -99,6 +100,20 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private float lastRadius;
     private String selectedPostObjectId;
     private int mostRecentMapUpdate;
+
+    /* Constants for population level */
+    public final int POPLEVEL1 = 1;
+    public final int POPLEVEL2 = 2;
+    public final int POPLEVEL3 = 3;
+    public final int POPLEVEL4 = 4;
+    public final int POPLEVEL5 = 5;
+    public final int POPLEVEL6 = 6;
+
+    public final int POPSIZE1 = 10;
+    public final int POPSIZE2 = 20;
+    public final int POPSIZE3 = 50;
+    public final int POPSIZE4 = 100;
+    public final int POPSIZE5 = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,10 +157,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
             }
         });
-
-        //TODO Logout and delete mass user
-//        deleteMassUser();
-//        ParseUser.logOut();
 
         mLeftBar = (Button)findViewById(R.id.map_left_bar);
         mLeftBar.setOnTouchListener(new View.OnTouchListener() {
@@ -375,9 +386,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(APPTAG, "my LatLng is " + latitude + ", " + longitude );
         // Create a LatLng object for the current location
         LatLng latLng = new LatLng(latitude,longitude);
-        // Get the bounds to zoom to
-     //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
-        // Zoom to the given bounds
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
         Log.i(APPTAG, "update camera");
@@ -387,10 +396,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 doMapQuery();
             }
         });
+        mMap.setOnMarkerClickListener(this);
 
-       // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-        //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
-        //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
 
     }
 
@@ -450,8 +457,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void anonymousUserLogin(){
         ParseUser.enableAutomaticUser();
         Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser());
-        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
-        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
+//        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
+//        Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
         Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getUsername());
         ParseUser puser = ParseUser.getCurrentUser();
         String pid = puser.getObjectId();
@@ -459,19 +466,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         if(pid == null) {
             Log.d(APPTAG,  " In anonymousUserLogin, in if!!!!");
             ParseAnonymousUtils.logInInBackground();
-//            ParseAnonymousUtils.logIn(new LogInCallback() {
-//
-//                @Override
-//                public void done(ParseUser user, ParseException e) {
-//                    if (e != null) {
-//                        Log.d(APPTAG, "Anonymous login failed.");
-//                    } else {
-//                        Log.d(APPTAG, "Anonymous user logged in.");
-//                        Log.d(APPTAG,  " in callback, ParseUser is "+ user.getObjectId());
-//                        Log.d(APPTAG,  " in callback, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
-//                    }
-//                }
-//            });
+
             Log.d(APPTAG,  " In anonymousUserLogin, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
 
         }
@@ -717,7 +712,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 // Handle the results
                 Set<String> toKeep = new HashSet<String>();
                 // 2
-                for (MassEvent mEvent : objects) {
+                for (final MassEvent mEvent : objects) {
                     // 3 check if the event size exceeds the threshold, tentatively set to 0
                     if (mEvent.getEventSize() > 10){
                         //Log.d(APPTAG, "valid mass event"+mEvent.getEventSize());
@@ -726,9 +721,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         // 4
                         Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
                         // 5
-                        MarkerOptions markerOpts =
-                                new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                                        .getLocation().getLongitude()));
+//                        MarkerOptions markerOpts =
+//                                new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
+//                                        .getLocation().getLongitude()));
+                        MarkerOptions markerOpts = createMarkerOpt(mEvent);
                         // 6
                         if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
                                 / METERS_PER_KILOMETER) {
@@ -759,7 +755,26 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             }
                         }
                         // 7
-                        Marker marker = mMap.addMarker(markerOpts);
+                        final Marker marker = mMap.addMarker(markerOpts);
+                        if (!markerIDs.containsKey(marker)){
+                            markerIDs.put(marker, mEvent.getObjectId());
+                        }
+//                        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//                            @Override
+//                            public boolean onMarkerClick(Marker arg) {
+//                                if(arg == marker) {
+//                                    Intent eventDetailIntent = new Intent();
+//                                    eventDetailIntent.setClass(getApplicationContext(),EventActivity.class);
+//                                    String eventId = mEvent.getObjectId();
+//                                    Log.d(Application.APPTAG, "On Marker Click, event object id is "+ eventId);
+//                                    startActivity(eventDetailIntent);
+//                                    return true;
+//
+//                                } else {
+//                                    return false;
+//                                }
+//                            }
+//                        });
                         mapMarkers.put(mEvent.getObjectId(), marker);
                         // 8
                         if (mEvent.getObjectId().equals(selectedPostObjectId)) {
@@ -774,6 +789,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
     }
+//
+//    mActivityOne.setOnItemClickListener(new OnItemClickListener() {
+//        @Override
+//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//            Intent eventDetailIntent = new Intent();
+//            eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+//            String eventId = mListArray[position];
+//            eventDetailIntent.putExtra("objectId", eventId);
+//            Log.d(Application.APPTAG, "event object id is "+id);
+//            startActivity(eventDetailIntent);
+//        }
+//    });
     /*
      * Remove markers that are not in the Hashmap markersToKeep
      */
@@ -781,14 +808,66 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         for (String objId : new HashSet<String>(mapMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
                 Marker marker = mapMarkers.get(objId);
+                markerIDs.remove(marker);
                 marker.remove();
                 mapMarkers.get(objId).remove();
+
                 mapMarkers.remove(objId);
             }
         }
     }
 
+    /*
+     * Create map markers based on location and size
+     * Size Criterion:
+     *      10-20:
+     *      20-50:
+     *      50-100:
+     *      100-500:
+     *      >500:
+     */
+    protected MarkerOptions createMarkerOpt(MassEvent mEvent){
 
+        MarkerOptions markerOpt = new MarkerOptions().position(
+                new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                .getLocation().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(markerColor(mEvent.getEventSize())));
+
+        return markerOpt;
+
+    }
+
+    // TODO
+    protected int populationLevel(int size){
+        if (size < POPSIZE1){
+            return POPLEVEL1;
+        } else if (size < POPSIZE2) {
+            return POPLEVEL2;
+        } else if (size < POPSIZE3) {
+            return POPLEVEL3;
+        } else if (size < POPSIZE4) {
+            return POPLEVEL4;
+        } else if (size < POPSIZE5) {
+            return POPLEVEL5;
+        } else {
+            return POPLEVEL6;
+        }
+    }
+    // TODO
+    protected float markerColor(int size){
+        if (size < POPSIZE1){
+            return BitmapDescriptorFactory.HUE_YELLOW;
+        } else if (size < POPSIZE2) {
+            return BitmapDescriptorFactory.HUE_ORANGE;
+        } else if (size < POPSIZE3) {
+            return BitmapDescriptorFactory.HUE_ROSE;
+        } else if (size < POPSIZE4) {
+            return BitmapDescriptorFactory.HUE_VIOLET;
+        } else if (size < POPSIZE5) {
+            return BitmapDescriptorFactory.HUE_MAGENTA;
+        } else {
+            return BitmapDescriptorFactory.HUE_RED;
+        }
+    }
 
     /*
      * Show a dialog returned by Google Play services for the connection error code
@@ -862,6 +941,24 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         alert.show();
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if(markerIDs.containsKey(marker)){
+            Intent eventDetailIntent = new Intent();
+            eventDetailIntent.setClass(getApplicationContext(),EventActivity.class);
+            String eventId = markerIDs.get(marker);
+            eventDetailIntent.putExtra("objectId", eventId);
+            Log.d(Application.APPTAG, "On Marker Click, event object id is "+ eventId);
+            startActivity(eventDetailIntent);
+            return true;
+
+        } else {
+            Log.d(Application.APPTAG, "On Marker Click, unable to start eventActivity");
+            return false;
+        }
+    }
+
 
     public static class ErrorDialogFragment extends DialogFragment {
         /*
