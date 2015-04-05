@@ -45,12 +45,44 @@ public class EventActivity extends Activity {
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
         eventObjectId = extras.getString("objectId");
-
+        // Set title to ObjectId
         mTitleTextView.setText(eventObjectId);
 
-        // Populating event comments
-        getComments();
+        
+        if (Application.networkConnected(this)) {
+            // Populating event comments
+            getComments();
 
+            setSendMessageB();
+        }
+
+    }
+
+    private void initViewParts() {
+        // TODO: Right now we use the unique object id as event title.
+        mTitleTextView = (TextView) findViewById(R.id.activity_name);
+//        mEventSizeView = (TextView) findViewById(R.id.event_size);
+        mSendMessageButton = (Button) findViewById(R.id.send_button);
+        mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
+        mEventComments = (ListView) findViewById(R.id.event_comments);
+    }
+
+    private void getComments() {
+        ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
+                new ParseQueryAdapter.QueryFactory<ParseObject>() {
+                    public ParseQuery create() {
+                        ParseQuery queryEventComment = new ParseQuery("EventComment");
+                        queryEventComment.whereEqualTo("EventId", eventObjectId);
+                        return queryEventComment;
+                    }
+                };
+        queryEventComment = new ParseQueryAdapter<ParseObject>(this, factoryEventComment);
+
+        queryEventComment.setTextKey("UserComment");
+        mEventComments.setAdapter(queryEventComment);
+    }
+
+    private void setSendMessageB() {
         // After a person decides to add comment, add a data field on EventComment and then add a
         // comment to the list view.
         mSendMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -79,30 +111,5 @@ public class EventActivity extends Activity {
                 }
             }
         });
-
-    }
-
-    private void initViewParts() {
-        // TODO: Right now we use the unique object id as event title.
-        mTitleTextView = (TextView) findViewById(R.id.activity_name);
-//        mEventSizeView = (TextView) findViewById(R.id.event_size);
-        mSendMessageButton = (Button) findViewById(R.id.send_button);
-        mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
-        mEventComments = (ListView) findViewById(R.id.event_comments);
-    }
-
-    private void getComments() {
-        ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
-                new ParseQueryAdapter.QueryFactory<ParseObject>() {
-                    public ParseQuery create() {
-                        ParseQuery queryEventComment = new ParseQuery("EventComment");
-                        queryEventComment.whereEqualTo("EventId", eventObjectId);
-                        return queryEventComment;
-                    }
-                };
-        queryEventComment = new ParseQueryAdapter<ParseObject>(this, factoryEventComment);
-
-        queryEventComment.setTextKey("UserComment");
-        mEventComments.setAdapter(queryEventComment);
     }
 }

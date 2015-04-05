@@ -38,29 +38,32 @@ public class ListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_list);
-        userLocationPoint = getLocationPoint();
-        mActivityOne = (ListView) findViewById(R.id.event_list);
-        mListArray = getEventInfo();
+        if (Application.networkConnected(this)) {
+
+            setContentView(R.layout.activity_list);
+            userLocationPoint = getLocationPoint();
+            mActivityOne = (ListView) findViewById(R.id.event_list);
+            mListArray = getEventInfo();
 
 
-        // Bind data from adapter to ListView.
-        ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
-        mActivityOne.setAdapter(adapter);
+            // Bind data from adapter to ListView.
+            ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
+            mActivityOne.setAdapter(adapter);
 
 
-        // Load EventActivity when user clicks on a mass in the
-        mActivityOne.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent eventDetailIntent = new Intent();
-                eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                String eventId = mListArray[position];
-                eventDetailIntent.putExtra("objectId", eventId);
-                Log.d(Application.APPTAG, "event object id is "+id);
-                startActivity(eventDetailIntent);
-            }
-        });
+            // Load EventActivity when user clicks on a mass in the
+            mActivityOne.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent eventDetailIntent = new Intent();
+                    eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+                    String eventId = mListArray[position];
+                    eventDetailIntent.putExtra("objectId", eventId);
+                    Log.d(Application.APPTAG, "event object id is "+id);
+                    startActivity(eventDetailIntent);
+                }
+            });
+        }
     }
 
     protected ParseGeoPoint getLocationPoint() {
