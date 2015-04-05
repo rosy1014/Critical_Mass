@@ -41,28 +41,8 @@ public class ListActivity extends Activity {
         setContentView(R.layout.activity_list);
         userLocationPoint = getLocationPoint();
         mActivityOne = (ListView) findViewById(R.id.event_list);
+        mListArray = getEventInfo();
 
-        ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
-
-        ArrayList<String> mNearbyList = new ArrayList<String>();
-
-        eventsQuery.whereNear("location", userLocationPoint);
-        eventsQuery.setLimit(10);
-
-        List<ParseObject> parseObjects;
-
-        try {
-            // Use find instead of findInBackground because of a potential thread problem.
-            parseObjects = eventsQuery.find();
-            for (ParseObject mass : parseObjects) {
-                String eventObjectId = mass.getObjectId();
-                mNearbyList.add(eventObjectId);
-            }
-        } catch (ParseException e) {
-            Log.d(Application.APPTAG, e.getMessage());
-        }
-
-        mListArray = mNearbyList.toArray(mListArray);
 
         // Bind data from adapter to ListView.
         ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
@@ -105,11 +85,10 @@ public class ListActivity extends Activity {
 
         ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
 
-        ArrayList<String> mNearbyList = new ArrayList<String>();
-
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
+        ArrayList<String> mNearbyList = new ArrayList<String>();
         List<ParseObject> parseObjects;
 
         try {
@@ -123,7 +102,8 @@ public class ListActivity extends Activity {
             Log.d(Application.APPTAG, e.getMessage());
         }
 
-        String[] listArray = mNearbyList.toArray(mListArray);
+        String[] listArray = new String[mNearbyList.size()];
+        listArray = mNearbyList.toArray(listArray);
 
         return listArray;
     }

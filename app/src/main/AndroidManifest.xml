@@ -57,8 +57,7 @@
         </activity>
 
         <activity android:name=".EventActivity"
-                  android:label="Event"
-                  android:windowSoftInputMode="adjustPan">
+                  android:label="Event">
         </activity>
 
         <activity android:name=".LoginSignupActivity" >
