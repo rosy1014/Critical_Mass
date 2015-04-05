@@ -14,8 +14,6 @@ import android.content.Intent;
 
 import android.util.Log;
 
-import android.widget.Toast;
-
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -34,32 +32,28 @@ public class ListActivity extends Activity {
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
     private String[] mListArray;
+    private ParseGeoPoint userLocationPoint;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_list);
+        userLocationPoint = getLocationPoint();
+        mActivityOne = (ListView) findViewById(R.id.event_list);
 
-
-        ParseQuery<ParseObject> testQuery = ParseQuery.getQuery("MassEvent");
-
-        Location userCurrentLocation = MapsActivity.mCurrentLocation;
-        Location userLastLocation = MapsActivity.mLastLocation;
-        if (userCurrentLocation == null) {
-            Log.i(Application.APPTAG, "the current location is null");
-            userCurrentLocation = userLastLocation;
-        }
+        ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
 
         ArrayList<String> mNearbyList = new ArrayList<String>();
 
-        testQuery.whereNear("location", geoPointFromLocation(userCurrentLocation));
-        testQuery.setLimit(10);
+        eventsQuery.whereNear("location", userLocationPoint);
+        eventsQuery.setLimit(10);
 
         List<ParseObject> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
-            parseObjects = testQuery.find();
+            parseObjects = eventsQuery.find();
             for (ParseObject mass : parseObjects) {
                 String eventObjectId = mass.getObjectId();
                 mNearbyList.add(eventObjectId);
@@ -68,16 +62,10 @@ public class ListActivity extends Activity {
             Log.d(Application.APPTAG, e.getMessage());
         }
 
-        mListArray = new String[(mNearbyList.size())];
         mListArray = mNearbyList.toArray(mListArray);
 
-//        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1, mListArray);
-
-        ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
-
-        mActivityOne = (ListView) findViewById(R.id.event_list);
         // Bind data from adapter to ListView.
+        ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
         mActivityOne.setAdapter(adapter);
 
 
@@ -95,12 +83,49 @@ public class ListActivity extends Activity {
         });
     }
 
-    // The "static" keyword was added so that the constructor can call this function.
-    private static ParseGeoPoint geoPointFromLocation(Location location) {
-        ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        Log.i(Application.APPTAG, "geoPoint is " + geoPoint);
+    protected ParseGeoPoint getLocationPoint() {
+
+        Location userLocation;
+        if (MapsActivity.mCurrentLocation == null) {
+            Log.i(Application.APPTAG, "the current location is null");
+            userLocation = MapsActivity.mLastLocation;
+        }
+        else {
+            userLocation = MapsActivity.mCurrentLocation;
+        }
+
+        ParseGeoPoint geoPoint = new ParseGeoPoint(userLocation.getLatitude(),
+                userLocation.getLongitude());
+
         return geoPoint;
     }
 
+
+    protected String[] getEventInfo() {
+
+        ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
+
+        ArrayList<String> mNearbyList = new ArrayList<String>();
+
+        eventsQuery.whereNear("location", userLocationPoint);
+        eventsQuery.setLimit(10);
+
+        List<ParseObject> parseObjects;
+
+        try {
+            // Use find instead of findInBackground because of a potential thread problem.
+            parseObjects = eventsQuery.find();
+            for (ParseObject mass : parseObjects) {
+                String eventObjectId = mass.getObjectId();
+                mNearbyList.add(eventObjectId);
+            }
+        } catch (ParseException e) {
+            Log.d(Application.APPTAG, e.getMessage());
+        }
+
+        String[] listArray = mNearbyList.toArray(mListArray);
+
+        return listArray;
+    }
 
 }

@@ -1,11 +1,16 @@
 package com.example.ruoxilu.criticalmass;
 
+import android.app.AlertDialog;
 import android.util.Log;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.content.Context;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+
 
 
 public class Application extends android.app.Application {
@@ -23,6 +28,11 @@ public class Application extends android.app.Application {
         Log.d("CriticalMassApplication", "On start the currentuser is "+ ParseUser.getCurrentUser());
         ParseUser.getCurrentUser().saveInBackground();
 
+        setParseACL();
+    }
+
+    public void setParseACL() {
+
         ParseACL defaultACL = new ParseACL();
 
         // Optionally enable public read access.
@@ -35,11 +45,36 @@ public class Application extends android.app.Application {
         ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
         postACL.setPublicReadAccess(true);
         postACL.setPublicWriteAccess(true);
-        
+
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getUsername());
 
+    }
+
+    public static boolean networkConnected(Context c) {
+        ConnectivityManager conManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = conManager.getActiveNetworkInfo();
+
+        boolean networkConnected = netInfo != null && netInfo.isConnected();
+
+        if (!networkConnected) {
+            internetAlert(c);
+        }
+
+        return networkConnected;
+    }
+
+    public static void internetAlert (Context c) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+        builder.setTitle("Error: No Internet connection.");
+        builder.setMessage("Sorry, it seems like no internet connection is available. \n" +
+                "Please turn off airplane mode or turn on Wi-Fi/Celluar connection in Settings.");
+
+        AlertDialog internetAlertDialog = builder.create();
+
+        internetAlertDialog.show();
     }
 }
 

@@ -78,10 +78,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
+
     private static final String APPTAG = "CriticalMass";
     // Made static so that other activity can access location.
     public static Location mCurrentLocation;
     public static Location mLastLocation;
+
     // Fields for helping process the map and location changes
     private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     Button mMiddleBar;  // Directs to list activity
