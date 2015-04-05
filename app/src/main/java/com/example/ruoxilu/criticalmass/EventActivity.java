@@ -10,9 +10,6 @@ import android.widget.Toast;
 
 import android.view.View;
 
-import android.util.Log;
-
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -43,7 +40,7 @@ public class EventActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_event);
-        instantiateViewParts();
+        initViewParts();
 
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
@@ -85,7 +82,7 @@ public class EventActivity extends Activity {
 
     }
 
-    private void instantiateViewParts() {
+    private void initViewParts() {
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
 //        mEventSizeView = (TextView) findViewById(R.id.event_size);

@@ -34,7 +34,7 @@ public class LoginSignupActivity extends Activity {
         // Get the view from main.xml
         setContentView(R.layout.loginsignup);
 
-        instantiateView();
+        initViewParts();
 
         // Create a mainContext variable since "this" variable cannot be used in OnClickListener.
         final Context loginSignupContext = this;
@@ -66,7 +66,7 @@ public class LoginSignupActivity extends Activity {
     }
 
 
-    protected void instantiateView() {
+    protected void initViewParts() {
         // Locate EditTexts in main.xml
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
