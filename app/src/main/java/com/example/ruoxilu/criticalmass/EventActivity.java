@@ -48,7 +48,7 @@ public class EventActivity extends Activity {
         // Set title to ObjectId
         mTitleTextView.setText(eventObjectId);
 
-        
+
         if (Application.networkConnected(this)) {
             // Populating event comments
             getComments();
