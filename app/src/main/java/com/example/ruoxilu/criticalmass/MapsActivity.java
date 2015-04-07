@@ -26,6 +26,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,
+public class MapsActivity extends FragmentActivity implements LocationListener,GoogleMap.OnMarkerClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -83,22 +84,35 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public static Location mCurrentLocation;
     public static Location mLastLocation;
     // Fields for helping process the map and location changes
-    private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
+    private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
+    private final Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
     Button mMiddleBar;  // Directs to list activity
     Button mLeftBar;    // Directs to login page
     Button mRightBar;   // Placeholder
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
-
-    private MassEvent mMassEvent; //
+    protected MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
     private String mEventID;
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
     private String selectedPostObjectId;
     private int mostRecentMapUpdate;
+
+    /* Constants for population level */
+    public final int POPLEVEL1 = 1;
+    public final int POPLEVEL2 = 2;
+    public final int POPLEVEL3 = 3;
+    public final int POPLEVEL4 = 4;
+    public final int POPLEVEL5 = 5;
+    public final int POPLEVEL6 = 6;
+
+    public final int POPSIZE1 = 10;
+    public final int POPSIZE2 = 20;
+    public final int POPSIZE3 = 50;
+    public final int POPSIZE4 = 100;
+    public final int POPSIZE5 = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +193,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 return true;
             }
         });
+
 
 
         //(Xin)
@@ -343,8 +358,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
@@ -382,8 +396,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 doMapQuery();
             }
         });
+        mMap.setOnMarkerClickListener(this);
 
-        // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+       // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
         //mMap.addMarker(new MarkerOptions().position(latLng).title("me"));
         //CameraPosition mCameraPosition = new CameraPosition.Builder().build();
 
@@ -393,9 +408,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
         mCurrentLocation = getLocation();
-        //Log.d(APPTAG,"ONCONNECTED");
 
-        anonymousUserLogin(); // Helper function to log in the user anonymously if not alreadly logged in
+        anonymousUserLogin(); // Helper function to log in the user anonymously if not already logged in
         starterPeriodicLocationUpdates();// connect googleFused api services
 
         // set up mMassUser
@@ -712,7 +726,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 // Handle the results
                 Set<String> toKeep = new HashSet<String>();
                 // 2
-                for (MassEvent mEvent : objects) {
+                for (final MassEvent mEvent : objects) {
                     // 3 check if the event size exceeds the threshold, tentatively set to 0
                     if (mEvent.getEventSize() > 10) {
                         //Log.d(APPTAG, "valid mass event"+mEvent.getEventSize());
@@ -721,9 +735,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         // 4
                         Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
                         // 5
-                        MarkerOptions markerOpts =
-                                new MarkerOptions().position(new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                                        .getLocation().getLongitude()));
+                        MarkerOptions markerOpts = createMarkerOpt(mEvent);
                         // 6
                         if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * METERS_PER_FEET
                                 / METERS_PER_KILOMETER) {
@@ -753,7 +765,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             }
                         }
                         // 7
-                        Marker marker = mMap.addMarker(markerOpts);
+                        final Marker marker = mMap.addMarker(markerOpts);
+                        // update markerIDs hash map and mapMarkers hash map.
+                        markerIDs.put(marker, mEvent.getObjectId());
                         mapMarkers.put(mEvent.getObjectId(), marker);
                         // 8
                         if (mEvent.getObjectId().equals(selectedPostObjectId)) {
@@ -775,6 +789,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         for (String objId : new HashSet<String>(mapMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
                 Marker marker = mapMarkers.get(objId);
+                markerIDs.remove(marker);
                 marker.remove();
                 mapMarkers.get(objId).remove();
                 mapMarkers.remove(objId);
@@ -782,6 +797,63 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
+    /*
+     * Create map markers based on location and size
+     * Size Criterion:
+     *      10-20:
+     *      20-50:
+     *      50-100:
+     *      100-500:
+     *      >500:
+     */
+    protected MarkerOptions createMarkerOpt(MassEvent mEvent){
+
+        MarkerOptions markerOpt = new MarkerOptions().position(
+                new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                .getLocation().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(markerColor(mEvent.getEventSize())));
+
+        return markerOpt;
+
+    }
+
+    // TODO
+    protected int populationLevel(int size){
+        if (size < POPSIZE1){
+            return POPLEVEL1;
+        } else if (size < POPSIZE2) {
+            return POPLEVEL2;
+        } else if (size < POPSIZE3) {
+            return POPLEVEL3;
+        } else if (size < POPSIZE4) {
+            return POPLEVEL4;
+        } else if (size < POPSIZE5) {
+            return POPLEVEL5;
+        } else {
+            return POPLEVEL6;
+        }
+    }
+
+    /*
+     * Define map marker color based on location and size
+     * Size Criterion:
+     *      10-20: yellow
+     *      20-50: orange
+     *      50-100: rose
+     *      100-500:violet
+     *      >500: red
+     */
+    protected float markerColor(int size){
+        if (size < POPSIZE2 && size >= POPSIZE1){
+            return BitmapDescriptorFactory.HUE_YELLOW;
+        } else if (size < POPSIZE3) {
+            return BitmapDescriptorFactory.HUE_ORANGE;
+        } else if (size < POPSIZE4) {
+            return BitmapDescriptorFactory.HUE_ROSE;
+        } else if (size < POPSIZE5) {
+            return BitmapDescriptorFactory.HUE_VIOLET;
+        } else
+            return BitmapDescriptorFactory.HUE_RED;
+    }
 
 
     /*
@@ -856,6 +928,28 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         alert.show();
     }
+
+    /*
+    * Click on marker redirects user to eventActivity
+    */
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if(markerIDs.containsKey(marker)){
+            Intent eventDetailIntent = new Intent();
+            eventDetailIntent.setClass(getApplicationContext(),EventActivity.class);
+            String eventId = markerIDs.get(marker);
+            eventDetailIntent.putExtra("objectId", eventId);
+            Log.d(Application.APPTAG, "On Marker Click, event object id is "+ eventId);
+            startActivity(eventDetailIntent);
+            return true;
+
+        } else {
+            Log.d(Application.APPTAG, "On Marker Click, unable to start eventActivity");
+            return false;
+        }
+    }
+
 
     public static class ErrorDialogFragment extends DialogFragment {
         /*
