@@ -84,8 +84,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
     public static Location mCurrentLocation;
     public static Location mLastLocation;
     // Fields for helping process the map and location changes
-    private final Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
-    private final Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
+    private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
+    private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
     Button mMiddleBar;  // Directs to list activity
     Button mLeftBar;    // Directs to login page
     Button mRightBar;   // Placeholder
@@ -558,7 +558,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                         public void done(ParseException e) {
                             Log.d(APPTAG, "Done with getFirstInBackground loc");
 
-                            if (e==null){
+                            if (e == null) {
                                 Log.d(APPTAG, "MassUser update saved successfully");
                             } else {
                                 Log.d(APPTAG, "MassUser update were not saved");
@@ -571,7 +571,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                     mMassUser.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if (e==null){
+                            if (e == null) {
                                 Log.d(APPTAG, "New MassUser saved successfully");
                             } else {
                                 Log.d(APPTAG, "New MassUser were not saved");
@@ -765,7 +765,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                             }
                         }
                         // 7
-                        final Marker marker = mMap.addMarker(markerOpts);
+                        Marker marker = mMap.addMarker(markerOpts);
                         // update markerIDs hash map and mapMarkers hash map.
                         markerIDs.put(marker, mEvent.getObjectId());
                         mapMarkers.put(mEvent.getObjectId(), marker);
@@ -808,13 +808,42 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
      */
     protected MarkerOptions createMarkerOpt(MassEvent mEvent){
 
-        MarkerOptions markerOpt = new MarkerOptions().position(
-                new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                .getLocation().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(markerColor(mEvent.getEventSize())));
-
-        return markerOpt;
+       int size = mEvent.getEventSize();
+        Log.d(APPTAG, "Event size is " + size);
+        if(size < POPSIZE2){
+            Log.d(APPTAG, "LEVEL 2");
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m1));
+            return markerOpt;
+        } else if (size < POPSIZE3 ) {
+            Log.d(APPTAG, "LEVEL 3");
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m2));
+            return markerOpt;
+        } else if (size < POPSIZE4) {
+            Log.d(APPTAG, "LEVEL 4");
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m3));
+            return markerOpt;
+        } else if (size < POPSIZE5) {
+            Log.d(APPTAG, "LEVEL 5");
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m4));
+            return markerOpt;
+        } else {
+            Log.d(APPTAG, "LEVEL 7");
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m6));
+            return markerOpt;
+        }
 
     }
+
 
     // TODO
     protected int populationLevel(int size){
