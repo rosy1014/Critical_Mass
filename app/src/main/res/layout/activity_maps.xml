@@ -21,21 +21,21 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#FF112645"/>
+            android:background="#ff3f4f57"/>
 
         <Button
             android:id="@+id/map_middle_bar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:background="#FF9DADD6"/>
+            android:background="#ffdf7377"/>
 
         <Button
             android:id="@+id/map_right_bar"
             android:layout_width="0dp"
             android:layout_height="20dp"
             android:layout_weight="1"
-            android:background="#FF112645"/>
+            android:background="#ff3f4f57"/>
 
     </LinearLayout>
 
