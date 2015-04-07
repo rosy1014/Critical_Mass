@@ -1,10 +1,12 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.content.Context;
+import android.content.Intent;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -67,10 +69,26 @@ public class Application extends android.app.Application {
 
     public static void internetAlert (Context c) {
 
+        final Context specificContext = c;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(c);
         builder.setTitle("Error: No Internet connection.");
         builder.setMessage("Sorry, it seems like no internet connection is available. \n" +
                 "Please turn off airplane mode or turn on Wi-Fi/Celluar connection in Settings.");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+
+        builder.setNegativeButton("Settings", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                specificContext.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS), null);
+            }
+        });
+
+
 
         AlertDialog internetAlertDialog = builder.create();
 
