@@ -6,17 +6,21 @@ package com.example.ruoxilu.criticalmass;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import org.w3c.dom.Text;
 
 public class LoginSignupActivity extends Activity {
     // Declare Variables
@@ -26,14 +30,23 @@ public class LoginSignupActivity extends Activity {
     String passwordtxt;
     EditText password;
     EditText username;
+    TextView mAppName;
 
     /**
      * Called when the activity is first created.
      */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Get the view from main.xml
         setContentView(R.layout.loginsignup);
+
+        String fontPath = "fonts/GloriaHallelujah.ttf";
+        mAppName = (TextView) findViewById(R.id.app_name);
+//        mAppName.setText("Set in Java!");
+        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+        mAppName.setTypeface(tf);
+
         // Locate EditTexts in main.xml
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);

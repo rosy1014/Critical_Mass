@@ -1,6 +1,7 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -44,8 +45,13 @@ public class EventActivity extends Activity {
 
         setContentView(R.layout.activity_event);
 
+        String fontPath = "fonts/Nunito-Bold.ttf";
+
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
+        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+        mTitleTextView.setTypeface(tf);
+
 //        mEventSizeView = (TextView) findViewById(R.id.event_size);
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);

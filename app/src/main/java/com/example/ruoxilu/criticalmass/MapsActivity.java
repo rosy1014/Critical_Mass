@@ -126,7 +126,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     startActivityForResult(i, 0);
 
                 } else {
-                    mMiddleBar.setBackgroundColor(0xff9dadd6);
+                    mMiddleBar.setBackgroundColor(0xffdf7377);
                 }
 
                 return true;
@@ -155,13 +155,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 // Change color if pressed and reset after release
                 if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
                     confirmLogOut();
-
-                    mLeftBar.setBackgroundColor(0xff2a4a90);
-//                    ParseUser.logOut();
-//                    Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
-//                    startActivityForResult(i,0);
+                    mLeftBar.setBackgroundColor(0xff758F9A);
                 } else {
-                    mLeftBar.setBackgroundColor(0xff112645);
+                    mLeftBar.setBackgroundColor(0xff3f4f57);
                 }
 
                 return true;
@@ -175,9 +171,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
                 // Change color if pressed and reset after release
                 if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
-                    mRightBar.setBackgroundColor(0xff2a4a90);
+                    mRightBar.setBackgroundColor(0xff758F9A);
                 } else {
-                    mRightBar.setBackgroundColor(0xff112645);
+                    mRightBar.setBackgroundColor(0xff3f4f57);
                 }
 
                 return true;
