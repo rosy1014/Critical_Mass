@@ -814,31 +814,31 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
             Log.d(APPTAG, "LEVEL 2");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m1));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2));
             return markerOpt;
         } else if (size < POPSIZE3 ) {
             Log.d(APPTAG, "LEVEL 3");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m2));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3));
             return markerOpt;
         } else if (size < POPSIZE4) {
             Log.d(APPTAG, "LEVEL 4");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m3));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4));
             return markerOpt;
         } else if (size < POPSIZE5) {
             Log.d(APPTAG, "LEVEL 5");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m4));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5));
             return markerOpt;
         } else {
             Log.d(APPTAG, "LEVEL 7");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.m6));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6));
             return markerOpt;
         }
 
@@ -940,8 +940,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
 
                 deleteMassUser();
                 ParseUser.logOut();
-                Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
-                startActivityForResult(i, 0);
+                Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+//                Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
+//                startActivityForResult(i, 0);
 
                 Toast.makeText(getApplicationContext(), "You have successfully logged out!", Toast.LENGTH_LONG).show();
             }
