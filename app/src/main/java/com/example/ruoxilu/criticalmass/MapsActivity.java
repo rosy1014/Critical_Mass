@@ -748,6 +748,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                                 } else {
                                     // Marker now out of range, needs to be refreshed
                                     oldMarker.remove();
+                                    Log.d(APPTAG, "Removed oldmarker: " + oldMarker);
                                 }
                             }
 
@@ -779,6 +780,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
 
                 // 9
                 cleanUpMarkers(toKeep);
+                Log.d(APPTAG,"After clean up markers");
             }
         });
     }
@@ -814,31 +816,31 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
             Log.d(APPTAG, "LEVEL 2");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2)).snippet("Size: " +size);
             return markerOpt;
         } else if (size < POPSIZE3 ) {
             Log.d(APPTAG, "LEVEL 3");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3)).snippet("Size: " +size);
             return markerOpt;
         } else if (size < POPSIZE4) {
             Log.d(APPTAG, "LEVEL 4");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4)).snippet("Size: " +size);
             return markerOpt;
         } else if (size < POPSIZE5) {
             Log.d(APPTAG, "LEVEL 5");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5)).snippet("Size: " +size);
             return markerOpt;
         } else {
             Log.d(APPTAG, "LEVEL 7");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6));
+                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6)).snippet("Size: " +size);
             return markerOpt;
         }
 
