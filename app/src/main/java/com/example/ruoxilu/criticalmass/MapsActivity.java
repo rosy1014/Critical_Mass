@@ -48,9 +48,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,GoogleMap.OnMarkerClickListener,
+public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     /*
@@ -396,6 +396,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                 doMapQuery();
             }
         });
+        mMap.setOnInfoWindowClickListener(this);
         mMap.setOnMarkerClickListener(this);
 
        // mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
@@ -628,6 +629,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                         // decrement the old event size as the user is no longer there
                         int size = massEvent.getEventSize();
                         size = size - 1;
+                        Log.d(APPTAG, "decrement event size");
                         massEvent.setEventSize(size);
                         massEvent.saveInBackground();
 
@@ -647,6 +649,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                                     size = size + 1;
                                     massEvent.setEventSize(size);
                                     massEvent.saveInBackground();
+                                    mMassUser.setEvent(massEvent);
+                                    mMassUser.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            Log.d(APPTAG, "update user event error: "+ e);
+                                        }
+                                    });
                                 } else {
                                     // No new event found
                                     Log.i(APPTAG, "new event not found ");
@@ -767,14 +776,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
                         }
                         // 7
                         Marker marker = mMap.addMarker(markerOpts);
+                        //marker.showInfoWindow();
+                        Log.d(APPTAG,"Showed info Window");
                         // update markerIDs hash map and mapMarkers hash map.
                         markerIDs.put(marker, mEvent.getObjectId());
                         mapMarkers.put(mEvent.getObjectId(), marker);
                         // 8
-                        if (mEvent.getObjectId().equals(selectedPostObjectId)) {
-                            marker.showInfoWindow();
-                            selectedPostObjectId = null;
-                        }
+//                        if (mEvent.getObjectId().equals(selectedPostObjectId)) {
+//                            marker.showInfoWindow();
+//                            selectedPostObjectId = null;
+//                        }
                     }
                 }
 
@@ -816,31 +827,41 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
             Log.d(APPTAG, "LEVEL 2");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2)).snippet("Size: " +size);
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " +size);
             return markerOpt;
         } else if (size < POPSIZE3 ) {
             Log.d(APPTAG, "LEVEL 3");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3)).snippet("Size: " +size);
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " +size);
             return markerOpt;
         } else if (size < POPSIZE4) {
             Log.d(APPTAG, "LEVEL 4");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4)).snippet("Size: " +size);
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " +size);
             return markerOpt;
         } else if (size < POPSIZE5) {
             Log.d(APPTAG, "LEVEL 5");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5)).snippet("Size: " +size);
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " +size);
             return markerOpt;
         } else {
             Log.d(APPTAG, "LEVEL 7");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
-                            .getLocation().getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6)).snippet("Size: " +size);
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " +size);
             return markerOpt;
         }
 
@@ -963,12 +984,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
         alert.show();
     }
 
-    /*
-    * Click on marker redirects user to eventActivity
-    */
-
     @Override
-    public boolean onMarkerClick(Marker marker) {
+    public void onInfoWindowClick(Marker marker) {
         if(markerIDs.containsKey(marker)){
             Intent eventDetailIntent = new Intent();
             eventDetailIntent.setClass(getApplicationContext(),EventActivity.class);
@@ -976,12 +993,38 @@ public class MapsActivity extends FragmentActivity implements LocationListener,G
             eventDetailIntent.putExtra("objectId", eventId);
             Log.d(Application.APPTAG, "On Marker Click, event object id is "+ eventId);
             startActivity(eventDetailIntent);
-            return true;
+            //return true;
 
         } else {
             Log.d(Application.APPTAG, "On Marker Click, unable to start eventActivity");
-            return false;
+           // return false;
         }
+    }
+/*
+ * Reference for customized info window
+ * http://stackoverflow.com/questions/14123243/google-maps-android-api-v2-interactive-infowindow-like-in-original-android-go/15040761#15040761
+ */
+    /*
+    * Click on marker redirects user to eventActivity
+    */
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.showInfoWindow();
+        return true;
+//        if(markerIDs.containsKey(marker)){
+//            Intent eventDetailIntent = new Intent();
+//            eventDetailIntent.setClass(getApplicationContext(),EventActivity.class);
+//            String eventId = markerIDs.get(marker);
+//            eventDetailIntent.putExtra("objectId", eventId);
+//            Log.d(Application.APPTAG, "On Marker Click, event object id is "+ eventId);
+//            startActivity(eventDetailIntent);
+//            return true;
+//
+//        } else {
+//            Log.d(Application.APPTAG, "On Marker Click, unable to start eventActivity");
+//            return false;
+//        }
     }
 
 
