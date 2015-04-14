@@ -984,6 +984,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         alert.show();
     }
 
+    /*
+    * Click on marker redirects user to eventActivity
+    */
+
     @Override
     public void onInfoWindowClick(Marker marker) {
         if(markerIDs.containsKey(marker)){
