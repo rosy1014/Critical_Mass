@@ -97,7 +97,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Fields for the map radius in feet
     private float radius;
     private float lastRadius;
-    private String selectedPostObjectId;
+  //  private String selectedPostObjectId;
     private int mostRecentMapUpdate;
 
     /* Constants for population level */
