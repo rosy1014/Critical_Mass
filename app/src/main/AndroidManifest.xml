@@ -35,7 +35,7 @@
     <application
         android:name=".Application"
         android:allowBackup="true"
-        android:icon="@drawable/pinicon"
+        android:icon="@drawable/appicon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
     <meta-data
@@ -51,7 +51,15 @@
 
             
         </activity>
+        <activity
+            android:name=".DispatchActivity"
+            android:noHistory="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ListActivity"
                   android:label="List">
         </activity>
@@ -62,10 +70,10 @@
 
         <activity android:name=".LoginSignupActivity" >
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
 
         </activity>
 
