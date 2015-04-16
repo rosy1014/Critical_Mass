@@ -24,6 +24,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.Parse;
 import com.parse.ParseImageView;
 import com.parse.ParseObject;
@@ -45,11 +46,14 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
 
     private Context context;
     private String[] values;
+    private com.parse.ParseFile[] eventIconsArray;
 
-    public ListActivityAdapter(Context context, String[] values) {
+
+    public ListActivityAdapter(Context context, String[] values, com.parse.ParseFile[] eventIconsArray) {
         super(context, R.layout.list_item, values);
         this.context = context;
         this.values = values;
+        this.eventIconsArray = eventIconsArray;
     }
 
     @Override
@@ -65,7 +69,15 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
         // TODO: add event size
         // TextView eventSizeTextView = (TextView) rowView.findViewById(R.id.event_size);
         titleTextView.setText(values[position]);
+        eventIconView.setParseFile(eventIconsArray[position]);
 
+        eventIconView.loadInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, com.parse.ParseException e) {
+                Log.d(Application.APPTAG,
+                        "Fetched image");
+            }
+        });
 
         return rowView;
     }

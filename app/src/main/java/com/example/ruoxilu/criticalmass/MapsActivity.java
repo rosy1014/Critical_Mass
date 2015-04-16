@@ -279,8 +279,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
-        //Log.d(APPTAG,"On Resume, Google Api Client connect");
-        //Log.d(APPTAG,"On Resume, my current location is " + mCurrentLocation);
+
+//        starterPeriodicLocationUpdates();// connect googleFused api services
+//        setUpMapIfNeeded();
+        Log.d(APPTAG,"On Resume, Google Api Client connect");
+        Log.d(APPTAG,"On Resume, my current location is " + mCurrentLocation);
+
         if(mCurrentLocation != null){
             // Create a LatLng object for the current location
             double latitude = mCurrentLocation.getLatitude();
@@ -699,7 +703,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private void updateZoom(Location location) {
         Log.d(Application.APPTAG, "updateZoom: latitude: "+location.getLatitude());
         Log.d(Application.APPTAG, "updateZoom: longtitude: "+location.getLongitude());
-
 
         LatLng myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
         // Move the camera to the location in interest and zoom to appropriate level

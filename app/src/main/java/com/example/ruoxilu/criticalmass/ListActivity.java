@@ -48,7 +48,7 @@ public class ListActivity extends Activity {
 
 
             // Bind data from adapter to ListView.
-            ArrayAdapter<String> adapter = new ListActivityAdapter(this, listArray);
+            ArrayAdapter<String> adapter = new ListActivityAdapter(this, listArray, eventIconsArray);
             mActivityOne.setAdapter(adapter);
 
 
@@ -92,11 +92,8 @@ public class ListActivity extends Activity {
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
-        // ArrayList<String> mNearbyList = new ArrayList<String>();
-
         eventIconsArray = new com.parse.ParseFile[10];
-//        String[] listArray = new String[mNearbyList.size()];
-//        listArray = mNearbyList.toArray(listArray);
+
         listArray = new String[10];
         List<ParseObject> parseObjects;
 
@@ -105,12 +102,13 @@ public class ListActivity extends Activity {
             parseObjects = eventsQuery.find();
             int i = 0;
             for (ParseObject mass : parseObjects) {
+
                 String eventObjectId = mass.getObjectId();
                 com.parse.ParseFile eventIcon = mass.getParseFile("image");
 
-//                mNearbyList.add(eventObjectId);
                 listArray[i] = eventObjectId;
                 eventIconsArray[i] = eventIcon;
+                Log.d(Application.APPTAG, "image name: "+eventIcon.getName());
                 i++;
             }
         } catch (ParseException e) {
