@@ -126,7 +126,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         //Log.d(APPTAG, "mMassUser " + mMassUser);
 
         setContentView(R.layout.activity_maps);
-        setUpMapIfNeeded();
 
         mMiddleBar = (Button)findViewById(R.id.map_middle_bar);
         mMiddleBar.setOnTouchListener(new View.OnTouchListener() {
@@ -408,10 +407,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     @Override
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
+
+        starterPeriodicLocationUpdates();// connect googleFused api services
+        setUpMapIfNeeded();
+
         mCurrentLocation = getLocation();
 
         anonymousUserLogin(); // Helper function to log in the user anonymously if not already logged in
-        starterPeriodicLocationUpdates();// connect googleFused api services
 
         // set up mMassUser
         mMassUser.setUser(ParseUser.getCurrentUser());
@@ -427,7 +429,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
         mMassUser.setUser(ParseUser.getCurrentUser());
         updateUserLocation(mMassUser.getLocation());
-
 
         // update MassEvent
         Log.i(APPTAG, "Event ID of current user is " + mEventID);
@@ -694,6 +695,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Zooms the map to show the area of interest based on the search radius
      */
     private void updateZoom(Location location) {
+        Log.d(Application.APPTAG, "updateZoom: latitude: "+location.getLatitude());
+        Log.d(Application.APPTAG, "updateZoom: longtitude: "+location.getLongitude());
+
+
         LatLng myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
         // Move the camera to the location in interest and zoom to appropriate level
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, ZOOM_LEVEL));
