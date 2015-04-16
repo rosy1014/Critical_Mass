@@ -14,8 +14,6 @@ import android.content.Intent;
 
 import android.util.Log;
 
-import android.widget.Toast;
-
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -34,32 +32,71 @@ public class ListActivity extends Activity {
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
     private String[] mListArray;
+    private ParseGeoPoint userLocationPoint;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
+
+        if (Application.networkConnected(this)) {
+
+            setContentView(R.layout.activity_list);
+            userLocationPoint = getLocationPoint();
+            mActivityOne = (ListView) findViewById(R.id.event_list);
+            mListArray = getEventInfo();
 
 
-        ParseQuery<ParseObject> testQuery = ParseQuery.getQuery("MassEvent");
+            // Bind data from adapter to ListView.
+            ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
+            mActivityOne.setAdapter(adapter);
 
-        Location userCurrentLocation = MapsActivity.mCurrentLocation;
-        Location userLastLocation = MapsActivity.mLastLocation;
-        if (userCurrentLocation == null) {
+
+            // Load EventActivity when user clicks on a mass in the
+            mActivityOne.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent eventDetailIntent = new Intent();
+                    eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+                    String eventId = mListArray[position];
+                    eventDetailIntent.putExtra("objectId", eventId);
+                    Log.d(Application.APPTAG, "event object id is "+id);
+                    startActivity(eventDetailIntent);
+                }
+            });
+        }
+    }
+
+    protected ParseGeoPoint getLocationPoint() {
+
+        Location userLocation;
+        if (MapsActivity.mCurrentLocation == null) {
             Log.i(Application.APPTAG, "the current location is null");
-            userCurrentLocation = userLastLocation;
+            userLocation = MapsActivity.mLastLocation;
+        }
+        else {
+            userLocation = MapsActivity.mCurrentLocation;
         }
 
+        ParseGeoPoint geoPoint = new ParseGeoPoint(userLocation.getLatitude(),
+                userLocation.getLongitude());
+
+        return geoPoint;
+    }
+
+
+    protected String[] getEventInfo() {
+
+        ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
+
+        eventsQuery.whereNear("location", userLocationPoint);
+        eventsQuery.setLimit(10);
+
         ArrayList<String> mNearbyList = new ArrayList<String>();
-
-        testQuery.whereNear("location", geoPointFromLocation(userCurrentLocation));
-        testQuery.setLimit(10);
-
         List<ParseObject> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
-            parseObjects = testQuery.find();
+            parseObjects = eventsQuery.find();
             for (ParseObject mass : parseObjects) {
                 String eventObjectId = mass.getObjectId();
                 mNearbyList.add(eventObjectId);
@@ -68,39 +105,10 @@ public class ListActivity extends Activity {
             Log.d(Application.APPTAG, e.getMessage());
         }
 
-        mListArray = new String[(mNearbyList.size())];
-        mListArray = mNearbyList.toArray(mListArray);
+        String[] listArray = new String[mNearbyList.size()];
+        listArray = mNearbyList.toArray(listArray);
 
-//        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-//                android.R.layout.simple_list_item_1, mListArray);
-
-        ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
-
-        mActivityOne = (ListView) findViewById(R.id.event_list);
-        // Bind data from adapter to ListView.
-        mActivityOne.setAdapter(adapter);
-
-
-        // Load EventActivity when user clicks on a mass in the
-        mActivityOne.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent eventDetailIntent = new Intent();
-                eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                String eventId = mListArray[position];
-                eventDetailIntent.putExtra("objectId", eventId);
-                Log.d(Application.APPTAG, "event object id is "+id);
-                startActivity(eventDetailIntent);
-            }
-        });
+        return listArray;
     }
-
-    // The "static" keyword was added so that the constructor can call this function.
-    private static ParseGeoPoint geoPointFromLocation(Location location) {
-        ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        Log.i(Application.APPTAG, "geoPoint is " + geoPoint);
-        return geoPoint;
-    }
-
 
 }

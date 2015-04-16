@@ -79,10 +79,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static final double OFFSET_CALCULATION_INIT_DIFF = 1.0;
     // Accuracy for calculating the map bounds
     private static final float OFFSET_CALCULATION_ACCURACY = 0.01f;
+
     private static final String APPTAG = "CriticalMass";
     // Made static so that other activity can access location.
-    public static Location mCurrentLocation;
-    public static Location mLastLocation;
+  //  public static Location mCurrentLocation;
+   // public static Location mLastLocation;
+
     // Fields for helping process the map and location changes
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
@@ -114,11 +116,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public final int POPSIZE4 = 100;
     public final int POPSIZE5 = 500;
 
+
+    public static Location mCurrentLocation = new Location("dummyprovider");
+    public static Location mLastLocation = new Location("dummyprovider");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(APPTAG,"onCreate");
         super.onCreate(savedInstanceState);
-
+        mCurrentLocation.setLongitude(37.0);
+        mCurrentLocation.setLatitude(64.0);
+        mLastLocation.setLongitude(37.0);
+        mLastLocation.setLatitude(64.0);
         initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
@@ -374,7 +383,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         String provider = mLocationManager.getBestProvider(criteria, true);
 
         // Get Current Location
-        Location mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
+        if(mLocationManager.getLastKnownLocation(provider) == null){
+            mCurrentLocation.setLongitude(37.0);
+            mCurrentLocation.setLatitude(-63.0);
+
+        } else {
+            mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
+        }
+
 
         updateZoom(mCurrentLocation);
 
@@ -694,7 +710,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Zooms the map to show the area of interest based on the search radius
      */
     private void updateZoom(Location location) {
-        LatLng myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+        LatLng myLatLng = (location == null) ? new LatLng(0, 0) : new LatLng(location.getLatitude(),location.getLongitude());
         // Move the camera to the location in interest and zoom to appropriate level
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, ZOOM_LEVEL));
     }
@@ -709,6 +725,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return;
         }
         // 2
+        Log.d(APPTAG, "myloc is " + myLoc);
         final ParseGeoPoint myPoint = geoPointFromLocation(myLoc);
         // 3
         ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
@@ -726,7 +743,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     Log.d(APPTAG, "An error occurred while querying for map posts.", e);
                     return;
                 } else {
-                    Log.d(APPTAG, "Find Mass Event" + objects.get(0).getObjectId());
+                    Log.d(APPTAG,"Find Mass Event " + e);
+                  //  Log.d(APPTAG, "Find Mass Event " + objects.get(0).getObjectId());
                 }
 
                 if (myUpdateNumber != mostRecentMapUpdate) {
