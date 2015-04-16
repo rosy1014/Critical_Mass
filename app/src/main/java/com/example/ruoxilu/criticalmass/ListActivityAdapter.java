@@ -54,23 +54,19 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         LayoutInflater inflater = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.list_item, parent, false);
 
         TextView titleTextView = (TextView) rowView.findViewById(R.id.title_text);
+        ParseImageView eventIconView = (ParseImageView) rowView.findViewById(R.id.activity_image);
 
         // TODO: add event size
         // TextView eventSizeTextView = (TextView) rowView.findViewById(R.id.event_size);
         titleTextView.setText(values[position]);
 
-        // TODO: different background color for different row
-//        if (position % 2 == 0) {
-//
-//        }
-//        else {
-//
-//        }
+
         return rowView;
     }
 

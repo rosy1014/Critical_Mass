@@ -31,7 +31,8 @@ public class ListActivity extends Activity {
 
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
-    private String[] mListArray;
+    private String[] listArray;
+    private com.parse.ParseFile[] eventIconsArray;
     private ParseGeoPoint userLocationPoint;
 
 
@@ -43,11 +44,11 @@ public class ListActivity extends Activity {
             setContentView(R.layout.activity_list);
             userLocationPoint = getLocationPoint();
             mActivityOne = (ListView) findViewById(R.id.event_list);
-            mListArray = getEventInfo();
+            getEventInfo();
 
 
             // Bind data from adapter to ListView.
-            ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
+            ArrayAdapter<String> adapter = new ListActivityAdapter(this, listArray);
             mActivityOne.setAdapter(adapter);
 
 
@@ -57,7 +58,7 @@ public class ListActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                    String eventId = mListArray[position];
+                    String eventId = listArray[position];
                     eventDetailIntent.putExtra("objectId", eventId);
                     Log.d(Application.APPTAG, "event object id is "+id);
                     startActivity(eventDetailIntent);
@@ -84,31 +85,38 @@ public class ListActivity extends Activity {
     }
 
 
-    protected String[] getEventInfo() {
+    protected void getEventInfo() {
 
         ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
 
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
-        ArrayList<String> mNearbyList = new ArrayList<String>();
+        // ArrayList<String> mNearbyList = new ArrayList<String>();
+
+        eventIconsArray = new com.parse.ParseFile[10];
+//        String[] listArray = new String[mNearbyList.size()];
+//        listArray = mNearbyList.toArray(listArray);
+        listArray = new String[10];
         List<ParseObject> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
+            int i = 0;
             for (ParseObject mass : parseObjects) {
                 String eventObjectId = mass.getObjectId();
-                mNearbyList.add(eventObjectId);
+                com.parse.ParseFile eventIcon = mass.getParseFile("image");
+
+//                mNearbyList.add(eventObjectId);
+                listArray[i] = eventObjectId;
+                eventIconsArray[i] = eventIcon;
+                i++;
             }
         } catch (ParseException e) {
             Log.d(Application.APPTAG, e.getMessage());
         }
 
-        String[] listArray = new String[mNearbyList.size()];
-        listArray = mNearbyList.toArray(listArray);
-
-        return listArray;
     }
 
 }
