@@ -1,18 +1,17 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-
 
 
 public class Application extends android.app.Application {
@@ -47,7 +46,7 @@ public class Application extends android.app.Application {
         ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
         postACL.setPublicReadAccess(true);
         postACL.setPublicWriteAccess(true);
-
+        
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getObjectId());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getCreatedAt());
         Log.d("CriticalMassApplication",  " In anonymousUserLogin, ParseUser is null?"+ ParseUser.getCurrentUser().getUsername());
