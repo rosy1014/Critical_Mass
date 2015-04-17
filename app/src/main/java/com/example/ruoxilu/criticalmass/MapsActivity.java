@@ -60,8 +60,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     // Made static so that other activity can access location.
-    public static Location mCurrentLocation = new Location("dummyprovider");
-    public static Location mLastLocation = new Location("dummyprovider");
+    public static Location mCurrentLocation = Settings.getDefaultLocation();
+    public static Location mLastLocation = Settings.getDefaultLocation();
     // Fields for helping process the map and location changes
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
@@ -88,10 +88,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-        mCurrentLocation.setLongitude(37.0);
-        mCurrentLocation.setLatitude(64.0);
-        mLastLocation.setLongitude(37.0);
-        mLastLocation.setLatitude(64.0);
         initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
@@ -113,11 +109,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         setUpMapIfNeeded();
 
-
         //TODO Logout and delete mass user
         //        deleteMassUser();
         //        ParseUser.logOut();
-
 
         checkLoginStatus();
 
