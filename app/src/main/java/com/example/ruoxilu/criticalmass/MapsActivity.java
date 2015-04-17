@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -62,8 +63,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Fields for helping process the map and location changes
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
-
-
+    private static ViewGroup mViewGroup;
+    private static LinearLayout mMainScreen;
     protected MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
     Button mMiddleBar;  // Directs to list activity
     Button mLeftBar;    // Directs to login page
@@ -82,6 +83,17 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
+
+//        if (mMainScreen != null) {
+//
+//            mViewGroup.removeView(mMainScreen);
+//            setContentView(R.layout.activity_maps_no_view);
+//
+//            mViewGroup = (ViewGroup) findViewById(R.id.second_map_screen);
+//            mViewGroup.addView(mMainScreen);
+//
+//        } else {
+
         mCurrentLocation.setLongitude(37.0);
         mCurrentLocation.setLatitude(64.0);
         mLastLocation.setLongitude(37.0);
@@ -93,15 +105,21 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         //Log.d(Settings.APPTAG, "mMassUser " + mMassUser);
 
         setContentView(R.layout.activity_maps);
+
+
+        mViewGroup = (ViewGroup) findViewById(R.id.first_map_screen);
+        mMainScreen = (LinearLayout) mViewGroup.findViewById(R.id.map_screen_content);
+
+
         setUpMapIfNeeded();
 
-        mMiddleBar = (Button)findViewById(R.id.map_middle_bar);
+        mMiddleBar = (Button) mViewGroup.findViewById(R.id.map_middle_bar);
         mMiddleBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent ev) {
 
                 // Change color if pressed and reset after release
-                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
                     mMiddleBar.setBackgroundColor(0xffffffff);
                     Intent i = new Intent(MapsActivity.this, ListActivity.class);
                     startActivityForResult(i, 0);
@@ -118,23 +136,23 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             public void onClick(View v) {
 
                 // Start ListActivity
-                Intent i = new Intent(MapsActivity.this, ListActivity.class);
-                startActivityForResult(i, 0);
+                    Intent i = new Intent(MapsActivity.this, ListActivity.class);
+                    startActivityForResult(i, 0);
 
-            }
+                }
         });
 
         //TODO Logout and delete mass user
-//        deleteMassUser();
-//        ParseUser.logOut();
+        //        deleteMassUser();
+        //        ParseUser.logOut();
 
-        mLeftBar = (Button)findViewById(R.id.map_left_bar);
+        mLeftBar = (Button) mViewGroup.findViewById(R.id.map_left_bar);
         mLeftBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent ev) {
 
                 // Change color if pressed and reset after release
-                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
                     confirmLogOut();
                     mLeftBar.setBackgroundColor(0xff758F9A);
                 } else {
@@ -145,23 +163,31 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         });
 
-        mRightBar = (Button)findViewById(R.id.map_right_bar);
+        mRightBar = (Button) mViewGroup.findViewById(R.id.map_right_bar);
         mRightBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent ev) {
 
                 // Change color if pressed and reset after release
-                if (ev.getAction() == MotionEvent.ACTION_DOWN ) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) {
                     mRightBar.setBackgroundColor(0xff758F9A);
                 } else {
                     mRightBar.setBackgroundColor(0xff3f4f57);
                 }
 
                 return true;
-            }
+                }
         });
 
+        checkLoginStatus();
 
+
+//        }
+
+    }
+
+
+    protected void checkLoginStatus() {
 
         //(Xin)
         // determine whether the current user is an anonymous user and
@@ -184,6 +210,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         }
     }
+
 
     protected void deleteMassUser() {
         ParseQuery<MassUser> query = MassUser.getQuery();
@@ -774,6 +801,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /*
      * Remove markers that are not in the Hashmap markersToKeep
      */
+    // SIGN_MARKER_OBJECT
     private void cleanUpMarkers(Set<String> markersToKeep) {
         for (String objId : new HashSet<String>(mapMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
@@ -795,6 +823,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      *      100-500:
      *      >500:
      */
+    // SIGN_MARKER_OBJECT
     protected MarkerOptions createMarkerOpt(MassEvent mEvent){
 
        int size = mEvent.getEventSize();
@@ -845,6 +874,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
 
     // TODO
+    // SIGN_MARKER_OBJECT
     protected int populationLevel(int size){
         if (size < Settings.POPSIZE1) {
             return Settings.POPLEVEL1;
@@ -870,6 +900,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      *      100-500:violet
      *      >500: red
      */
+    // SIGN_MARKER_OBJECT
     protected float markerColor(int size){
         if (size < Settings.POPSIZE2 && size >= Settings.POPSIZE1) {
             return BitmapDescriptorFactory.HUE_YELLOW;
@@ -909,6 +940,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
+    // SIGN_BACKGROUND_SERVICE
     private boolean servicesConnected() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
@@ -992,19 +1024,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public boolean onMarkerClick(Marker marker) {
         marker.showInfoWindow();
         return true;
-//        if(markerIDs.containsKey(marker)){
-//            Intent eventDetailIntent = new Intent();
-//            eventDetailIntent.setClass(getApplicationContext(),EventActivity.class);
-//            String eventId = markerIDs.get(marker);
-//            eventDetailIntent.putExtra("objectId", eventId);
-//            Log.d(Application.Settings.APPTAG, "On Marker Click, event object id is "+ eventId);
-//            startActivity(eventDetailIntent);
-//            return true;
-//
-//        } else {
-//            Log.d(Application.Settings.APPTAG, "On Marker Click, unable to start eventActivity");
-//            return false;
-//        }
+
     }
 
 
@@ -1031,4 +1051,3 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
 
 }
-
