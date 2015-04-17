@@ -1,45 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    android:id="@+id/map_screen"
+
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/button_panel"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:weightSum="5">
-
-        <Button
-            android:id="@+id/map_left_bar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#ff3f4f57"/>
-
-        <Button
-            android:id="@+id/map_middle_bar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:background="#ffdf7377"/>
-
-        <Button
-            android:id="@+id/map_right_bar"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_weight="1"
-            android:background="#ff3f4f57"/>
-
-    </LinearLayout>
-
-
+    <!-- As the main content view, the view below consumes the entire
+         space available using match_parent in both dimensions. -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -48,5 +18,20 @@
         tools:context=".MapsActivity"
         tools:layout="@layout/activity_maps"/>
 
+    <!-- android:layout_gravity="start" tells DrawerLayout to treat
+         this as a sliding drawer on the left side for left-to-right
+         languages and on the right side for right-to-left languages.
+         The drawer is given a fixed width in dp and extends the full height of
+         the container. A solid background is used for contrast
+         with the content view. -->
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#111"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"/>
 
-</LinearLayout>
+</android.support.v4.widget.DrawerLayout>
