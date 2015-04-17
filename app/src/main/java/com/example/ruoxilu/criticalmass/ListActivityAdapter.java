@@ -82,5 +82,4 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
         return rowView;
     }
 
-    
 }

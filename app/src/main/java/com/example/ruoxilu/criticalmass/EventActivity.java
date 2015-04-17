@@ -3,6 +3,8 @@ package com.example.ruoxilu.criticalmass;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,6 +20,9 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by tingyu on 2/26/15.
  */
@@ -25,6 +30,9 @@ public class EventActivity extends Activity {
 
     private String eventObjectId;
 //    private int mEventSize;
+    private ArrayList<String> comments;
+    private ArrayList<String> username;
+
     private String messageBody;
 
     private TextView mTitleTextView;
@@ -52,7 +60,11 @@ public class EventActivity extends Activity {
 
         if (Application.networkConnected(this)) {
             // Populating event comments
-            getComments();
+            String[] values = getComments(eventObjectId);
+
+            // Bind data from adapter to ListView.
+            ArrayAdapter<String> adapter = new EventActivityAdapter(this, comments, username);
+            mEventComments.setAdapter(adapter);
 
             setSendMessageB();
         }
@@ -73,19 +85,46 @@ public class EventActivity extends Activity {
         mEventComments = (ListView) findViewById(R.id.event_comments);
     }
 
-    private void getComments() {
-        ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
-                new ParseQueryAdapter.QueryFactory<ParseObject>() {
-                    public ParseQuery create() {
-                        ParseQuery queryEventComment = new ParseQuery("EventComment");
-                        queryEventComment.whereEqualTo("EventId", eventObjectId);
-                        return queryEventComment;
-                    }
-                };
-        queryEventComment = new ParseQueryAdapter<ParseObject>(this, factoryEventComment);
+//    private void getComments() {
+//        ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
+//                new ParseQueryAdapter.QueryFactory<ParseObject>() {
+//                    public ParseQuery create() {
+//                        ParseQuery queryEventComment = new ParseQuery("EventComment");
+//                        queryEventComment.whereEqualTo("EventId", eventObjectId);
+//                        return queryEventComment;
+//                    }
+//                };
+//        queryEventComment = new ParseQueryAdapter<ParseObject>(this, factoryEventComment);
+//
+//        queryEventComment.setTextKey("UserComment");
+//        mEventComments.setAdapter(queryEventComment);
+//    }
 
-        queryEventComment.setTextKey("UserComment");
-        mEventComments.setAdapter(queryEventComment);
+    private String [] getComments(String eventId) {
+        ParseQuery queryEventComment = new ParseQuery("EventComment");
+        queryEventComment.whereEqualTo("EventId", eventId);
+        comments = new ArrayList<String>();
+
+        List<ParseObject> parseObjects;
+
+        try {
+            // Use find instead of findInBackground because of a potential thread problem.
+            parseObjects = queryEventComment.find();
+
+            for (ParseObject commentInfo : parseObjects) {
+                comments.add(commentInfo.getString("UserComment"));
+                username.add(commentInfo.getString("username"));
+            }
+
+        } catch (com.parse.ParseException e) {
+            Log.d(Application.APPTAG, e.getMessage());
+        }
+
+        String[] values = new String[comments.size()];
+        values = comments.toArray(values);
+
+        return values;
+
     }
 
     private void setSendMessageB() {
