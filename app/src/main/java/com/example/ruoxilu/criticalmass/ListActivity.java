@@ -60,7 +60,7 @@ public class ListActivity extends Activity {
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
                     String eventId = listArray[position];
                     eventDetailIntent.putExtra("objectId", eventId);
-                    Log.d(Application.APPTAG, "event object id is "+id);
+                    Log.d(Settings.APPTAG, "event object id is "+id);
                     startActivity(eventDetailIntent);
                 }
             });
@@ -71,17 +71,16 @@ public class ListActivity extends Activity {
 
         Location userLocation;
         if (MapsActivity.mCurrentLocation == null) {
-            Log.i(Application.APPTAG, "the current location is null");
+            Log.i(Settings.APPTAG, "the current location is null");
             userLocation = MapsActivity.mLastLocation;
-        }
-        else {
+        } else {
             userLocation = MapsActivity.mCurrentLocation;
         }
 
-        ParseGeoPoint geoPoint = new ParseGeoPoint(userLocation.getLatitude(),
+        ParseGeoPoint currentPoint = new ParseGeoPoint(userLocation.getLatitude(),
                 userLocation.getLongitude());
 
-        return geoPoint;
+        return currentPoint;
     }
 
 
@@ -101,6 +100,7 @@ public class ListActivity extends Activity {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
             int i = 0;
+
             for (ParseObject mass : parseObjects) {
 
                 String eventObjectId = mass.getObjectId();
@@ -108,11 +108,11 @@ public class ListActivity extends Activity {
 
                 listArray[i] = eventObjectId;
                 eventIconsArray[i] = eventIcon;
-                Log.d(Application.APPTAG, "image name: "+eventIcon.getName());
+                Log.d(Settings.APPTAG, "image name: "+eventIcon.getName());
                 i++;
             }
         } catch (ParseException e) {
-            Log.d(Application.APPTAG, e.getMessage());
+            Log.d(Settings.APPTAG, e.getMessage());
         }
 
     }

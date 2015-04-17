@@ -21,8 +21,6 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
-import org.w3c.dom.Text;
-
 public class LoginSignupActivity extends Activity {
 
     // Declare Variables

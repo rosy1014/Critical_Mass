@@ -5,13 +5,12 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Button;
 import android.widget.Toast;
-
-import android.view.View;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -42,6 +41,7 @@ public class EventActivity extends Activity {
     private ListView mEventComments;
 
     private ParseQueryAdapter<ParseObject> queryEventComment;
+    private String fontPath = "fonts/Nunito-Bold.ttf";
 
 
     @Override
@@ -72,7 +72,6 @@ public class EventActivity extends Activity {
     }
 
     private void initViewParts() {
-        String fontPath = "fonts/Nunito-Bold.ttf";
 
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
@@ -117,7 +116,7 @@ public class EventActivity extends Activity {
             }
 
         } catch (com.parse.ParseException e) {
-            Log.d(Application.APPTAG, e.getMessage());
+            Log.d(Settings.APPTAG, e.getMessage());
         }
 
         String[] values = new String[comments.size()];
@@ -126,6 +125,8 @@ public class EventActivity extends Activity {
         return values;
 
     }
+
+
 
     private void setSendMessageB() {
         // After a person decides to add comment, add a data field on EventComment and then add a

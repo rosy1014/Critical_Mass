@@ -2,11 +2,12 @@ package com.example.ruoxilu.criticalmass;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.util.Log;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -17,7 +18,6 @@ import com.parse.ParseUser;
 
 public class Application extends android.app.Application {
 
-    public static final String APPTAG = "CriticalMass";
 
     @Override
     public void onCreate() {
@@ -27,7 +27,7 @@ public class Application extends android.app.Application {
 
         Parse.initialize(this, "ADIzf9tA1P4KQFL1AyyAKoCjLKhgaCmaZTmp96CL", "PcefekoiDoE3uR2yUd932HRbPPqrEGJyaE61aPVF");
         ParseUser.enableAutomaticUser();
-        Log.d("CriticalMassApplication", "On start the currentuser is "+ ParseUser.getCurrentUser());
+        Log.d("CriticalMassApplication", "On start the currentuser is " + ParseUser.getCurrentUser());
         ParseUser.getCurrentUser().saveInBackground();
 
         setParseACL();
@@ -89,8 +89,6 @@ public class Application extends android.app.Application {
                 specificContext.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS), null);
             }
         });
-
-
 
         AlertDialog internetAlertDialog = builder.create();
 
