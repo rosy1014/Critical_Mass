@@ -88,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-        initLocationRequest(); // Helper function to initiate location request
+        MapHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
         mMassUser = new MassUser(); // Initialize mMassUser data object
@@ -109,9 +109,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         setUpMapIfNeeded();
 
-        //TODO Logout and delete mass user
-        //        deleteMassUser();
-        //        ParseUser.logOut();
 
         checkLoginStatus();
 
@@ -191,20 +188,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 }
             }
         });
-    }
-
-    protected void initLocationRequest() {
-        // Create a new global location parameters object
-        mLocationRequest = LocationRequest.create();
-        Log.i(Settings.APPTAG, "LOCATION REQUEST CREATED");
-
-        // Set the update interval
-        mLocationRequest.setInterval(Settings.UPDATE_INTERVAL_IN_MILLISECONDS);
-
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        mLocationRequest.setFastestInterval(Settings.FAST_INTERVAL_CEILING_IN_MILLLISECONDS);
-
     }
 
     /*
@@ -622,7 +605,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
-                .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                .requestLocationUpdates(mGoogleApiClient, MapHandler.mLocationRequest, this);
     }
 
     /*
