@@ -17,6 +17,8 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import android.view.inputmethod.InputMethodManager;
+
 /**
  * Created by tingyu on 2/26/15.
  */
@@ -115,6 +117,9 @@ public class EventActivity extends Activity {
                         }
                     });
                 }
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
         });
 
