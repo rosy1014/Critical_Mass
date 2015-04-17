@@ -59,7 +59,7 @@ public class ListActivity extends Activity {
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
                     String eventId = mListArray[position];
                     eventDetailIntent.putExtra("objectId", eventId);
-                    Log.d(Application.APPTAG, "event object id is "+id);
+                    Log.d(Settings.APPTAG, "event object id is " + id);
                     startActivity(eventDetailIntent);
                 }
             });
@@ -70,7 +70,7 @@ public class ListActivity extends Activity {
 
         Location userLocation;
         if (MapsActivity.mCurrentLocation == null) {
-            Log.i(Application.APPTAG, "the current location is null");
+            Log.i(Settings.APPTAG, "the current location is null");
             userLocation = MapsActivity.mLastLocation;
         }
         else {
@@ -102,7 +102,7 @@ public class ListActivity extends Activity {
                 mNearbyList.add(eventObjectId);
             }
         } catch (ParseException e) {
-            Log.d(Application.APPTAG, e.getMessage());
+            Log.d(Settings.APPTAG, e.getMessage());
         }
 
         String[] listArray = new String[mNearbyList.size()];
