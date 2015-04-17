@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -84,24 +85,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Made static so that other activity can access location.
   //  public static Location mCurrentLocation;
    // public static Location mLastLocation;
-
+    public static Location mCurrentLocation = new Location("dummyprovider");
+    public static Location mLastLocation = new Location("dummyprovider");
     // Fields for helping process the map and location changes
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
-    Button mMiddleBar;  // Directs to list activity
-    Button mLeftBar;    // Directs to login page
-    Button mRightBar;   // Placeholder
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private LocationRequest mLocationRequest;
-    private GoogleApiClient mGoogleApiClient;
-    protected MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
-    private String mEventID;
-    // Fields for the map radius in feet
-    private float radius;
-    private float lastRadius;
-  //  private String selectedPostObjectId;
-    private int mostRecentMapUpdate;
-
     /* Constants for population level */
     public final int POPLEVEL1 = 1;
     public final int POPLEVEL2 = 2;
@@ -109,16 +97,24 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public final int POPLEVEL4 = 4;
     public final int POPLEVEL5 = 5;
     public final int POPLEVEL6 = 6;
-
     public final int POPSIZE1 = 10;
     public final int POPSIZE2 = 20;
     public final int POPSIZE3 = 50;
     public final int POPSIZE4 = 100;
     public final int POPSIZE5 = 500;
-
-
-    public static Location mCurrentLocation = new Location("dummyprovider");
-    public static Location mLastLocation = new Location("dummyprovider");
+    protected MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
+    Button mMiddleBar;  // Directs to list activity
+    Button mLeftBar;    // Directs to login page
+    Button mRightBar;   // Placeholder
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private String mEventID;
+    // Fields for the map radius in feet
+    private float radius;
+    private float lastRadius;
+    //  private String selectedPostObjectId;
+    private int mostRecentMapUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
