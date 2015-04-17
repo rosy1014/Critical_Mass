@@ -3,17 +3,13 @@ package com.example.ruoxilu.criticalmass;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Button;
 import android.widget.Toast;
 
-import android.view.View;
-
-import android.util.Log;
-
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -37,6 +33,7 @@ public class EventActivity extends Activity {
     private ListView mEventComments;
 
     private ParseQueryAdapter<ParseObject> queryEventComment;
+    private String fontPath = "fonts/Nunito-Bold.ttf";
 
 
     @Override
@@ -44,9 +41,27 @@ public class EventActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_event);
+        initViewParts();
 
-        String fontPath = "fonts/Nunito-Bold.ttf";
 
+
+        // Receive ObjectId from the List Activity
+        Bundle extras = getIntent().getExtras();
+        eventObjectId = extras.getString("objectId");
+        // Set title to ObjectId
+        mTitleTextView.setText(eventObjectId);
+
+
+        if (Application.networkConnected(this)) {
+            // Populating event comments
+            getComments();
+
+            setSendMessageB();
+        }
+
+    }
+
+    private void initViewParts() {
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
@@ -56,25 +71,9 @@ public class EventActivity extends Activity {
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
         mEventComments = (ListView) findViewById(R.id.event_comments);
+    }
 
-        // Receive ObjectId from the List Activity
-        Bundle extras = getIntent().getExtras();
-        eventObjectId = extras.getString("objectId");
-
-        mTitleTextView.setText(eventObjectId);
-
-//        ParseQuery<ParseObject> queryMassEvent = ParseQuery.getQuery("MassEvent");
-//
-//        try {
-//            // Use find instead of findInBackground because of a potential thread problem.
-//            ParseObject object = queryMassEvent.get(eventObjectId);
-//            mEventSize = object.getInt("EventSize");
-//            mEventSizeView.setText(mEventSize);
-//        } catch (ParseException e) {
-//            Log.d(Application.APPTAG, e.getMessage());
-//        }
-
-        // Populating event comments
+    private void getComments() {
         ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
                 new ParseQueryAdapter.QueryFactory<ParseObject>() {
                     public ParseQuery create() {
@@ -87,8 +86,9 @@ public class EventActivity extends Activity {
 
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
+    }
 
-
+    private void setSendMessageB() {
         // After a person decides to add comment, add a data field on EventComment and then add a
         // comment to the list view.
         mSendMessageButton.setOnClickListener(new View.OnClickListener() {
