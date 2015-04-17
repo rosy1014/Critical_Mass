@@ -11,3 +11,5 @@
 
 # Idea non-crucial project files
 *.iws
+
+app/src/debug/res/values/google_maps_api.xml
