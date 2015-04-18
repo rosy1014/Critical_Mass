@@ -345,40 +345,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         updateUserEvent(geoPointFromLocation(mCurrentLocation));
     }
 
-    /*
-     * Helper Function
-     * Anonymous User login for phase 1, to be replaced with actual log-in activity
-     * TODO
-     */
-//    protected void anonymousUserLogin() {
-//        ParseUser.enableAutomaticUser();
-//        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null? " + ParseUser.getCurrentUser().getObjectId());
-//
-//        ParseUser puser = ParseUser.getCurrentUser();
-//        String pid = puser.getObjectId();
-//        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + pid);
-//        if (pid == null) {
-//            Log.d(Settings.APPTAG, " In anonymousUserLogin, in if!!!!");
-//            ParseAnonymousUtils.logInInBackground();
-////            ParseAnonymousUtils.logIn(new LogInCallback() {
-////
-////                @Override
-////                public void done(ParseUser user, ParseException e) {
-////                    if (e != null) {
-////                        Log.d(Settings.APPTAG, "Anonymous login failed.");
-////                    } else {
-////                        Log.d(Settings.APPTAG, "Anonymous user logged in.");
-////                        Log.d(Settings.APPTAG,  " in callback, ParseUser is "+ user.getObjectId());
-////                        Log.d(Settings.APPTAG,  " in callback, ParseUser is "+ ParseUser.getCurrentUser().getObjectId());
-////                    }
-////                }
-////            });
-//            Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + ParseUser.getCurrentUser().getObjectId());
-//
-//        }
-//        //setParseACL();
-//        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + ParseUser.getCurrentUser().getObjectId());
-//    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -667,8 +633,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         }
                         // 7
                         Marker marker = mMap.addMarker(markerOpts);
-                        //marker.showInfoWindow();
-//                        Log.d(Settings.APPTAG, "Showed info Window");
                         // update markerIDs hash map and mapMarkers hash map.
                         markerIDs.put(marker, mEvent.getObjectId());
                         mapMarkers.put(mEvent.getObjectId(), marker);
