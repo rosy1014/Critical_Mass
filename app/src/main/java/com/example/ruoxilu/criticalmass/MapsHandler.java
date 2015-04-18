@@ -1,6 +1,9 @@
 package com.example.ruoxilu.criticalmass;
 
+import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +21,7 @@ import java.util.Map;
  * Created by RuoxiLu on 4/17/15.
  */
 public class MapsHandler {
+    public static Context mContext;
     public static Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     public static Map<Marker, String> markerIDs = new HashMap<Marker, String>();
     public static GoogleMap mMap;
@@ -28,6 +32,9 @@ public class MapsHandler {
     private static Location mCurrentLocation = Settings.getDefaultLocation();
     private static Location mLastLocation = Settings.getDefaultLocation();
 
+    public MapsHandler(Context context){
+        this.mContext = context;
+    }
 
     public static void initLocationRequest() {
         // Create a new global location parameters object
@@ -40,6 +47,24 @@ public class MapsHandler {
 
         mLocationRequest.setFastestInterval(Settings.FAST_INTERVAL_CEILING_IN_MILLLISECONDS);
 
+    }
+
+    public static Location initialMapLocation(){
+        LocationManager mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        // Create a criteria object to retrieve provider
+        Criteria criteria = new Criteria();
+
+        // Get the name of the best provider
+        String provider = mLocationManager.getBestProvider(criteria, true);
+
+        // Get Current Location
+        if (mLocationManager.getLastKnownLocation(provider) == null) {
+            return Settings.getDefaultLocation();
+
+        } else {
+            return mLocationManager.getLastKnownLocation(provider);
+        }
     }
 
     /*

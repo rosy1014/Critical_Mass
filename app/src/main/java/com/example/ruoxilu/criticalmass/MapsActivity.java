@@ -6,9 +6,7 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -55,7 +53,7 @@ import java.util.Set;
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
-
+    private MapsHandler mapsHandler;
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
@@ -84,6 +82,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
+        mapsHandler = new MapsHandler(this);
 
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
@@ -265,23 +264,22 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
         // Get LocationManager object from System Service LOCATION_SERVICE
-        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        // Create a criteria object to retrieve provider
-        Criteria criteria = new Criteria();
-
-        // Get the name of the best provider
-        String provider = mLocationManager.getBestProvider(criteria, true);
-
-        // Get Current Location
-        if (mLocationManager.getLastKnownLocation(provider) == null) {
-            mCurrentLocation = Settings.getDefaultLocation();
-//            mCurrentLocation.setLongitude(37.0);
-//            mCurrentLocation.setLatitude(-63.0);
-
-        } else {
-            mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
-        }
+        mCurrentLocation = mapsHandler.initialMapLocation();
+//        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+//
+//        // Create a criteria object to retrieve provider
+//        Criteria criteria = new Criteria();
+//
+//        // Get the name of the best provider
+//        String provider = mLocationManager.getBestProvider(criteria, true);
+//
+//        // Get Current Location
+//        if (mLocationManager.getLastKnownLocation(provider) == null) {
+//            mCurrentLocation = Settings.getDefaultLocation();
+//
+//        } else {
+//            mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
+//        }
 
 
         updateZoom(mCurrentLocation);
