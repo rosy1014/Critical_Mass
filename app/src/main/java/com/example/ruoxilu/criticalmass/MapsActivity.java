@@ -38,7 +38,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseAnonymousUtils;
@@ -165,31 +164,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
-    protected void deleteMassUser() {
-        ParseQuery<MassUser> query = MassUser.getQuery();
-        final String user_id = mMassUser.getUser();
-//        Log.d(Settings.APPTAG, obj_id);
-        query.whereEqualTo("user", user_id);
-        query.getFirstInBackground(new GetCallback<MassUser>() {
-            @Override
-            public void done(final MassUser massUser, ParseException e) {
-                if (e == null) {
-                    massUser.deleteInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                Log.d(Settings.APPTAG, "Successfully deleted mass user " + user_id);
-                            } else {
-                                Log.d(Settings.APPTAG, "Failed to delete mass user " + e);
-                            }
-                        }
-                    });
-                } else {
-                    Log.d(Settings.APPTAG, "Failed to find the current mass user");
-                }
-            }
-        });
-    }
 
     /*
      * Helper function for onCreate
@@ -874,7 +848,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
             public void onClick(DialogInterface dialog, int whichButton) {
 
-                deleteMassUser();
+                ParseHandler.deleteMassUser(mMassUser);
                 ParseUser.logOut();
                 Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
