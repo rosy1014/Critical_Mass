@@ -51,7 +51,6 @@ import java.util.Set;
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
-    private MapsHandler mapsHandler;
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
@@ -61,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static ViewGroup mViewGroup;
     private static LinearLayout mMainScreen;
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
-
+    private MapsHandler mapsHandler;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
    // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
@@ -204,13 +203,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         super.onStop();
         setUpMapIfNeeded();
 
-    }
-
-    @Override
-    //TODO
-    // Must call super.onDestroy() at the end.
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     /**

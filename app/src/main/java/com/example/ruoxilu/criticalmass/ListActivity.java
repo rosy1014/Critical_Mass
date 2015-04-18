@@ -66,7 +66,7 @@ public class ListActivity extends Activity {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
                     String eventId = parseObjects.get(position).getObjectId();
-                    String locationName = parseObjects.get(position).getEventName();
+                    String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
                     eventDetailIntent.putExtra("location", locationName);
                     Log.d(Settings.APPTAG, "event object id is " + id);
@@ -119,7 +119,7 @@ public class ListActivity extends Activity {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
             for (MassEvent mass : parseObjects) {
-                String locationName = mass.getEventName();
+                String locationName = mass.getLocationName();
                 mNearbyList.add(locationName);
             }
         } catch (ParseException e) {
