@@ -3,6 +3,7 @@ package com.example.ruoxilu.criticalmass;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -28,7 +29,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -62,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
+    public static Context mContext;
     // Fields for helping process the map and location changes
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
@@ -70,7 +71,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private LocationRequest mLocationRequest;
+   // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private String mEventID;
     // Fields for the map radius in feet
@@ -88,7 +89,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-        MapHandler.initLocationRequest(); // Helper function to initiate location request
+        MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
         mMassUser = new MassUser(); // Initialize mMassUser data object
@@ -193,6 +194,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /*
      * Helper function for onCreate
      * Initialize the Goolge Api Client for maps activity
+     * TODO refactor to MapHandler
      */
     protected void initGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -200,19 +202,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-        Log.i(Settings.APPTAG, "GOOGLE API CLIENT CREATED");
+//        Log.i(Settings.APPTAG, "GOOGLE API CLIENT CREATED");
     }
-    /*
-     * Helper function for onCreate
-     * Initialize the location request for maps activity
-     */
 
     @Override
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
-        //Log.d(Settings.APPTAG,"On Resume, Google Api Client connect");
-        //Log.d(Settings.APPTAG,"On Resume, my current location is " + mCurrentLocation);
         if (mCurrentLocation != null) {
             // Create a LatLng object for the current location
             double latitude = mCurrentLocation.getLatitude();
@@ -308,8 +304,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         // Get Current Location
         if (mLocationManager.getLastKnownLocation(provider) == null) {
-            mCurrentLocation.setLongitude(37.0);
-            mCurrentLocation.setLatitude(-63.0);
+            mCurrentLocation = Settings.getDefaultLocation();
+//            mCurrentLocation.setLongitude(37.0);
+//            mCurrentLocation.setLatitude(-63.0);
 
         } else {
             mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
@@ -355,7 +352,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         // set up mMassUser
         mMassUser.setUser(ParseUser.getCurrentUser());
-        Log.d(Settings.APPTAG, "Current massuser is " + mMassUser);
+        Log.d(Settings.APPTAG, "Current massuser is " + ParseUser.getCurrentUser());
         if (mCurrentLocation == null) {
             Log.d(Settings.APPTAG, "mCurrentlocation is null");
             mMassUser.setLocation(null);
@@ -381,10 +378,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     protected void anonymousUserLogin() {
         ParseUser.enableAutomaticUser();
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + ParseUser.getCurrentUser());
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getObjectId());
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getCreatedAt());
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getUsername());
+        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null? " + ParseUser.getCurrentUser().getObjectId());
+
         ParseUser puser = ParseUser.getCurrentUser();
         String pid = puser.getObjectId();
         Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + pid);
@@ -415,24 +410,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public void onConnectionSuspended(int i) {
 
     }
-    /*
-     * Helper Function
-     * Set up the ParseACL for the current user
-     */
-//    protected void setParseACL(){
-//        ParseACL defaultACL = new ParseACL();
-//
-//        // Optionally enable public read access.
-//        defaultACL.setPublicReadAccess(true);
-//        defaultACL.setPublicWriteAccess(true);
-//
-//        ParseACL.setDefaultACL(defaultACL, true);
-//
-//        // allows read and write access to all users
-//        ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
-//        postACL.setPublicReadAccess(true);
-//        postACL.setPublicWriteAccess(true);
-//    }
 
     @Override
     // passes in the user current location as input
@@ -605,7 +582,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
-                .requestLocationUpdates(mGoogleApiClient, MapHandler.mLocationRequest, this);
+                .requestLocationUpdates(mGoogleApiClient, MapsHandler.mLocationRequest, this);
     }
 
     /*
@@ -762,9 +739,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected MarkerOptions createMarkerOpt(MassEvent mEvent) {
 
         int size = mEvent.getEventSize();
-        Log.d(Settings.APPTAG, "Event size is " + size);
         if (size < Settings.POPSIZE2) {
-            Log.d(Settings.APPTAG, "LEVEL 2");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
@@ -772,7 +747,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
             return markerOpt;
         } else if (size < Settings.POPSIZE3) {
-            Log.d(Settings.APPTAG, "LEVEL 3");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
@@ -780,7 +754,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
             return markerOpt;
         } else if (size < Settings.POPSIZE4) {
-            Log.d(Settings.APPTAG, "LEVEL 4");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
@@ -788,7 +761,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
             return markerOpt;
         } else if (size < Settings.POPSIZE5) {
-            Log.d(Settings.APPTAG, "LEVEL 5");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
@@ -796,7 +768,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
             return markerOpt;
         } else {
-            Log.d(Settings.APPTAG, "LEVEL 7");
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
@@ -808,22 +779,22 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
 
     // TODO
-    // SIGN_MARKER_OBJECT
-    protected int populationLevel(int size) {
-        if (size < Settings.POPSIZE1) {
-            return Settings.POPLEVEL1;
-        } else if (size < Settings.POPSIZE2) {
-            return Settings.POPLEVEL2;
-        } else if (size < Settings.POPSIZE3) {
-            return Settings.POPLEVEL3;
-        } else if (size < Settings.POPSIZE4) {
-            return Settings.POPLEVEL4;
-        } else if (size < Settings.POPSIZE5) {
-            return Settings.POPLEVEL5;
-        } else {
-            return Settings.POPLEVEL6;
-        }
-    }
+//    // SIGN_MARKER_OBJECT
+//    protected int populationLevel(int size) {
+//        if (size < Settings.POPSIZE1) {
+//            return Settings.POPLEVEL1;
+//        } else if (size < Settings.POPSIZE2) {
+//            return Settings.POPLEVEL2;
+//        } else if (size < Settings.POPSIZE3) {
+//            return Settings.POPLEVEL3;
+//        } else if (size < Settings.POPSIZE4) {
+//            return Settings.POPLEVEL4;
+//        } else if (size < Settings.POPSIZE5) {
+//            return Settings.POPLEVEL5;
+//        } else {
+//            return Settings.POPLEVEL6;
+//        }
+//    }
 
     /*
      * Define map marker color based on location and size
@@ -835,18 +806,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      *      >500: red
      */
     // SIGN_MARKER_OBJECT
-    protected float markerColor(int size) {
-        if (size < Settings.POPSIZE2 && size >= Settings.POPSIZE1) {
-            return BitmapDescriptorFactory.HUE_YELLOW;
-        } else if (size < Settings.POPSIZE3) {
-            return BitmapDescriptorFactory.HUE_ORANGE;
-        } else if (size < Settings.POPSIZE4) {
-            return BitmapDescriptorFactory.HUE_ROSE;
-        } else if (size < Settings.POPSIZE5) {
-            return BitmapDescriptorFactory.HUE_VIOLET;
-        } else
-            return BitmapDescriptorFactory.HUE_RED;
-    }
+//    protected float markerColor(int size) {
+//        if (size < Settings.POPSIZE2 && size >= Settings.POPSIZE1) {
+//            return BitmapDescriptorFactory.HUE_YELLOW;
+//        } else if (size < Settings.POPSIZE3) {
+//            return BitmapDescriptorFactory.HUE_ORANGE;
+//        } else if (size < Settings.POPSIZE4) {
+//            return BitmapDescriptorFactory.HUE_ROSE;
+//        } else if (size < Settings.POPSIZE5) {
+//            return BitmapDescriptorFactory.HUE_VIOLET;
+//        } else
+//            return BitmapDescriptorFactory.HUE_RED;
+//    }
 
     private void showErrorDialog(int errorCode) {
         Dialog errorDialog
@@ -933,12 +904,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
             String eventId = markerIDs.get(marker);
             eventDetailIntent.putExtra("objectId", eventId);
-            Log.d(Settings.APPTAG, "On Marker Click, event object id is " + eventId);
+//            Log.d(Settings.APPTAG, "On Marker Click, event object id is " + eventId);
             startActivity(eventDetailIntent);
             //return true;
 
         } else {
-            Log.d(Settings.APPTAG, "On Marker Click, unable to start eventActivity");
+//            Log.d(Settings.APPTAG, "On Marker Click, unable to start eventActivity");
             // return false;
         }
     }
