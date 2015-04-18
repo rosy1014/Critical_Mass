@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -23,8 +24,9 @@ import com.parse.SaveCallback;
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-//    private int mEventSize;
+    //    private int mEventSize;
     private String messageBody;
+    private String locationName;
 
     private TextView mTitleTextView;
     private TextView mEventSizeView;
@@ -44,12 +46,12 @@ public class EventActivity extends Activity {
         initViewParts();
 
 
-
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
         eventObjectId = extras.getString("objectId");
+        locationName = extras.getString("location");
         // Set title to ObjectId
-        mTitleTextView.setText(eventObjectId);
+        mTitleTextView.setText(locationName);
 
 
         if (Application.networkConnected(this)) {
@@ -64,6 +66,8 @@ public class EventActivity extends Activity {
     private void initViewParts() {
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
+
+        // set custom font
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         mTitleTextView.setTypeface(tf);
 
@@ -99,8 +103,7 @@ public class EventActivity extends Activity {
                 if (messageBody.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
-                }
-                else {
+                } else {
                     ParseObject userComment = new ParseObject("EventComment");
                     userComment.put("EventId", eventObjectId);
                     userComment.put("UserComment", messageBody);
@@ -115,11 +118,13 @@ public class EventActivity extends Activity {
                         }
                     });
                 }
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
         });
 
     }
-
 
 
     // If the activity is resumed

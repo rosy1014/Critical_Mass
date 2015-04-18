@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,7 +14,6 @@ import android.widget.ListView;
 
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -26,11 +26,13 @@ import java.util.List;
  */
 public class ListActivity extends Activity {
 
+    ArrayAdapter<String> mAdapter;
+    List<MassEvent> parseObjects;
+    private SwipeRefreshLayout mScrollList;
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
     private String[] mListArray;
     private ParseGeoPoint userLocationPoint;
-
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,10 +44,19 @@ public class ListActivity extends Activity {
             mActivityOne = (ListView) findViewById(R.id.event_list);
             mListArray = getEventInfo();
 
+            mScrollList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+            mScrollList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    refreshContent();
+
+                }
+            });
+
 
             // Bind data from adapter to ListView.
-            ArrayAdapter<String> adapter = new ListActivityAdapter(this, mListArray);
-            mActivityOne.setAdapter(adapter);
+            mAdapter = new ListActivityAdapter(this, mListArray);
+            mActivityOne.setAdapter(mAdapter);
 
 
             // Load EventActivity when user clicks on a mass in the
@@ -54,13 +65,28 @@ public class ListActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                    String eventId = mListArray[position];
+                    String eventId = parseObjects.get(position).getObjectId();
+                    String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
+                    eventDetailIntent.putExtra("location", locationName);
                     Log.d(Settings.APPTAG, "event object id is " + id);
                     startActivity(eventDetailIntent);
                 }
             });
         }
+    }
+
+    private void refreshContent() {
+        userLocationPoint = getLocationPoint();
+        mListArray = getEventInfo();
+        mAdapter = new ListActivityAdapter(this, mListArray);
+        mActivityOne.setAdapter(mAdapter);
+
+
+        mScrollList.setRefreshing(false);
+
+        Log.d(Settings.APPTAG, "refreshContent and getEventInfo!!!!");
+
     }
 
     protected ParseGeoPoint getLocationPoint() {
@@ -69,8 +95,7 @@ public class ListActivity extends Activity {
         if (MapsActivity.mCurrentLocation == null) {
             Log.i(Settings.APPTAG, "the current location is null");
             userLocation = MapsActivity.mLastLocation;
-        }
-        else {
+        } else {
             userLocation = MapsActivity.mCurrentLocation;
         }
 
@@ -83,20 +108,19 @@ public class ListActivity extends Activity {
 
     protected String[] getEventInfo() {
 
-        ParseQuery<ParseObject> eventsQuery = ParseQuery.getQuery("MassEvent");
+        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
 
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
         ArrayList<String> mNearbyList = new ArrayList<String>();
-        List<ParseObject> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
-            for (ParseObject mass : parseObjects) {
-                String eventObjectId = mass.getObjectId();
-                mNearbyList.add(eventObjectId);
+            for (MassEvent mass : parseObjects) {
+                String locationName = mass.getLocationName();
+                mNearbyList.add(locationName);
             }
         } catch (ParseException e) {
             Log.d(Settings.APPTAG, e.getMessage());
