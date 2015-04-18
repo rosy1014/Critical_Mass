@@ -88,9 +88,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
-        //mMassUser = new MassUser(); // Initialize mMassUser data object
-        //Log.d(Settings.APPTAG, "mMassUser " + mMassUser);
-
         setContentView(R.layout.activity_maps);
         mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -123,6 +120,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
             Intent i = new Intent(MapsActivity.this, ListActivity.class);
             startActivityForResult(i, 0);
+
 
 //            android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_fragment);
 //            Bundle args = new Bundle();
@@ -319,24 +317,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
         mCurrentLocation = getLocation();
-        mMassUser= ParseHandler.getDefaultMassUser();
+        if(mMassUser == null){
+            mMassUser= ParseHandler.getDefaultMassUser();
+        }
 
-     //   anonymousUserLogin(); // Helper function to log in the user anonymously if not already logged in
         starterPeriodicLocationUpdates();// connect googleFused api services
-
-        // set up mMassUser
-//        mMassUser.setUser(ParseUser.getCurrentUser());
-//        Log.d(Settings.APPTAG, "Current massuser is " + ParseUser.getCurrentUser());
-//        if (mCurrentLocation == null) {
-//            Log.d(Settings.APPTAG, "mCurrentlocation is null");
-//            mMassUser.setLocation(null);
-//        } else {
-//            Log.d(Settings.APPTAG, "mCurrentlocation is NOT null");
-//            mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
-//        }
-//
-//        Log.i(Settings.APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
-//        mMassUser.setUser(ParseUser.getCurrentUser());
         updateUserLocation(mMassUser.getLocation());
 
 

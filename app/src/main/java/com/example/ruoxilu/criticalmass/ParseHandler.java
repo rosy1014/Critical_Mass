@@ -45,13 +45,15 @@ public class ParseHandler {
 
 
     public static MassUser getDefaultMassUser(){
-        MassUser massUser = new MassUser();
+
         if(ParseUser.getCurrentUser() == null){
             anonymousUserLogin();
         }
+        MassUser massUser = new MassUser();
         massUser.setUser(ParseUser.getCurrentUser());
         massUser.setLocation(geoPointFromLocation(Settings.getDefaultLocation()));
         return massUser;
+
     }
 
     private static ParseGeoPoint geoPointFromLocation(Location location) {
