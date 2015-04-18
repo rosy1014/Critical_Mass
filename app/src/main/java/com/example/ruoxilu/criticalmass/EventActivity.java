@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -23,7 +24,7 @@ import com.parse.SaveCallback;
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-//    private int mEventSize;
+    //    private int mEventSize;
     private String messageBody;
 
     private TextView mTitleTextView;
@@ -42,7 +43,6 @@ public class EventActivity extends Activity {
 
         setContentView(R.layout.activity_event);
         initViewParts();
-
 
 
         // Receive ObjectId from the List Activity
@@ -99,8 +99,7 @@ public class EventActivity extends Activity {
                 if (messageBody.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
-                }
-                else {
+                } else {
                     ParseObject userComment = new ParseObject("EventComment");
                     userComment.put("EventId", eventObjectId);
                     userComment.put("UserComment", messageBody);
@@ -115,11 +114,13 @@ public class EventActivity extends Activity {
                         }
                     });
                 }
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
         });
 
     }
-
 
 
     // If the activity is resumed
