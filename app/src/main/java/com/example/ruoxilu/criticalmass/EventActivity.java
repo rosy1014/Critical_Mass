@@ -34,7 +34,7 @@ public class EventActivity extends Activity {
     private EditText mMessageBodyField;
     private ListView mEventComments;
 
-    private ParseQueryAdapter<ParseObject> queryEventComment;
+    private CommentAdapter queryEventComment;
     private String fontPath = "fonts/Nunito-Bold.ttf";
 
 
@@ -78,15 +78,9 @@ public class EventActivity extends Activity {
     }
 
     private void getComments() {
-        ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
-                new ParseQueryAdapter.QueryFactory<ParseObject>() {
-                    public ParseQuery create() {
-                        ParseQuery queryEventComment = new ParseQuery("EventComment");
-                        queryEventComment.whereEqualTo("EventId", eventObjectId);
-                        return queryEventComment;
-                    }
-                };
-        queryEventComment = new ParseQueryAdapter<ParseObject>(this, factoryEventComment);
+
+        final String finalId = eventObjectId;
+        queryEventComment = new CommentAdapter(this, finalId);
 
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
@@ -104,10 +98,18 @@ public class EventActivity extends Activity {
                     Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
                 } else {
-                    ParseObject userComment = new ParseObject("EventComment");
-                    userComment.put("EventId", eventObjectId);
-                    userComment.put("UserComment", messageBody);
-                    userComment.put("UserId", ParseUser.getCurrentUser().getObjectId());
+
+                    Comment userComment = new Comment();
+                    userComment.setEventId(eventObjectId);
+                    userComment.setUserComment(messageBody);
+                    userComment.setUserName(ParseUser.getCurrentUser().getUsername());
+                    userComment.setUserId(ParseUser.getCurrentUser().getObjectId());
+
+//                    ParseObject userComment = new ParseObject("EventComment");
+//                    userComment.put("EventId", eventObjectId);
+//                    userComment.put("UserComment", messageBody);
+//                    userComment.put("UserId", ParseUser.getCurrentUser().getObjectId());
+//                    userComment.put("UserName", ParseUser.getCurrentUser().getUsername());
                     userComment.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {

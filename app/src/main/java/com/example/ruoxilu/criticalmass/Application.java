@@ -60,6 +60,7 @@ public class Application extends android.app.Application {
         super.onCreate();
         ParseObject.registerSubclass(MassUser.class);
         ParseObject.registerSubclass(MassEvent.class);
+        ParseObject.registerSubclass(Comment.class);
 
         Parse.initialize(this, "ADIzf9tA1P4KQFL1AyyAKoCjLKhgaCmaZTmp96CL", "PcefekoiDoE3uR2yUd932HRbPPqrEGJyaE61aPVF");
         ParseUser.enableAutomaticUser();
