@@ -85,35 +85,35 @@ public class MapsHandler {
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
-                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+                    .title("Location: " + mEvent.getLocationName()).snippet("Size: " + size);
             return markerOpt;
         } else if (size < Settings.POPSIZE3) {
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3))
-                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+                    .title("Location: " + mEvent.getLocationName()).snippet("Size: " + size);
             return markerOpt;
         } else if (size < Settings.POPSIZE4) {
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4))
-                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+                    .title("Location: " + mEvent.getLocationName()).snippet("Size: " + size);
             return markerOpt;
         } else if (size < Settings.POPSIZE5) {
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5))
-                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+                    .title("Location: " + mEvent.getLocationName()).snippet("Size: " + size);
             return markerOpt;
         } else {
             MarkerOptions markerOpt = new MarkerOptions().position(
                     new LatLng(mEvent.getLocation().getLatitude(), mEvent
                             .getLocation().getLongitude()))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6))
-                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+                    .title("Location: " + mEvent.getLocationName()).snippet("Size: " + size);
             return markerOpt;
         }
 
