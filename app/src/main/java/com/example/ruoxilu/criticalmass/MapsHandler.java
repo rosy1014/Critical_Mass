@@ -6,7 +6,10 @@ import android.util.Log;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,5 +42,96 @@ public class MapsHandler {
 
     }
 
+    /*
+     * Create map markers based on location and size
+     * Size Criterion:
+     *      10-20:
+     *      20-50:
+     *      50-100:
+     *      100-500:
+     *      >500:
+     */
+    // SIGN_MARKER_OBJECT
+    public static MarkerOptions createMarkerOpt(MassEvent mEvent) {
+
+        int size = mEvent.getEventSize();
+        if (size < Settings.POPSIZE2) {
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+            return markerOpt;
+        } else if (size < Settings.POPSIZE3) {
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker3))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+            return markerOpt;
+        } else if (size < Settings.POPSIZE4) {
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker4))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+            return markerOpt;
+        } else if (size < Settings.POPSIZE5) {
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker5))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+            return markerOpt;
+        } else {
+            MarkerOptions markerOpt = new MarkerOptions().position(
+                    new LatLng(mEvent.getLocation().getLatitude(), mEvent
+                            .getLocation().getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker6))
+                    .title("Location: " + mEvent.getLocation()).snippet("Size: " + size);
+            return markerOpt;
+        }
+
+    }
+    // TODO
+//    // SIGN_MARKER_OBJECT
+//    protected int populationLevel(int size) {
+//        if (size < Settings.POPSIZE1) {
+//            return Settings.POPLEVEL1;
+//        } else if (size < Settings.POPSIZE2) {
+//            return Settings.POPLEVEL2;
+//        } else if (size < Settings.POPSIZE3) {
+//            return Settings.POPLEVEL3;
+//        } else if (size < Settings.POPSIZE4) {
+//            return Settings.POPLEVEL4;
+//        } else if (size < Settings.POPSIZE5) {
+//            return Settings.POPLEVEL5;
+//        } else {
+//            return Settings.POPLEVEL6;
+//        }
+//    }
+
+    /*
+     * Define map marker color based on location and size
+     * Size Criterion:
+     *      10-20: yellow
+     *      20-50: orange
+     *      50-100: rose
+     *      100-500:violet
+     *      >500: red
+     */
+    // SIGN_MARKER_OBJECT
+//    protected float markerColor(int size) {
+//        if (size < Settings.POPSIZE2 && size >= Settings.POPSIZE1) {
+//            return BitmapDescriptorFactory.HUE_YELLOW;
+//        } else if (size < Settings.POPSIZE3) {
+//            return BitmapDescriptorFactory.HUE_ORANGE;
+//        } else if (size < Settings.POPSIZE4) {
+//            return BitmapDescriptorFactory.HUE_ROSE;
+//        } else if (size < Settings.POPSIZE5) {
+//            return BitmapDescriptorFactory.HUE_VIOLET;
+//        } else
+//            return BitmapDescriptorFactory.HUE_RED;
+//    }
 
 }
