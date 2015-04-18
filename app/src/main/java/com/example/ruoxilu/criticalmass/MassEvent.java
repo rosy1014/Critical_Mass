@@ -20,16 +20,6 @@ public class MassEvent extends ParseObject {
         return ParseQuery.getQuery(MassEvent.class);
     }
 
-    // Every event is associated with an event ID
-    public String getEvent() {
-        return getString("event");
-    }
-
-    // event field takes ObjectId of Parse Object
-    public void setUser(ParseObject value) {
-        put("event", value.getObjectId());
-    }
-
     // retrieve the event radius
     public int getRadius() {
         return getInt("radius");
