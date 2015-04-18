@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -472,14 +473,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         if (errorDialog != null) {
 
-            // Creatae a new DialogFracment in which to show the error dialog
-            ErrorDialogFragment errorDialogFragment = new ErrorDialogFragment();
-
-            // Set the dialog in the DialogFragment
-            errorDialogFragment.setDialog(errorDialog);
-
-            // Show the error dialog in the DialogFragment
-            errorDialogFragment.show(getSupportFragmentManager(), Settings.APPTAG);
+            new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText(errorDialog.toString())
+                    .show();
         }
 
     }
@@ -493,9 +490,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         } else {
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
             if (dialog != null) {
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                errorFragment.setDialog(dialog);
-                errorFragment.show(this.getSupportFragmentManager(), Settings.APPTAG);
+                new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Oops...")
+                        .setContentText(dialog.toString())
+                        .show();
             }
             return false;
         }
@@ -508,34 +506,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     public void confirmLogOut() {
 
+        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure?")
+                .setContentText("Logged out users will no longer be shown on the map.")
+                .setCancelText("No")
+                .setConfirmText("Yes")
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.cancel();
+                    }
+                })
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        ParseHandler.deleteMassUser(mMassUser);
+                        ParseUser.logOut();
+                        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .show();
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Are you sure you want to log out?");
-        alert.setMessage("Logged out users will no longer be shown on the map.");
-
-        // Make an "OK" button to confirm log out
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-                ParseHandler.deleteMassUser(mMassUser);
-                ParseUser.logOut();
-                Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), "You have successfully logged out!", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        // Make a "Cancel" button
-        // that simply dismisses the alert
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-
-        alert.show();
     }
 
     @Override

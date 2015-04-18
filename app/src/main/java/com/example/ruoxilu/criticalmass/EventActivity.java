@@ -18,6 +18,8 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by tingyu on 2/26/15.
  */
@@ -95,8 +97,13 @@ public class EventActivity extends Activity {
                 messageBody = mMessageBodyField.getText().toString();
 
                 if (messageBody.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
+
+                    new SweetAlertDialog(EventActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Oops...")
+                            .setContentText("Please enter a message")
+                            .show();
                     return;
+
                 } else {
 
                     Comment userComment = new Comment();
