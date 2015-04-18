@@ -27,6 +27,7 @@ import java.util.List;
 public class ListActivity extends Activity {
 
     ArrayAdapter<String> mAdapter;
+    List<MassEvent> parseObjects;
     private SwipeRefreshLayout mScrollList;
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
@@ -64,8 +65,10 @@ public class ListActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                    String eventId = mListArray[position];
+                    String eventId = parseObjects.get(position).getObjectId();
+                    String locationName = parseObjects.get(position).getEventName();
                     eventDetailIntent.putExtra("objectId", eventId);
+                    eventDetailIntent.putExtra("location", locationName);
                     Log.d(Settings.APPTAG, "event object id is " + id);
                     startActivity(eventDetailIntent);
                 }
@@ -111,7 +114,6 @@ public class ListActivity extends Activity {
         eventsQuery.setLimit(10);
 
         ArrayList<String> mNearbyList = new ArrayList<String>();
-        List<MassEvent> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
