@@ -26,6 +26,7 @@ public class EventActivity extends Activity {
     private String eventObjectId;
     //    private int mEventSize;
     private String messageBody;
+    private String locationName;
 
     private TextView mTitleTextView;
     private TextView mEventSizeView;
@@ -48,8 +49,9 @@ public class EventActivity extends Activity {
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
         eventObjectId = extras.getString("objectId");
+        locationName = extras.getString("location");
         // Set title to ObjectId
-        mTitleTextView.setText(eventObjectId);
+        mTitleTextView.setText(locationName);
 
 
         if (Application.networkConnected(this)) {
@@ -64,6 +66,8 @@ public class EventActivity extends Activity {
     private void initViewParts() {
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
+
+        // set custom font
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         mTitleTextView.setTypeface(tf);
 
