@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -31,9 +32,11 @@ public class MapsHandler {
 
     private static Location mCurrentLocation = Settings.getDefaultLocation();
     private static Location mLastLocation = Settings.getDefaultLocation();
+    private int mostRecentMapUpdate = 0;
 
     public MapsHandler(Context context){
         this.mContext = context;
+        //this.mMap = map;
     }
 
     public static void initLocationRequest() {
@@ -117,6 +120,40 @@ public class MapsHandler {
             return markerOpt;
         }
 
+    }
+
+    public void updateMarkers(HashSet<MassEvent> eventList) {
+        HashSet<String> eventIdsToKeep = new HashSet<String>();
+        for (MassEvent event : eventList) {
+            if (event.getEventSize() > 10) {
+                eventIdsToKeep.add(event.getObjectId());
+                Marker marker = mMap.addMarker(createMarkerOpt(event));
+                mapMarkers.put(event.getObjectId(), marker);
+                markerIDs.put(marker, event.getObjectId());
+            }
+        }
+        for(String objId: new HashSet<>(mapMarkers.keySet())){
+            if (!eventIdsToKeep.contains(objId)){
+                Marker marker= mapMarkers.get(objId);
+                markerIDs.remove(marker);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+                mapMarkers.remove(objId);
+            }
+        }
+    }
+
+
+    public static void cleanUpMarkers(HashMap<String, MarkerOptions> markersToKeep) {
+        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
+            if (!markersToKeep.containsKey(objId)) {
+                Marker marker = mapMarkers.get(objId);
+                markerIDs.remove(marker);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+                mapMarkers.remove(objId);
+            }
+        }
     }
     // TODO
 //    // SIGN_MARKER_OBJECT
