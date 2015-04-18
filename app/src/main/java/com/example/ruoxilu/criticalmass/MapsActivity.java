@@ -1,28 +1,22 @@
 package com.example.ruoxilu.criticalmass;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -53,6 +47,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
@@ -874,20 +870,17 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         if (errorDialog != null) {
 
-            // Creatae a new DialogFracment in which to show the error dialog
-            ErrorDialogFragment errorDialogFragment = new ErrorDialogFragment();
-
-            // Set the dialog in the DialogFragment
-            errorDialogFragment.setDialog(errorDialog);
-
-            // Show the error dialog in the DialogFragment
-            errorDialogFragment.show(getSupportFragmentManager(), Settings.APPTAG);
+            new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText(errorDialog.toString())
+                    .show();
         }
 
     }
 
     // SIGN_BACKGROUND_SERVICE
     private boolean servicesConnected() {
+
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
         if (ConnectionResult.SUCCESS == resultCode) {
@@ -895,9 +888,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         } else {
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
             if (dialog != null) {
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                errorFragment.setDialog(dialog);
-                errorFragment.show(this.getSupportFragmentManager(), Settings.APPTAG);
+
+                new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Oops...")
+                        .setContentText(dialog.toString())
+                        .show();
             }
             return false;
         }
@@ -910,37 +905,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     public void confirmLogOut() {
 
+        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure?")
+                .setContentText("Logged out users will no longer be shown on the map.")
+                .setCancelText("No")
+                .setConfirmText("Yes")
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.cancel();
+                    }
+                })
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        deleteMassUser();
+                        ParseUser.logOut();
+                        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .show();
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Are you sure you want to log out?");
-        alert.setMessage("Logged out users will no longer be shown on the map.");
-
-        // Make an "OK" button to confirm log out
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-                deleteMassUser();
-                ParseUser.logOut();
-                Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-//                Intent i = new Intent(MapsActivity.this, LoginSignupActivity.class);
-//                startActivityForResult(i, 0);
-
-                Toast.makeText(getApplicationContext(), "You have successfully logged out!", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        // Make a "Cancel" button
-        // that simply dismisses the alert
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-
-        alert.show();
     }
 
     @Override
@@ -967,59 +955,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
-    /*
-    * Click on marker redirects user to eventActivity
-    */
-
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
-    public static class EventListFragment extends Fragment {
-        public static final String ARG_MENU_OPTION = "menu_option";
-
-        public EventListFragment() {
-            // Empty constructor required for fragment subclasses
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-
-
-            View rootView = inflater.inflate(R.layout.activity_list, container, false);
-
-            return rootView;
-        }
-    }
 /*
  * Reference for customized info window
  * http://stackoverflow.com/questions/14123243/google-maps-android-api-v2-interactive-infowindow-like-in-original-android-go/15040761#15040761
  */
-    /*
-    * Click on marker redirects user to eventActivity
-    */
 
-    public static class ErrorDialogFragment extends DialogFragment {
-        /*
-         * Show user a message if Google Play services are not enabled on the
-         * device.
-         */
-        private Dialog mDialog;
-
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
-    }
 
     /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

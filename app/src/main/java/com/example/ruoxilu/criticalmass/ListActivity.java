@@ -4,20 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -96,8 +92,7 @@ public class ListActivity extends Activity {
         if (MapsActivity.mCurrentLocation == null) {
             Log.i(Settings.APPTAG, "the current location is null");
             userLocation = MapsActivity.mLastLocation;
-        }
-        else {
+        } else {
             userLocation = MapsActivity.mCurrentLocation;
         }
 

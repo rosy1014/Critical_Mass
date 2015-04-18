@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -17,15 +18,13 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import android.view.inputmethod.InputMethodManager;
-
 /**
  * Created by tingyu on 2/26/15.
  */
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-//    private int mEventSize;
+    //    private int mEventSize;
     private String messageBody;
 
     private TextView mTitleTextView;
@@ -44,7 +43,6 @@ public class EventActivity extends Activity {
 
         setContentView(R.layout.activity_event);
         initViewParts();
-
 
 
         // Receive ObjectId from the List Activity
@@ -101,8 +99,7 @@ public class EventActivity extends Activity {
                 if (messageBody.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
                     return;
-                }
-                else {
+                } else {
                     ParseObject userComment = new ParseObject("EventComment");
                     userComment.put("EventId", eventObjectId);
                     userComment.put("UserComment", messageBody);
@@ -124,7 +121,6 @@ public class EventActivity extends Activity {
         });
 
     }
-
 
 
     // If the activity is resumed
