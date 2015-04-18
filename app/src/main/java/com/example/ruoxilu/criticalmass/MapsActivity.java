@@ -134,7 +134,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
-
+// TODO repeat the functionality of the dispatchActivity
     protected void checkLoginStatus() {
 
         //(Xin)
@@ -212,19 +212,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     //TODO
     // Must call super.onDestroy() at the end.
     protected void onDestroy() {
- //       ParseHandler.deleteMassUser(mMassUser);
-//        ParseQuery<MassUser> query = MassUser.getQuery();
-//        query.whereEqualTo("user", mMassUser.getUser());
-//        query.getFirstInBackground(new GetCallback<MassUser>() {
-//            @Override
-//            public void done(MassUser massUser, ParseException e) {
-//                if (e == null) {
-//                    massUser.deleteInBackground();
-//                } else {
-//                    Log.d(Settings.APPTAG, "Failed to find the current mass user");
-//                }
-//            }
-//        });
         super.onDestroy();
     }
 
@@ -265,23 +252,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.setMyLocationEnabled(true);
         // Get LocationManager object from System Service LOCATION_SERVICE
         mCurrentLocation = mapsHandler.initialMapLocation();
-//        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-//
-//        // Create a criteria object to retrieve provider
-//        Criteria criteria = new Criteria();
-//
-//        // Get the name of the best provider
-//        String provider = mLocationManager.getBestProvider(criteria, true);
-//
-//        // Get Current Location
-//        if (mLocationManager.getLastKnownLocation(provider) == null) {
-//            mCurrentLocation = Settings.getDefaultLocation();
-//
-//        } else {
-//            mCurrentLocation = mLocationManager.getLastKnownLocation(provider);
-//        }
-
-
         updateZoom(mCurrentLocation);
 
         // Get longitude of the current location
@@ -290,12 +260,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
         // Create a LatLng object for the current location
         LatLng latLng = new LatLng(latitude, longitude);
-        // Get the bounds to zoom to
-        //   LatLngBounds bounds = calculateBoundsWithCenter(latLng);
-        // Zoom to the given bounds
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
-        Log.i(Settings.APPTAG, "update camera");
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -315,16 +281,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
         mCurrentLocation = getLocation();
+        if (mCurrentLocation==null){
+            mCurrentLocation = Settings.getDefaultLocation();
+        }
         if(mMassUser == null){
             mMassUser= ParseHandler.getDefaultMassUser();
         }
 
         starterPeriodicLocationUpdates();// connect googleFused api services
-        updateUserLocation(mMassUser.getLocation());
-
-
+        ParseHandler.updateUserLocation(mMassUser.getLocation(), mMassUser);
         // update MassEvent
-       // Log.i(Settings.APPTAG, "Event ID of current user is " + mEventID);
         updateUserEvent(geoPointFromLocation(mCurrentLocation));
     }
 
@@ -344,7 +310,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return;
         }
         mLastLocation = location;
-        updateUserLocation(geoPointFromLocation(location));
+        ParseHandler.updateUserLocation(ParseHandler.geoPointFromLocation(location),mMassUser);
+        //updateUserLocation(geoPointFromLocation(location));
         updateZoom(location);
         doMapQuery();
 
@@ -369,63 +336,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Log.i(Settings.APPTAG, "geoPoint is " + geoPoint);
         return geoPoint;
     }
-
-    /*
-     * Helper function to update user's location in the MassUser table in cloud
-     *    if the user is not found in the table, save it to the cloud with the current location
-     *    if the user is already in the table, then replace the obsolete location with the current location.
-     */
-    protected void updateUserLocation(ParseGeoPoint value) {
-        final ParseGeoPoint geoPointValue = value; // need "final" type to pass in the callback function
-        ParseQuery<MassUser> query = MassUser.getQuery();
-        query.whereEqualTo("user", mMassUser.getUser());
-        Log.d(Settings.APPTAG, "in UpdateUserLocation, user is " + mMassUser.getUser());
-        Log.d(Settings.APPTAG, "in UpdateUserLocation, user is " + geoPointValue);
-        query.getFirstInBackground(new GetCallback<MassUser>() {
-            @Override
-            public void done(MassUser massUser, ParseException e) {
-                Log.d(Settings.APPTAG, "Done with getFirstInBackground loc " + e);
-
-                if (e == null) {
-                    // no error exception, the user is found in the cloud, update the location in the cloud
-                    Log.d(Settings.APPTAG, "massuser in updateUserLocation after query is " + massUser.getUser());
-                    Log.d(Settings.APPTAG, "massuser in updateUserLocation after query is " + geoPointValue);
-                    massUser.setLocation(geoPointValue);
-                    massUser.saveInBackground(new SaveCallback() {
-
-                        @Override
-                        public void done(ParseException e) {
-                            Log.d(Settings.APPTAG, "Done with getFirstInBackground loc");
-
-                            if (e == null) {
-                                Log.d(Settings.APPTAG, "MassUser update saved successfully");
-                            } else {
-                                Log.d(Settings.APPTAG, "MassUser update were not saved");
-                            }
-                        }
-                    });
-                    Log.d(Settings.APPTAG, "Updated the parse user's location");
-                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                    // The user has not been saved into the cloud, save it with current location
-                    mMassUser.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                Log.d(Settings.APPTAG, "New MassUser saved successfully");
-                            } else {
-                                Log.d(Settings.APPTAG, "New MassUser were not saved");
-                            }
-                        }
-                    });
-                    Log.d(Settings.APPTAG, "Saved new MassUser.");
-                } else {
-                    // Do nothing
-                }
-            }
-        });
-        return;
-    }
-
     /*
      * private helper functions
      */
