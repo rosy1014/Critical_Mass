@@ -25,6 +25,7 @@ public class MapsHandler {
     public static Context mContext;
     public static Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     public static Map<Marker, String> markerIDs = new HashMap<Marker, String>();
+    public static Map<Marker, String> markerNames = new HashMap<>();
     public static GoogleMap mMap;
 
     public static LocationRequest mLocationRequest;
@@ -113,15 +114,17 @@ public class MapsHandler {
                 Marker marker = mMap.addMarker(createMarkerOpt(event));
                 mapMarkers.put(event.getObjectId(), marker);
                 markerIDs.put(marker, event.getObjectId());
+                markerNames.put(marker, event.getLocationName());
             }
         }
         for(String objId: new HashSet<>(mapMarkers.keySet())){
             if (!eventIdsToKeep.contains(objId)){
                 Marker marker= mapMarkers.get(objId);
                 markerIDs.remove(marker);
+                markerNames.remove(marker);
                 marker.remove();
                 mapMarkers.get(objId).remove();
-                mapMarkers.remove(objId);
+
             }
         }
     }

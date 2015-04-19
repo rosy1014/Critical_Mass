@@ -231,54 +231,6 @@ public class ParseHandler {
     }
 
 
-//            mapQuery.findInBackground(new FindCallback<MassEvent>() {
-//                @Override
-//                public void done(List<MassEvent> objects, ParseException e) {
-//                    if (e != null) {
-//                        Log.d(Settings.APPTAG, "An error occurred while querying for mass event.", e);
-//                        return;
-//                    } else {
-//                        Log.d(Settings.APPTAG, "Find Mass Events");
-//                    }
-//                    // Handle the results
-//
-//                    // 2
-//                    for (final MassEvent mEvent : objects) {
-//                        // 3 check if the event size exceeds the threshold, tentatively set to 0
-//                        if (mEvent.getEventSize() > 10) {
-//                            //Log.d(Settings.APPTAG, "valid mass event"+mEvent.getEventSize());
-//
-//
-//                            // 4
-////                            Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
-//                            // 5
-//                            MarkerOptions markerOpts = MapsHandler.createMarkerOpt(mEvent);
-//
-//                            // 6
-//                            if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * Settings.METERS_PER_FEET
-//                                    / Settings.METERS_PER_KILOMETER) {
-//                                toKeep.put(mEvent.getObjectId(), markerOpts);
-//                            }
-//
-////                            Marker marker = mapsHandler.mMap.addMarker(markerOpts);
-////                            // update markerIDs hash map and mapMarkers hash map.
-////                            markerIDs.put(marker, mEvent.getObjectId());
-////                            mapMarkers.put(mEvent.getObjectId(), marker);
-////
-////                        }
-////                    }
-////
-////                    // 9
-//                    mMapsHandler.cleanUpMarkers(toKeep);
-////                    Log.d(Settings.APPTAG, "After clean up markers");
-//                        }
-//                    }
-//                }
-//            });
-
-//        return toKeep;
-//    }
-
     protected static void anonymousUserLogin() {
         ParseUser.enableAutomaticUser();
         Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null? " + ParseUser.getCurrentUser().getObjectId());

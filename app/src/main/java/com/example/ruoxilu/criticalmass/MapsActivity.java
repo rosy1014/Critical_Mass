@@ -1,9 +1,7 @@
 package com.example.ruoxilu.criticalmass;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
@@ -20,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -38,9 +35,7 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -365,17 +360,17 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Remove markers that are not in the Hashmap markersToKeep
      */
     // SIGN_MARKER_OBJECT
-    private void cleanUpMarkers(Set<String> markersToKeep) {
-        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
-            if (!markersToKeep.contains(objId)) {
-                Marker marker = mapMarkers.get(objId);
-                markerIDs.remove(marker);
-                marker.remove();
-                mapMarkers.get(objId).remove();
-                mapMarkers.remove(objId);
-            }
-        }
-    }
+//    private void cleanUpMarkers(Set<String> markersToKeep) {
+//        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
+//            if (!markersToKeep.contains(objId)) {
+//                Marker marker = mapMarkers.get(objId);
+//                markerIDs.remove(marker);
+//                marker.remove();
+//                mapMarkers.get(objId).remove();
+//                mapMarkers.remove(objId);
+//            }
+//        }
+//    }
 
 
     private void showErrorDialog(int errorCode) {
@@ -448,11 +443,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if (markerIDs.containsKey(marker)) {
+        if (mapsHandler.markerIDs.containsKey(marker)) {
             Intent eventDetailIntent = new Intent();
             eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-            String eventId = markerIDs.get(marker);
+            String locationName = mapsHandler.markerNames.get(marker);
+            String eventId = mapsHandler.markerIDs.get(marker);
             eventDetailIntent.putExtra("objectId", eventId);
+            eventDetailIntent.putExtra("location", locationName);
 //            Log.d(Settings.APPTAG, "On Marker Click, event object id is " + eventId);
             startActivity(eventDetailIntent);
             //return true;
