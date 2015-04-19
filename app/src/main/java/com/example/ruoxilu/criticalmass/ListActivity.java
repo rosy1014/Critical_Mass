@@ -18,6 +18,7 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Integer;
 
 /**
  * Created by tingyu on 2/23/15.
@@ -32,6 +33,7 @@ public class ListActivity extends Activity {
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
     private String[] mListArray;
+    private Integer[] mSizeArray;
     private ParseGeoPoint userLocationPoint;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class ListActivity extends Activity {
             setContentView(R.layout.activity_list);
             userLocationPoint = getLocationPoint();
             mActivityOne = (ListView) findViewById(R.id.event_list);
-            mListArray = getEventInfo();
+            getEventInfo();
 
             mScrollList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
             mScrollList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -55,7 +57,7 @@ public class ListActivity extends Activity {
 
 
             // Bind data from adapter to ListView.
-            mAdapter = new ListActivityAdapter(this, mListArray);
+            mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray);
             mActivityOne.setAdapter(mAdapter);
 
 
@@ -65,10 +67,12 @@ public class ListActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+
                     String eventId = parseObjects.get(position).getObjectId();
                     String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
                     eventDetailIntent.putExtra("location", locationName);
+
                     Log.d(Settings.APPTAG, "event object id is " + id);
                     startActivity(eventDetailIntent);
                 }
@@ -78,8 +82,8 @@ public class ListActivity extends Activity {
 
     private void refreshContent() {
         userLocationPoint = getLocationPoint();
-        mListArray = getEventInfo();
-        mAdapter = new ListActivityAdapter(this, mListArray);
+        getEventInfo();
+        mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray);
         mActivityOne.setAdapter(mAdapter);
 
 
@@ -106,30 +110,36 @@ public class ListActivity extends Activity {
     }
 
 
-    protected String[] getEventInfo() {
+    protected void getEventInfo() {
 
         ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
 
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
-        ArrayList<String> mNearbyList = new ArrayList<String>();
+        ArrayList<String> mNearbyList = new ArrayList<String>(10);
+        ArrayList<Integer> mEventSize = new ArrayList<Integer>(10);
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
             for (MassEvent mass : parseObjects) {
                 String locationName = mass.getLocationName();
+                Integer eventSize = mass.getEventSize();
+
                 mNearbyList.add(locationName);
+                mEventSize.add(eventSize);
             }
         } catch (ParseException e) {
             Log.d(Settings.APPTAG, e.getMessage());
         }
 
-        String[] listArray = new String[mNearbyList.size()];
-        listArray = mNearbyList.toArray(listArray);
+        mListArray = new String[mNearbyList.size()];
+        mListArray = mNearbyList.toArray(mListArray);
 
-        return listArray;
+        mSizeArray = new Integer[mEventSize.size()];
+        mSizeArray = mEventSize.toArray(mSizeArray);
+
     }
 
 }

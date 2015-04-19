@@ -3,6 +3,7 @@ package com.example.ruoxilu.criticalmass;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -26,9 +27,10 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-    //    private int mEventSize;
+    private int mEventSize;
     private String messageBody;
     private String locationName;
+    private Integer eventSize;
 
     private TextView mTitleTextView;
     private TextView mEventSizeView;
@@ -51,10 +53,26 @@ public class EventActivity extends Activity {
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
         eventObjectId = extras.getString("objectId");
-        locationName = extras.getString("location");
+
+        locationName = extras.getString("location", null);
+
+        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
+        eventsQuery.whereEqualTo("objectId", eventObjectId);
+        try {
+            MassEvent mass = eventsQuery.getFirst();
+            eventSize = mass.getEventSize();
+
+            if (locationName == null) {
+                locationName = mass.getLocationName();
+            }
+
+        }   catch (ParseException e) {
+            Log.e(Settings.APPTAG, e.getMessage());
+        }
+
         // Set title to ObjectId
         mTitleTextView.setText(locationName);
-
+        mEventSizeView.setText(eventSize);
 
         if (Application.networkConnected(this)) {
             // Populating event comments
@@ -73,7 +91,7 @@ public class EventActivity extends Activity {
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         mTitleTextView.setTypeface(tf);
 
-//        mEventSizeView = (TextView) findViewById(R.id.event_size);
+        mEventSizeView = (TextView) findViewById(R.id.event_size);
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
         mEventComments = (ListView) findViewById(R.id.event_comments);

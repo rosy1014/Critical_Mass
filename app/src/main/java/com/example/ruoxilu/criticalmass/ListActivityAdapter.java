@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.lang.Integer;
 
 /**
  * Created by angeloliao on 3/28/15.
@@ -15,11 +16,13 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
 
     private Context context;
     private String[] values;
+    private Integer[] sizes;
 
-    public ListActivityAdapter(Context context, String[] values) {
+    public ListActivityAdapter(Context context, String[] values, Integer[] sizes) {
         super(context, R.layout.list_item, values);
         this.context = context;
         this.values = values;
+        this.sizes = sizes;
     }
 
     @Override
@@ -29,10 +32,12 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
         View rowView = inflater.inflate(R.layout.list_item, parent, false);
 
         TextView titleTextView = (TextView) rowView.findViewById(R.id.title_text);
+        TextView sizeTextView = (TextView) rowView.findViewById(R.id.event_size);
 
         // TODO: add event size
         // TextView eventSizeTextView = (TextView) rowView.findViewById(R.id.event_size);
         titleTextView.setText(values[position]);
+        sizeTextView.setText(sizes[position]);
 
         // TODO: different background color for different row
 //        if (position % 2 == 0) {
