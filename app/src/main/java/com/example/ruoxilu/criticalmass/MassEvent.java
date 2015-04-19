@@ -55,11 +55,11 @@ public class MassEvent extends ParseObject {
         put("EventSize", eventSize);
     }
 
-    public String getEventName() {
+    public String getLocationName(){
         return getString("locationName");
     }
 
-    public void setEventName(String newName) {
-        put("locationName", newName);
+    public void setLocationName(String name){
+        put("locationName", name);
     }
 }

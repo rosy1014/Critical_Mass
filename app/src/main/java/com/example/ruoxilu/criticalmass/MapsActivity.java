@@ -33,20 +33,25 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.FindCallback;
 import com.parse.ParseAnonymousUtils;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
-    public static MapsHandler mapsHandler;
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
@@ -55,10 +60,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
     private static ViewGroup mViewGroup;
     private static LinearLayout mMainScreen;
-    protected MassUser mMassUser; // Each user (i.e. application) only has one MassUser object.
-
+    protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
+    private MapsHandler mapsHandler;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private LocationRequest mLocationRequest;
+   // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private String mEventID;
     // Fields for the map radius in feet
@@ -77,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         super.onCreate(savedInstanceState);
         mapsHandler = new MapsHandler(this);
 
-        initLocationRequest(); // Helper function to initiate location request
+        MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
         setContentView(R.layout.activity_maps);
@@ -94,6 +99,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         setUpMapIfNeeded();
+
+//        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+//        startActivity(intent);
         checkLoginStatus();
 
 
@@ -110,6 +118,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Intent i = new Intent(MapsActivity.this, ListActivity.class);
             startActivityForResult(i, 0);
 
+
 //            android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_fragment);
 //            Bundle args = new Bundle();
 //            args.putInt(EventListFragment.ARG_MENU_OPTION, position);
@@ -124,6 +133,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
+// TODO repeat the functionality of the dispatchActivity
     protected void checkLoginStatus() {
 
         //(Xin)
@@ -177,8 +187,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             LatLng latLng = new LatLng(latitude, longitude);
 
             // Move the camera to the place in interest
-            mapsHandler.mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mapsHandler.mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+            //Log.d(Settings.APPTAG, "update camera on resume");
         }
 
     }
@@ -212,12 +223,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mapsHandler.mMap == null) {
+        if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mapsHandler.mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
-            if (mapsHandler.mMap != null) {
+            if (mMap != null) {
                 setUpMap();
             }
         }
@@ -229,7 +240,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        mapsHandler.mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true);
         // Get LocationManager object from System Service LOCATION_SERVICE
         mCurrentLocation = mapsHandler.initialMapLocation();
         updateZoom(mCurrentLocation);
@@ -240,16 +251,16 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
         // Create a LatLng object for the current location
         LatLng latLng = new LatLng(latitude, longitude);
-        mapsHandler.mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mapsHandler.mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
-        mapsHandler.mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
                 doMapQuery();
             }
         });
-        mapsHandler.mMap.setOnInfoWindowClickListener(this);
-        mapsHandler.mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
+        mMap.setOnMarkerClickListener(this);
     }
 
     @Override
@@ -340,18 +351,100 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private void updateZoom(Location location) {
         LatLng myLatLng = (location == null) ? new LatLng(0, 0) : new LatLng(location.getLatitude(), location.getLongitude());
         // Move the camera to the location in interest and zoom to appropriate level
-        mapsHandler.mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, Settings.ZOOM_LEVEL));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, Settings.ZOOM_LEVEL));
     }
 
     // display events by markers on the map
     private void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
-
-
         // 1
         Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-//        HashSet<MassEvent> nearbyEvents = ParseHandler.queryNearbyEvent(myLoc);
-        ParseHandler.queryNearbyEvent(myLoc);
+        if (myLoc == null) {
+            cleanUpMarkers(new HashSet<String>());
+            return;
+        }
+        // 2
+        Log.d(Settings.APPTAG, "myloc is " + myLoc);
+        final ParseGeoPoint myPoint = ParseHandler.geoPointFromLocation(myLoc);
+        // 3
+        ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
+        // 4
+        mapQuery.whereWithinKilometers("location", myPoint, Settings.SEARCH_DISTANCE);
+        // 5
+        //mapQuery.include("objectId");
+        mapQuery.orderByDescending("createdAt");
+        // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
+        // 6
+        mapQuery.findInBackground(new FindCallback<MassEvent>() {
+            @Override
+            public void done(List<MassEvent> objects, ParseException e) {
+                if (e != null) {
+                    Log.d(Settings.APPTAG, "An error occurred while querying for map posts.", e);
+                    return;
+                } else {
+                    Log.d(Settings.APPTAG, "Find Mass Event " + e);
+                    //  Log.d(Settings.APPTAG, "Find Mass Event " + objects.get(0).getObjectId());
+                }
+
+                if (myUpdateNumber != mostRecentMapUpdate) {
+                    return;
+                }
+                // Handle the results
+                Set<String> toKeep = new HashSet<String>();
+                // 2
+                for (final MassEvent mEvent : objects) {
+                    // 3 check if the event size exceeds the threshold, tentatively set to 0
+                    if (mEvent.getEventSize() > 10) {
+                        //Log.d(Settings.APPTAG, "valid mass event"+mEvent.getEventSize());
+
+                        toKeep.add(mEvent.getObjectId());
+                        // 4
+                        Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
+                        // 5
+                        MarkerOptions markerOpts = MapsHandler.createMarkerOpt(mEvent);
+                        // 6
+                        if (mEvent.getLocation().distanceInKilometersTo(myPoint) > radius * Settings.METERS_PER_FEET
+                                / Settings.METERS_PER_KILOMETER) {
+                            // Set up an out-of-range marker
+                            // Check for an existing out of range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() == null) {
+                                    // Out of range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now out of range, needs to be refreshed
+                                    oldMarker.remove();
+//                                    Log.d(Settings.APPTAG, "Removed oldmarker: " + oldMarker);
+                                }
+                            }
+
+                        } else {
+                            // Set up an in-range marker
+                            // Check for an existing in range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() != null) {
+                                    // In range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now in range, needs to be refreshed
+                                    oldMarker.remove();
+                                }
+                            }
+                        }
+                        // 7
+                        Marker marker = mMap.addMarker(markerOpts);
+                        // update markerIDs hash map and mapMarkers hash map.
+                        markerIDs.put(marker, mEvent.getObjectId());
+                        mapMarkers.put(mEvent.getObjectId(), marker);
+
+                    }
+                }
+
+                // 9
+                cleanUpMarkers(toKeep);
+                Log.d(Settings.APPTAG, "After clean up markers");
+            }
+        });
     }
 
     /*
@@ -380,14 +473,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         if (errorDialog != null) {
 
-            // Creatae a new DialogFracment in which to show the error dialog
-            ErrorDialogFragment errorDialogFragment = new ErrorDialogFragment();
-
-            // Set the dialog in the DialogFragment
-            errorDialogFragment.setDialog(errorDialog);
-
-            // Show the error dialog in the DialogFragment
-            errorDialogFragment.show(getSupportFragmentManager(), Settings.APPTAG);
+            new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText(errorDialog.toString())
+                    .show();
         }
 
     }
@@ -401,9 +490,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         } else {
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
             if (dialog != null) {
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                errorFragment.setDialog(dialog);
-                errorFragment.show(this.getSupportFragmentManager(), Settings.APPTAG);
+                new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Oops...")
+                        .setContentText(dialog.toString())
+                        .show();
             }
             return false;
         }
@@ -416,34 +506,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     public void confirmLogOut() {
 
+        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure?")
+                .setContentText("Logged out users will no longer be shown on the map.")
+                .setCancelText("No")
+                .setConfirmText("Yes")
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.cancel();
+                    }
+                })
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        ParseHandler.deleteMassUser(mMassUser);
+                        ParseUser.logOut();
+                        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .show();
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Are you sure you want to log out?");
-        alert.setMessage("Logged out users will no longer be shown on the map.");
-
-        // Make an "OK" button to confirm log out
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-                ParseHandler.deleteMassUser(mMassUser);
-                ParseUser.logOut();
-                Intent intent = new Intent(MapsActivity.this, LoginSignupActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                Toast.makeText(getApplicationContext(), "You have successfully logged out!", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        // Make a "Cancel" button
-        // that simply dismisses the alert
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-
-        alert.show();
     }
 
     @Override

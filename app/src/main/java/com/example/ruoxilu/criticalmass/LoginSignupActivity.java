@@ -14,12 +14,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginSignupActivity extends Activity {
     // Declare Variables
@@ -109,20 +110,21 @@ public class LoginSignupActivity extends Activity {
                 new LogInCallback() {
                     public void done(ParseUser user, ParseException e) {
                         if (e == null) {
+
                             // If user exist and authenticated, send user to MapsActivity.class
                             Intent intent = new Intent(
                                     LoginSignupActivity.this,
                                     MapsActivity.class);
                             startActivity(intent);
-                            Toast.makeText(getApplicationContext(),
-                                    "Successfully Logged in",
-                                    Toast.LENGTH_LONG).show();
                             finish();
+
                         } else {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    "No such user exist, please signup",
-                                    Toast.LENGTH_LONG).show();
+
+                            new SweetAlertDialog(LoginSignupActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                    .setTitleText("Oops...")
+                                    .setContentText("No such user exist, please sign up.")
+                                    .show();
+
                         }
                     }
                 }
@@ -136,9 +138,11 @@ public class LoginSignupActivity extends Activity {
 
         // Force user to fill up the form
         if (usernametxt.equals("") && passwordtxt.equals("")) {
-            Toast.makeText(getApplicationContext(),
-                    "Please complete the sign up form",
-                    Toast.LENGTH_LONG).show();
+
+            new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Oops...")
+                    .setContentText("Please complete the sign up form!")
+                    .show();
 
         } else {
             // Save new user data into Parse.com Data Storage
@@ -149,19 +153,23 @@ public class LoginSignupActivity extends Activity {
             user.signUpInBackground(new SignUpCallback() {
                 public void done(ParseException e) {
                     if (e == null) {
-                        // Show a simple Toast message upon successful registration
-                        Toast.makeText(getApplicationContext(),
-                                "Successfully Signed up, please log in.",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(),
-                                "Sign up Error", Toast.LENGTH_LONG)
+
+                        new SweetAlertDialog(LoginSignupActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("Yay!")
+                                .setContentText("Successfully signed up, please log in!")
                                 .show();
+
+                    } else {
+
+                        new SweetAlertDialog(LoginSignupActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Oops...")
+                                .setContentText("Something went wrong! Please try again!")
+                                .show();
+
                     }
                 }
             });
         }
     }
-
 
 }

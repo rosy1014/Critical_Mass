@@ -4,20 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -31,6 +27,7 @@ import java.util.List;
 public class ListActivity extends Activity {
 
     ArrayAdapter<String> mAdapter;
+    List<MassEvent> parseObjects;
     private SwipeRefreshLayout mScrollList;
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
@@ -68,8 +65,10 @@ public class ListActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                    String eventId = mListArray[position];
+                    String eventId = parseObjects.get(position).getObjectId();
+                    String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
+                    eventDetailIntent.putExtra("location", locationName);
                     Log.d(Settings.APPTAG, "event object id is " + id);
                     startActivity(eventDetailIntent);
                 }
@@ -96,8 +95,7 @@ public class ListActivity extends Activity {
         if (MapsActivity.mCurrentLocation == null) {
             Log.i(Settings.APPTAG, "the current location is null");
             userLocation = MapsActivity.mLastLocation;
-        }
-        else {
+        } else {
             userLocation = MapsActivity.mCurrentLocation;
         }
 
@@ -116,13 +114,12 @@ public class ListActivity extends Activity {
         eventsQuery.setLimit(10);
 
         ArrayList<String> mNearbyList = new ArrayList<String>();
-        List<MassEvent> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
             for (MassEvent mass : parseObjects) {
-                String locationName = mass.getEventName();
+                String locationName = mass.getLocationName();
                 mNearbyList.add(locationName);
             }
         } catch (ParseException e) {
