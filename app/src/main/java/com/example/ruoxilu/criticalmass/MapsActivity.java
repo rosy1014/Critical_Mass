@@ -52,9 +52,11 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
+
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
+
     // Fields for helping process the map and location changes
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
@@ -86,9 +88,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
         setContentView(R.layout.activity_maps);
-        mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
 
         // set a custom shadow that overlays the main content when the drawer opens
@@ -177,6 +176,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         super.onResume();
         mGoogleApiClient.connect();
         if (mCurrentLocation != null) {
+
             // Create a LatLng object for the current location
             double latitude = mCurrentLocation.getLatitude();
 
@@ -266,7 +266,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     @Override
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
+
+        starterPeriodicLocationUpdates();// connect googleFused api services
+        setUpMapIfNeeded();
+
         mCurrentLocation = getLocation();
+
         if (mCurrentLocation==null){
             mCurrentLocation = Settings.getDefaultLocation();
         }
@@ -276,6 +281,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         starterPeriodicLocationUpdates();// connect googleFused api services
         ParseHandler.updateUserLocation(mMassUser.getLocation(), mMassUser);
+
         // update MassEvent
         ParseHandler.updateUserEvent(geoPointFromLocation(mCurrentLocation),mMassUser);
     }
@@ -350,6 +356,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     private void updateZoom(Location location) {
         LatLng myLatLng = (location == null) ? new LatLng(0, 0) : new LatLng(location.getLatitude(), location.getLongitude());
+
         // Move the camera to the location in interest and zoom to appropriate level
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, Settings.ZOOM_LEVEL));
     }

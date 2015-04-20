@@ -12,9 +12,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
+import com.parse.ParseObject;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,11 @@ public class ListActivity extends Activity {
     private SwipeRefreshLayout mScrollList;
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
+
     private String[] mListArray;
     private Integer[] mSizeArray;
+    private com.parse.ParseFile[] mEventIconsArray;
+
     private ParseGeoPoint userLocationPoint;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,7 @@ public class ListActivity extends Activity {
 
 
             // Bind data from adapter to ListView.
-            mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray);
+            mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray, mEventIconsArray);
             mActivityOne.setAdapter(mAdapter);
 
 
@@ -74,6 +78,7 @@ public class ListActivity extends Activity {
                     eventDetailIntent.putExtra("location", locationName);
 
                     Log.d(Settings.APPTAG, "event object id is " + id);
+
                     startActivity(eventDetailIntent);
                 }
             });
@@ -83,7 +88,7 @@ public class ListActivity extends Activity {
     private void refreshContent() {
         userLocationPoint = getLocationPoint();
         getEventInfo();
-        mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray);
+        mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray, mEventIconsArray);
         mActivityOne.setAdapter(mAdapter);
 
 
@@ -103,10 +108,10 @@ public class ListActivity extends Activity {
             userLocation = MapsActivity.mCurrentLocation;
         }
 
-        ParseGeoPoint geoPoint = new ParseGeoPoint(userLocation.getLatitude(),
+        ParseGeoPoint currentPoint = new ParseGeoPoint(userLocation.getLatitude(),
                 userLocation.getLongitude());
 
-        return geoPoint;
+        return currentPoint;
     }
 
 
@@ -117,28 +122,33 @@ public class ListActivity extends Activity {
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
-        ArrayList<String> mNearbyList = new ArrayList<String>(10);
-        ArrayList<Integer> mEventSize = new ArrayList<Integer>(10);
+
+        mListArray = new String[10];
+        mSizeArray = new Integer[10];
+        mEventIconsArray = new com.parse.ParseFile[10];
+
+        List<MassEvent> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
             parseObjects = eventsQuery.find();
+            int i = 0;
+
             for (MassEvent mass : parseObjects) {
-                String locationName = mass.getLocationName();
+
+                String eventObjectId = mass.getObjectId();
+                com.parse.ParseFile eventIcon = mass.getEventIcon();
                 Integer eventSize = mass.getEventSize();
 
-                mNearbyList.add(locationName);
-                mEventSize.add(eventSize);
+                mListArray[i] = eventObjectId;
+                mEventIconsArray[i] = eventIcon;
+                mSizeArray[i] = eventSize;
+                Log.d(Settings.APPTAG, "image name: "+eventIcon.getName());
+                i++;
             }
         } catch (ParseException e) {
             Log.d(Settings.APPTAG, e.getMessage());
         }
-
-        mListArray = new String[mNearbyList.size()];
-        mListArray = mNearbyList.toArray(mListArray);
-
-        mSizeArray = new Integer[mEventSize.size()];
-        mSizeArray = mEventSize.toArray(mSizeArray);
 
     }
 

@@ -1,6 +1,7 @@
 package com.example.ruoxilu.criticalmass;
 
 import com.parse.ParseClassName;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -62,4 +63,9 @@ public class MassEvent extends ParseObject {
     public void setLocationName(String name){
         put("locationName", name);
     }
+
+    public ParseFile getEventIcon(){
+        return getParseFile("image");
+    }
+
 }

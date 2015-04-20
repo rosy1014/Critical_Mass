@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+
+import android.widget.ArrayAdapter;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import com.parse.SaveCallback;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+
 /**
  * Created by tingyu on 2/26/15.
  */
@@ -28,6 +31,7 @@ public class EventActivity extends Activity {
 
     private String eventObjectId;
     private int mEventSize;
+
     private String messageBody;
     private String locationName;
     private Integer eventSize;
@@ -48,7 +52,6 @@ public class EventActivity extends Activity {
 
         setContentView(R.layout.activity_event);
         initViewParts();
-
 
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
@@ -84,6 +87,7 @@ public class EventActivity extends Activity {
     }
 
     private void initViewParts() {
+
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
 
@@ -107,6 +111,8 @@ public class EventActivity extends Activity {
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
     }
+
+
 
     private void setSendMessageB() {
         // After a person decides to add comment, add a data field on EventComment and then add a
@@ -147,11 +153,6 @@ public class EventActivity extends Activity {
                 imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
         });
-
     }
-
-
-    // If the activity is resumed
-
 
 }
