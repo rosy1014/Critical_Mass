@@ -58,6 +58,7 @@ public class ParseHandler {
         MassUser massUser = new MassUser();
         massUser.setUser(ParseUser.getCurrentUser());
         massUser.setLocation(geoPointFromLocation(Settings.getDefaultLocation()));
+        massUser.saveInBackground();
         return massUser;
 
     }
