@@ -29,7 +29,8 @@ import java.lang.Integer;
 public class ListActivity extends Activity {
 
     ArrayAdapter<String> mAdapter;
-    List<MassEvent> parseObjects;
+    List<MassEvent> mParseObjects;
+
     private SwipeRefreshLayout mScrollList;
     private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
@@ -72,10 +73,10 @@ public class ListActivity extends Activity {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
 
-                    String eventId = parseObjects.get(position).getObjectId();
-                    String locationName = parseObjects.get(position).getLocationName();
+                    String eventId = mParseObjects.get(position).getObjectId();
+                    //String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
-                    eventDetailIntent.putExtra("location", locationName);
+                    //eventDetailIntent.putExtra("location", locationName);
 
                     Log.d(Settings.APPTAG, "event object id is " + id);
 
@@ -122,28 +123,25 @@ public class ListActivity extends Activity {
         eventsQuery.whereNear("location", userLocationPoint);
         eventsQuery.setLimit(10);
 
-
         mListArray = new String[10];
         mSizeArray = new Integer[10];
         mEventIconsArray = new com.parse.ParseFile[10];
 
-        List<MassEvent> parseObjects;
 
         try {
             // Use find instead of findInBackground because of a potential thread problem.
-            parseObjects = eventsQuery.find();
+            mParseObjects = eventsQuery.find();
             int i = 0;
 
-            for (MassEvent mass : parseObjects) {
+            for (MassEvent mass : mParseObjects) {
 
-                String eventObjectId = mass.getObjectId();
+                String eventLocName = mass.getLocationName();
                 com.parse.ParseFile eventIcon = mass.getEventIcon();
                 Integer eventSize = mass.getEventSize();
 
-                mListArray[i] = eventObjectId;
+                mListArray[i] = eventLocName;
                 mEventIconsArray[i] = eventIcon;
                 mSizeArray[i] = eventSize;
-                Log.d(Settings.APPTAG, "image name: "+eventIcon.getName());
                 i++;
             }
         } catch (ParseException e) {

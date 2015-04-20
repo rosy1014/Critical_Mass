@@ -66,7 +66,7 @@ public class EventActivity extends Activity {
             eventSize = mass.getEventSize();
 
             if (locationName == null) {
-                locationName = mass.getLocationName();
+            locationName = mass.getLocationName();
             }
 
         }   catch (ParseException e) {
@@ -88,7 +88,6 @@ public class EventActivity extends Activity {
 
     private void initViewParts() {
 
-        // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
 
         // set custom font
