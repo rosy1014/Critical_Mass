@@ -1,5 +1,7 @@
 package com.example.ruoxilu.criticalmass;
 
+import android.location.Location;
+
 /**
  * Created by tingyu on 4/16/15.
  */
@@ -47,4 +49,18 @@ public class Settings {
     public static final int POPSIZE3 = 50;
     public static final int POPSIZE4 = 100;
     public static final int POPSIZE5 = 500;
+
+    private static Location DEFAULT_LOCATION = new Location(" ");
+
+    private static void setDefaultLocation() {
+        DEFAULT_LOCATION.setLongitude(37.0);
+        DEFAULT_LOCATION.setLatitude(64.0);
+    }
+
+    public static Location getDefaultLocation() {
+        setDefaultLocation();
+        return DEFAULT_LOCATION;
+    }
+
+
 }

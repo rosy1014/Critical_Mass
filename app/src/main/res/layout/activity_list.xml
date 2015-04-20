@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/swipe_refresh_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ffffffff">
-    <!-- May change the height to match_parent after testing -->
 
     <ListView
         android:id="@+id/event_list"
@@ -15,4 +17,4 @@
 
     </ListView>
 
-    </RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

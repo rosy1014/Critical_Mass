@@ -1,8 +1,6 @@
 package com.example.ruoxilu.criticalmass;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,6 +10,8 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 public class Application extends android.app.Application {
@@ -33,27 +33,26 @@ public class Application extends android.app.Application {
 
         final Context specificContext = c;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(c);
-        builder.setTitle("Error: No Internet connection.");
-        builder.setMessage("Sorry, it seems like no internet connection is available. \n" +
-                "Please turn off airplane mode or turn on Wi-Fi/Celluar connection in Settings.");
+        new SweetAlertDialog(c, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText("Oops...")
+                .setContentText("No internet connection available. Please check your internet settings.")
+                .setConfirmText("Settings")
+                .setCancelText("Cancel")
+                .showCancelButton(true)
+                .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.cancel();
+                    }
+                })
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        specificContext.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS), null);
+                    }
+                })
+                .show();
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-
-        builder.setNegativeButton("Settings", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                specificContext.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS), null);
-            }
-        });
-
-
-        AlertDialog internetAlertDialog = builder.create();
-
-        internetAlertDialog.show();
     }
 
     @Override
@@ -61,6 +60,7 @@ public class Application extends android.app.Application {
         super.onCreate();
         ParseObject.registerSubclass(MassUser.class);
         ParseObject.registerSubclass(MassEvent.class);
+        ParseObject.registerSubclass(Comment.class);
 
         Parse.initialize(this, "ADIzf9tA1P4KQFL1AyyAKoCjLKhgaCmaZTmp96CL", "PcefekoiDoE3uR2yUd932HRbPPqrEGJyaE61aPVF");
         ParseUser.enableAutomaticUser();

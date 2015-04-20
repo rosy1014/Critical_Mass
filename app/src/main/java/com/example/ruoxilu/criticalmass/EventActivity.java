@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -17,14 +18,17 @@ import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by tingyu on 2/26/15.
  */
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-//    private int mEventSize;
+    //    private int mEventSize;
     private String messageBody;
+    private String locationName;
 
     private TextView mTitleTextView;
     private TextView mEventSizeView;
@@ -32,7 +36,7 @@ public class EventActivity extends Activity {
     private EditText mMessageBodyField;
     private ListView mEventComments;
 
-    private ParseQueryAdapter<ParseObject> queryEventComment;
+    private CommentAdapter queryEventComment;
     private String fontPath = "fonts/Nunito-Bold.ttf";
 
 
@@ -44,12 +48,12 @@ public class EventActivity extends Activity {
         initViewParts();
 
 
-
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
         eventObjectId = extras.getString("objectId");
+        locationName = extras.getString("location");
         // Set title to ObjectId
-        mTitleTextView.setText(eventObjectId);
+        mTitleTextView.setText(locationName);
 
 
         if (Application.networkConnected(this)) {
@@ -64,6 +68,8 @@ public class EventActivity extends Activity {
     private void initViewParts() {
         // TODO: Right now we use the unique object id as event title.
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
+
+        // set custom font
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         mTitleTextView.setTypeface(tf);
 
@@ -74,15 +80,9 @@ public class EventActivity extends Activity {
     }
 
     private void getComments() {
-        ParseQueryAdapter.QueryFactory<ParseObject> factoryEventComment =
-                new ParseQueryAdapter.QueryFactory<ParseObject>() {
-                    public ParseQuery create() {
-                        ParseQuery queryEventComment = new ParseQuery("EventComment");
-                        queryEventComment.whereEqualTo("EventId", eventObjectId);
-                        return queryEventComment;
-                    }
-                };
-        queryEventComment = new ParseQueryAdapter<ParseObject>(this, factoryEventComment);
+
+        final String finalId = eventObjectId;
+        queryEventComment = new CommentAdapter(this, finalId);
 
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
@@ -97,14 +97,26 @@ public class EventActivity extends Activity {
                 messageBody = mMessageBodyField.getText().toString();
 
                 if (messageBody.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Please enter a message", Toast.LENGTH_LONG).show();
+
+                    new SweetAlertDialog(EventActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Oops...")
+                            .setContentText("Please enter a message")
+                            .show();
                     return;
-                }
-                else {
-                    ParseObject userComment = new ParseObject("EventComment");
-                    userComment.put("EventId", eventObjectId);
-                    userComment.put("UserComment", messageBody);
-                    userComment.put("UserId", ParseUser.getCurrentUser().getObjectId());
+
+                } else {
+
+                    Comment userComment = new Comment();
+                    userComment.setEventId(eventObjectId);
+                    userComment.setUserComment(messageBody);
+                    userComment.setUserName(ParseUser.getCurrentUser().getUsername());
+                    userComment.setUserId(ParseUser.getCurrentUser().getObjectId());
+
+//                    ParseObject userComment = new ParseObject("EventComment");
+//                    userComment.put("EventId", eventObjectId);
+//                    userComment.put("UserComment", messageBody);
+//                    userComment.put("UserId", ParseUser.getCurrentUser().getObjectId());
+//                    userComment.put("UserName", ParseUser.getCurrentUser().getUsername());
                     userComment.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -115,11 +127,13 @@ public class EventActivity extends Activity {
                         }
                     });
                 }
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
         });
 
     }
-
 
 
     // If the activity is resumed
