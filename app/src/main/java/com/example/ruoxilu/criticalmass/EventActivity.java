@@ -72,7 +72,7 @@ public class EventActivity extends Activity {
 
         // Set title to ObjectId
         mTitleTextView.setText(locationName);
-        mEventSizeView.setText(eventSize);
+        mEventSizeView.setText(String.valueOf(eventSize));
 
         if (Application.networkConnected(this)) {
             // Populating event comments
@@ -92,6 +92,8 @@ public class EventActivity extends Activity {
         mTitleTextView.setTypeface(tf);
 
         mEventSizeView = (TextView) findViewById(R.id.event_size);
+        mEventSizeView.setTypeface(tf);
+
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
         mEventComments = (ListView) findViewById(R.id.event_comments);
@@ -130,11 +132,6 @@ public class EventActivity extends Activity {
                     userComment.setUserName(ParseUser.getCurrentUser().getUsername());
                     userComment.setUserId(ParseUser.getCurrentUser().getObjectId());
 
-//                    ParseObject userComment = new ParseObject("EventComment");
-//                    userComment.put("EventId", eventObjectId);
-//                    userComment.put("UserComment", messageBody);
-//                    userComment.put("UserId", ParseUser.getCurrentUser().getObjectId());
-//                    userComment.put("UserName", ParseUser.getCurrentUser().getUsername());
                     userComment.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {

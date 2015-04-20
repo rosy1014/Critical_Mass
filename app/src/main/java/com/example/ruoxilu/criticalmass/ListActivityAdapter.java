@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.util.Log;
 
 import java.lang.Integer;
 
@@ -34,18 +35,10 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
         TextView titleTextView = (TextView) rowView.findViewById(R.id.title_text);
         TextView sizeTextView = (TextView) rowView.findViewById(R.id.event_size);
 
-        // TODO: add event size
-        // TextView eventSizeTextView = (TextView) rowView.findViewById(R.id.event_size);
         titleTextView.setText(values[position]);
-        sizeTextView.setText(sizes[position]);
 
-        // TODO: different background color for different row
-//        if (position % 2 == 0) {
-//
-//        }
-//        else {
-//
-//        }
+        sizeTextView.setText(String.valueOf(sizes[position]));
+
         return rowView;
     }
 
