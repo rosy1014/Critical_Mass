@@ -52,6 +52,7 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
         View rowView = inflater.inflate(R.layout.list_item, parent, false);
 
         TextView titleTextView = (TextView) rowView.findViewById(R.id.title_text);
+
         TextView sizeTextView = (TextView) rowView.findViewById(R.id.event_size);
         ParseImageView eventIconView = (ParseImageView) rowView.findViewById(R.id.activity_image);
 

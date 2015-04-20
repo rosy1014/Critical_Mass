@@ -14,7 +14,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -35,7 +37,9 @@ public class EventActivity extends Activity {
     private String messageBody;
     private String locationName;
     private Integer eventSize;
+    private com.parse.ParseFile mEventIcon;
 
+    private ParseImageView mIconPImageView;
     private TextView mTitleTextView;
     private TextView mEventSizeView;
     private Button mSendMessageButton;
@@ -63,7 +67,9 @@ public class EventActivity extends Activity {
         eventsQuery.whereEqualTo("objectId", eventObjectId);
         try {
             MassEvent mass = eventsQuery.getFirst();
+
             eventSize = mass.getEventSize();
+            mEventIcon = mass.getEventIcon();
 
             if (locationName == null) {
             locationName = mass.getLocationName();
@@ -73,7 +79,16 @@ public class EventActivity extends Activity {
             Log.e(Settings.APPTAG, e.getMessage());
         }
 
-        // Set title to ObjectId
+        mIconPImageView.setParseFile(mEventIcon);
+        mIconPImageView.setPlaceholder(getResources().getDrawable(R.drawable.giraffe));
+        mIconPImageView.loadInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, com.parse.ParseException e) {
+                Log.d(Settings.APPTAG,
+                        "Fetched image");
+            }
+        });
+
         mTitleTextView.setText(locationName);
         mEventSizeView.setText(String.valueOf(eventSize));
 
@@ -88,6 +103,7 @@ public class EventActivity extends Activity {
 
     private void initViewParts() {
 
+        mIconPImageView = (ParseImageView) findViewById(R.id.activity_image);
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
 
         // set custom font

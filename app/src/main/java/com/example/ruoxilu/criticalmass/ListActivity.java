@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
@@ -70,19 +72,38 @@ public class ListActivity extends Activity {
             mActivityOne.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    String locationName = mParseObjects.get(position).getLocationName();
+
+                    android.content.ClipboardManager clipboard =
+                            (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    android.content.ClipData clip =
+                            android.content.ClipData.newPlainText("Location:", locationName);
+                    clipboard.setPrimaryClip(clip);
+
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
 
                     String eventId = mParseObjects.get(position).getObjectId();
-                    //String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
-                    //eventDetailIntent.putExtra("location", locationName);
+                    eventDetailIntent.putExtra("location", locationName);
 
                     Log.d(Settings.APPTAG, "event object id is " + id);
 
                     startActivity(eventDetailIntent);
                 }
             });
+
+//            mActivityOne.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//                @Override
+//                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//
+////                    TextView titleTextView = (TextView) view.findViewById(R.id.title_text);
+////                    titleTextView.setTextIsSelectable(true);
+//                    return true;
+//                }
+//            });
+
         }
     }
 

@@ -20,6 +20,7 @@
         android:padding="20dp"
         android:textSize="30sp"
         android:layout_toRightOf="@id/activity_image"
+        android:longClickable="true"
         />
 
     <TextView
