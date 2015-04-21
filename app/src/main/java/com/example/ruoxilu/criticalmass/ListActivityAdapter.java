@@ -67,7 +67,7 @@ public class ListActivityAdapter extends ArrayAdapter<String> {
             }
         });
 
-        sizeTextView.setText(String.valueOf(sizes[position]));
+        sizeTextView.setText("Size: "+String.valueOf(sizes[position]));
 
         return rowView;
     }
