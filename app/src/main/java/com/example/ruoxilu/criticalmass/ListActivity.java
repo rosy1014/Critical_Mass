@@ -9,15 +9,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
+import com.parse.ParseObject;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Integer;
 
 /**
  * Created by tingyu on 2/23/15.
@@ -27,14 +32,18 @@ import java.util.List;
 public class ListActivity extends Activity {
 
     ArrayAdapter<String> mAdapter;
-    List<MassEvent> parseObjects;
+    List<MassEvent> mParseObjects;
+    
     private EventListAdapter mEventListAdapter;
     private SwipeRefreshLayout mScrollList;
     private ListView mActivityOne;
+    
     private ParseGeoPoint userLocationPoint;
 
     private ArrayList<String> mNearbyList;
     private String[] mListArray;
+    private Integer[] mSizeArray;
+    private com.parse.ParseFile[] mEventIconsArray;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +53,7 @@ public class ListActivity extends Activity {
             setContentView(R.layout.activity_list);
             userLocationPoint = getLocationPoint();
             mActivityOne = (ListView) findViewById(R.id.event_list);
-            //mListArray = getEventInfo();
+            getEventInfo();
 
             mScrollList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
             mScrollList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -57,23 +66,33 @@ public class ListActivity extends Activity {
 
 
             // Bind data from adapter to ListView.
-            mAdapter = new ListActivityAdapter(this, mListArray);
 
             mEventListAdapter = new EventListAdapter(this, userLocationPoint);
             mActivityOne.setAdapter(mEventListAdapter);
-
 
             // Load EventActivity when user clicks on a mass in the
             mActivityOne.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    String locationName = mParseObjects.get(position).getLocationName();
+
+                    android.content.ClipboardManager clipboard =
+                            (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    android.content.ClipData clip =
+                            android.content.ClipData.newPlainText("Location:", locationName);
+                    clipboard.setPrimaryClip(clip);
+
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-                    String eventId = parseObjects.get(position).getObjectId();
+
+                    String eventId = mParseObjects.get(position).getObjectId();
                     String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
                     eventDetailIntent.putExtra("location", locationName);
+
                     Log.d(Settings.APPTAG, "event object id is " + id);
+
                     startActivity(eventDetailIntent);
                 }
             });
@@ -82,9 +101,9 @@ public class ListActivity extends Activity {
 
     private void refreshContent() {
         userLocationPoint = getLocationPoint();
-        //mListArray = getEventInfo();
-        //mAdapter = new ListActivityAdapter(this, mListArray);
-        //mActivityOne.setAdapter(mAdapter);
+        getEventInfo();
+        mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray, mEventIconsArray);
+        mActivityOne.setAdapter(mAdapter);
 
 
         mScrollList.setRefreshing(false);
@@ -112,30 +131,42 @@ public class ListActivity extends Activity {
     }
 
 
-//    protected String[] getEventInfo() {
-//
-//        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
-//
-//        eventsQuery.whereNear("location", userLocationPoint);
-//        eventsQuery.setLimit(Settings.MAX_EVENT_NUMBER);
-//
-//        ArrayList<String> mNearbyList = new ArrayList<String>();
-//
-//        try {
-//            // Use find instead of findInBackground because of a potential thread problem.
-//            parseObjects = eventsQuery.find();
-//            for (MassEvent mass : parseObjects) {
-//                String locationName = mass.getLocationName();
-//                mNearbyList.add(locationName);
-//            }
-//        } catch (ParseException e) {
-//            Log.d(Settings.APPTAG, e.getMessage());
-//        }
-//
-//        String[] listArray = new String[mNearbyList.size()];
-//        listArray = mNearbyList.toArray(listArray);
-//
-//        return listArray;
-//    }
+    protected void getEventInfo() {
+
+        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
+
+        eventsQuery.whereNear("location", userLocationPoint);
+        eventsQuery.setLimit(10);
+
+        mListArray = new String[10];
+        mSizeArray = new Integer[10];
+        mEventIconsArray = new com.parse.ParseFile[10];
+
+
+        try {
+            // Use find instead of findInBackground because of a potential thread problem.
+            mParseObjects = eventsQuery.find();
+            int i = 0;
+
+            for (MassEvent mass : mParseObjects) {
+
+                String eventLocName = mass.getLocationName();
+                com.parse.ParseFile eventIcon = mass.getEventIcon();
+                Integer eventSize = mass.getEventSize();
+
+                mListArray[i] = eventLocName;
+                mEventIconsArray[i] = eventIcon;
+                mSizeArray[i] = eventSize;
+                i++;
+            }
+        } catch (ParseException e) {
+            Log.d(Settings.APPTAG, e.getMessage());
+        }
+
+        String[] listArray = new String[mNearbyList.size()];
+        listArray = mNearbyList.toArray(listArray);
+
+        return listArray;
+    }
 
 }

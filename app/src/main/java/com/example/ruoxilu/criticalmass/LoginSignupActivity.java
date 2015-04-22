@@ -23,6 +23,7 @@ import com.parse.SignUpCallback;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginSignupActivity extends Activity {
+
     // Declare Variables
     Button loginbutton;
     Button signup;
@@ -60,9 +61,6 @@ public class LoginSignupActivity extends Activity {
         loginbutton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
-                // Retrieve the text entered from the EditText
-                usernametxt = username.getText().toString();
-                passwordtxt = password.getText().toString();
 
                 if ( Application.networkConnected(loginSignupContext) ) {
                     verifyLogin();
@@ -75,9 +73,6 @@ public class LoginSignupActivity extends Activity {
         signup.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
-                // Retrieve the text entered from the EditText
-                usernametxt = username.getText().toString();
-                passwordtxt = password.getText().toString();
 
                 if ( Application.networkConnected(loginSignupContext) ) {
                     signup();
