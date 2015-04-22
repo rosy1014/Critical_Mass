@@ -4,6 +4,7 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
  
+//static var EVENT_RADIUS = 0.2;
 /*
  * Update a user's location if the location has changed 
  * differs from the last location by more than 0.01 km
@@ -11,50 +12,91 @@ Parse.Cloud.define("hello", function(request, response) {
  * Handling Duplicates
  */
  
- Parse.Cloud.define("updateUserLocation", function(request, response) {
+ Parse.Cloud.define("updateEventSize", function(request, status) {
     Parse.Cloud.useMasterKey();
- 
-  var user = request.params.user;
-  //
-    var query = new Parse.Query("MassUser");
-    var currentLocation = Parse.GeoPoint.current;
-    query.equalTo("objectId", request.params.objectId);
-    query.first({
-    success: function(result) {
-      if(currentLocation.kilometersTo(result.location) > 0.01) {
-        result.set("location", currentLocation);
-      }
-      return result.save();
-      console.log("Updated the user's location.");
-      response.success("Updated the user's location");
-    }, 
-    error: function(result, error) {
-      console.log("request.. internal unusual failure: " + error.code + " " + error.message);
-      response.error("Failed to update the user's location.");
-    return;
-  }
+
+    var query = new Parse.Query("MassEvent");
+    query.each( function(event){
+    	console.log(event.get("objectId"));
+    	query2 = new Parse.Query("MassUser");
+    		query2.withinKilometers("location", event.get('location'), 0.2);
+    		query2.count({
+    			success: function(count){
+    				event.set("EventSize", count);
+    				
+
+    				status.success("updated sizes of event " + event.id + "to size " + count);
+
+    			//event.save();
+    				//status.success("new event size is " + count);
+    			},
+    			error: function(error){
+    				//status.error("failed to updateEventSize");
+    				alert("Error: " + error.code + " failed to updateEventSize "+ event.get('objectId'));
+    			}
+    		});
+    		event.save();
+
+    	}).then(function(){
+    		status.success("Updated sizes of event");
+    	}, function(error){
+    		status.error("failed to update event size, Error: " + error.code);
+
     });
- });
- 
-/*
-// Check the if the oldLocation is very close to the current location.
- Parse.Cloud.beforeSave("MassUser", function(request, response) {
-  var oldLocation = request.object.get("location");
-  var currentLocation = userObject.get("location");
-  //Replace with a distance interval
-  if (!oldLocation.equalTo(currentLocation)) {
-    request.object.set("location", currentLocation);
-  }
-  response.success();
 });
- 
- Parse.Cloud.beforeSave("MassUser", function(request, response) {
-  if (request.object.get("location") != null) {
-    response.error("you cannot give less than one star");
-  } else if (request.object.get("stars") > 5) {
-    response.error("you cannot give more than five stars");
-  } else {
-    response.success();
-  }
+
+ Parse.Cloud.define("updateEventSize2", function(request, status) {
+    Parse.Cloud.useMasterKey();
+
+    var query = new Parse.Query("MassEvent");
+    //query.equalTo("objectId", "jHgaxJAyMd");
+    query.find({
+    	success: function(events){
+    		var ids = " ";
+    		for(var i = 0; i < events.length; i++){
+    		// // 	query2 = new Parse.Query("MassUser");
+    		// // 	query2.withinKilometers("location", events[i].get("location"), 0.2);
+    		// // 	query2.count({
+    		// // 		success:function(count){
+    		// // 			event[i].set("EventSize", count);
+    		// // 		});
+    		// // },
+    		// 	})
+				var objId = events[i].id;
+				ids = ids + objId + " ";
+				events[i].set("EventSize", 40);
+				events[i].save();
+    			query2 = new Parse.Query("MassEvent");
+    			query2.equalTo("objectId", objId);
+    			query2.first({
+    				success:function(mEvent){
+    					mEvent.set("EventSize", 30);
+    					mEvent.save();
+    				},
+    				error: function(){
+    					console.log(error.code);
+    				}
+    			});
+    		// 	ids = ids + "old event size " + events[i].get("EventSize") + " ";
+    		// 	events[i].set("EventSize", 100);
+    		// 	events[i].save();
+    		// 	ids = ids + events[i].id + " " + events[i].get("EventSize") + " ";
+    		// 	ids = ids + "old event size " + events[i].get("EventSize") + " ";
+    		// 	events[i].set("EventSize", 100);
+    		// 	events[i].save();
+    		// 	ids = ids + events[i].id + " " + events[i].get("EventSize") + " ";
+
+    		// event.set("EventSize", 1);
+    		// event.save()	
+    		// ids = ids + event.get("EventSize");
+    	}
+    		
+    		status.success("updated event size, with " + ids + " events ");
+    	},
+    	error: function(error){
+    		status.error("Oops, error "+ error.code);
+    	}
+    });
 });
-*/
+
+
