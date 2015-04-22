@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -24,6 +25,7 @@ public class MapsHandler {
     public static Context mContext;
     public static Map<String, Marker> mapMarkers = new HashMap<String, Marker>();
     public static Map<Marker, String> markerIDs = new HashMap<Marker, String>();
+    public static Map<Marker, String> markerNames = new HashMap<>();
     public static GoogleMap mMap;
 
     public static LocationRequest mLocationRequest;
@@ -31,6 +33,7 @@ public class MapsHandler {
 
     private static Location mCurrentLocation = Settings.getDefaultLocation();
     private static Location mLastLocation = Settings.getDefaultLocation();
+    private int mostRecentMapUpdate = 0;
 
     public MapsHandler(Context context){
         this.mContext = context;
@@ -101,6 +104,42 @@ public class MapsHandler {
         }
 
         return markerOpt;
+    }
+
+    public void updateMarkers(HashSet<MassEvent> eventList) {
+        HashSet<String> eventIdsToKeep = new HashSet<String>();
+        for (MassEvent event : eventList) {
+            if (event.getEventSize() > 10) {
+                eventIdsToKeep.add(event.getObjectId());
+                Marker marker = mMap.addMarker(createMarkerOpt(event));
+                mapMarkers.put(event.getObjectId(), marker);
+                markerIDs.put(marker, event.getObjectId());
+                markerNames.put(marker, event.getLocationName());
+            }
+        }
+        for(String objId: new HashSet<>(mapMarkers.keySet())){
+            if (!eventIdsToKeep.contains(objId)){
+                Marker marker= mapMarkers.get(objId);
+                markerIDs.remove(marker);
+                markerNames.remove(marker);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+
+            }
+        }
+    }
+
+
+    public static void cleanUpMarkers(HashMap<String, MarkerOptions> markersToKeep) {
+        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
+            if (!markersToKeep.containsKey(objId)) {
+                Marker marker = mapMarkers.get(objId);
+                markerIDs.remove(marker);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+                mapMarkers.remove(objId);
+            }
+        }
     }
 
     private static MarkerOptions setMarkerOpt(MassEvent mEvent) {

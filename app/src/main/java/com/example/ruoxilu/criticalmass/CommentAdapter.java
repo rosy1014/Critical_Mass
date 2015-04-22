@@ -1,13 +1,10 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -45,7 +42,11 @@ public class CommentAdapter extends ParseQueryAdapter<Comment> {
         super.getItemView(comment, v, parent);
 
         TextView usernameText = (TextView) v.findViewById(R.id.comment_username);
-        usernameText.setText(comment.getUserName() + ": ");
+        if (comment.getUserName() == null) {
+            usernameText.setText("Anon: ");
+        } else {
+            usernameText.setText(comment.getUserName() + ": ");
+        }
         TextView commentText = (TextView) v
                 .findViewById(R.id.comment_content);
         commentText.setText(comment.getUserComment());

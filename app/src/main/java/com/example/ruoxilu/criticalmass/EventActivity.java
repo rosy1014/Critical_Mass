@@ -10,16 +10,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
+import com.parse.ParseImageView;
 import com.parse.ParseQuery;
-import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+
 
 /**
  * Created by tingyu on 2/26/15.
@@ -27,11 +27,13 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-    private int mEventSize;
+
     private String messageBody;
     private String locationName;
     private Integer eventSize;
+    private com.parse.ParseFile mEventIcon;
 
+    private ParseImageView mIconPImageView;
     private TextView mTitleTextView;
     private TextView mEventSizeView;
     private Button mSendMessageButton;
@@ -40,6 +42,7 @@ public class EventActivity extends Activity {
 
     private CommentAdapter queryEventComment;
     private String fontPath = "fonts/Nunito-Bold.ttf";
+    // TODO move fontpath to settings.java
 
 
     @Override
@@ -48,7 +51,6 @@ public class EventActivity extends Activity {
 
         setContentView(R.layout.activity_event);
         initViewParts();
-
 
         // Receive ObjectId from the List Activity
         Bundle extras = getIntent().getExtras();
@@ -60,19 +62,30 @@ public class EventActivity extends Activity {
         eventsQuery.whereEqualTo("objectId", eventObjectId);
         try {
             MassEvent mass = eventsQuery.getFirst();
+
             eventSize = mass.getEventSize();
+            mEventIcon = mass.getEventImage();
 
             if (locationName == null) {
                 locationName = mass.getLocationName();
             }
 
-        }   catch (ParseException e) {
+        } catch (ParseException e) {
             Log.e(Settings.APPTAG, e.getMessage());
         }
 
-        // Set title to ObjectId
+        mIconPImageView.setParseFile(mEventIcon);
+        mIconPImageView.setPlaceholder(getResources().getDrawable(R.drawable.giraffe));
+        mIconPImageView.loadInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, com.parse.ParseException e) {
+                Log.d(Settings.APPTAG,
+                        "Fetched image");
+            }
+        });
+
         mTitleTextView.setText(locationName);
-        mEventSizeView.setText(eventSize);
+        mEventSizeView.setText("Size: " + String.valueOf(eventSize));
 
         if (Application.networkConnected(this)) {
             // Populating event comments
@@ -84,7 +97,8 @@ public class EventActivity extends Activity {
     }
 
     private void initViewParts() {
-        // TODO: Right now we use the unique object id as event title.
+
+        mIconPImageView = (ParseImageView) findViewById(R.id.activity_image);
         mTitleTextView = (TextView) findViewById(R.id.activity_name);
 
         // set custom font
@@ -92,6 +106,8 @@ public class EventActivity extends Activity {
         mTitleTextView.setTypeface(tf);
 
         mEventSizeView = (TextView) findViewById(R.id.event_size);
+        mEventSizeView.setTypeface(tf);
+
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
         mEventComments = (ListView) findViewById(R.id.event_comments);
@@ -99,12 +115,11 @@ public class EventActivity extends Activity {
 
     private void getComments() {
 
-        final String finalId = eventObjectId;
-        queryEventComment = new CommentAdapter(this, finalId);
-
+        queryEventComment = new CommentAdapter(this, eventObjectId);
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
     }
+
 
     private void setSendMessageB() {
         // After a person decides to add comment, add a data field on EventComment and then add a
@@ -130,11 +145,6 @@ public class EventActivity extends Activity {
                     userComment.setUserName(ParseUser.getCurrentUser().getUsername());
                     userComment.setUserId(ParseUser.getCurrentUser().getObjectId());
 
-//                    ParseObject userComment = new ParseObject("EventComment");
-//                    userComment.put("EventId", eventObjectId);
-//                    userComment.put("UserComment", messageBody);
-//                    userComment.put("UserId", ParseUser.getCurrentUser().getObjectId());
-//                    userComment.put("UserName", ParseUser.getCurrentUser().getUsername());
                     userComment.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -146,15 +156,14 @@ public class EventActivity extends Activity {
                     });
                 }
 
-                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                try {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                } catch (Exception e) {
+                    Log.d(Settings.APPTAG, e.getMessage());
+                }
             }
         });
-
     }
-
-
-    // If the activity is resumed
-
 
 }
