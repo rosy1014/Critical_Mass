@@ -48,6 +48,7 @@ public class EventActivity extends Activity {
 
     private CommentAdapter queryEventComment;
     private String fontPath = "fonts/Nunito-Bold.ttf";
+    // TODO move fontpath to settings.java
 
 
     @Override
@@ -69,7 +70,7 @@ public class EventActivity extends Activity {
             MassEvent mass = eventsQuery.getFirst();
 
             eventSize = mass.getEventSize();
-            mEventIcon = mass.getEventIcon();
+            mEventIcon = mass.getEventImage();
 
             if (locationName == null) {
             locationName = mass.getLocationName();

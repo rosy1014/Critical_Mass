@@ -54,10 +54,13 @@ public class MassEvent extends ParseObject {
         put("locationName", name);
     }
 
-    public ParseFile getEventIcon(){
+    public ParseFile getEventImage() {
         return getParseFile("image");
     }
 
-    public void setEventIcon(ParseFile icon) { put("image", icon); }
+    public void setEventImage(ParseFile icon) {
+        put("image", icon);
+    }
+
 
 }

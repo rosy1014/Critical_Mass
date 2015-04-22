@@ -9,20 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.view.View.OnLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseQuery;
-import com.parse.ParseObject;
-import com.parse.ParseException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.lang.Integer;
 
 /**
  * Created by tingyu on 2/23/15.
@@ -31,19 +22,14 @@ import java.lang.Integer;
  */
 public class ListActivity extends Activity {
 
-    ArrayAdapter<String> mAdapter;
     List<MassEvent> mParseObjects;
     
     private EventListAdapter mEventListAdapter;
     private SwipeRefreshLayout mScrollList;
-    private ListView mActivityOne;
-    
-    private ParseGeoPoint userLocationPoint;
+    private ListView mEventListView;
 
-    private ArrayList<String> mNearbyList;
-    private String[] mListArray;
-    private Integer[] mSizeArray;
-    private com.parse.ParseFile[] mEventIconsArray;
+    private ParseGeoPoint mLocationPoint;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,27 +37,20 @@ public class ListActivity extends Activity {
         if (Application.networkConnected(this)) {
 
             setContentView(R.layout.activity_list);
-            userLocationPoint = getLocationPoint();
-            mActivityOne = (ListView) findViewById(R.id.event_list);
-            getEventInfo();
+            mLocationPoint = getLocationPoint();
+            mEventListView = (ListView) findViewById(R.id.event_list);
+            initEventInfo();
 
             mScrollList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
             mScrollList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                    refreshContent();
-
+                    refreshEventInfo();
                 }
             });
 
-
-            // Bind data from adapter to ListView.
-
-            mEventListAdapter = new EventListAdapter(this, userLocationPoint);
-            mActivityOne.setAdapter(mEventListAdapter);
-
             // Load EventActivity when user clicks on a mass in the
-            mActivityOne.setOnItemClickListener(new OnItemClickListener() {
+            mEventListView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
@@ -87,7 +66,6 @@ public class ListActivity extends Activity {
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
 
                     String eventId = mParseObjects.get(position).getObjectId();
-                    String locationName = parseObjects.get(position).getLocationName();
                     eventDetailIntent.putExtra("objectId", eventId);
                     eventDetailIntent.putExtra("location", locationName);
 
@@ -99,29 +77,31 @@ public class ListActivity extends Activity {
         }
     }
 
-    private void refreshContent() {
-        userLocationPoint = getLocationPoint();
-        getEventInfo();
-        mAdapter = new ListActivityAdapter(this, mListArray, mSizeArray, mEventIconsArray);
-        mActivityOne.setAdapter(mAdapter);
+    private void refreshEventInfo() {
 
+        // Get updated user location
+        mLocationPoint = getLocationPoint();
+        initEventInfo();
 
+        // Reset the ParseQueryAapter using the new location
         mScrollList.setRefreshing(false);
-
-        Log.d(Settings.APPTAG, "refreshContent and getEventInfo!!!!");
 
     }
 
     protected ParseGeoPoint getLocationPoint() {
 
         Location userLocation;
-        if (MapsActivity.mCurrentLocation == null) {
-            Log.i(Settings.APPTAG, "the current location is null");
 
-            userLocation = (MapsActivity.mLastLocation == null) ?
-                    Settings.getDefaultLocation() : MapsActivity.mLastLocation;
-        } else {
+
+        if (MapsActivity.mCurrentLocation != null) {
             userLocation = MapsActivity.mCurrentLocation;
+
+        } else if (MapsActivity.mLastLocation != null) {
+            userLocation = MapsActivity.mLastLocation;
+
+        } else {
+            userLocation = Settings.getDefaultLocation();
+
         }
 
         ParseGeoPoint geoPoint = new ParseGeoPoint(userLocation.getLatitude(),
@@ -131,42 +111,12 @@ public class ListActivity extends Activity {
     }
 
 
-    protected void getEventInfo() {
+    protected void initEventInfo() {
 
-        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
+        // Bind data from adapter to ListView
+        mEventListAdapter = new EventListAdapter(this, mLocationPoint);
+        mEventListView.setAdapter(mEventListAdapter);
 
-        eventsQuery.whereNear("location", userLocationPoint);
-        eventsQuery.setLimit(10);
-
-        mListArray = new String[10];
-        mSizeArray = new Integer[10];
-        mEventIconsArray = new com.parse.ParseFile[10];
-
-
-        try {
-            // Use find instead of findInBackground because of a potential thread problem.
-            mParseObjects = eventsQuery.find();
-            int i = 0;
-
-            for (MassEvent mass : mParseObjects) {
-
-                String eventLocName = mass.getLocationName();
-                com.parse.ParseFile eventIcon = mass.getEventIcon();
-                Integer eventSize = mass.getEventSize();
-
-                mListArray[i] = eventLocName;
-                mEventIconsArray[i] = eventIcon;
-                mSizeArray[i] = eventSize;
-                i++;
-            }
-        } catch (ParseException e) {
-            Log.d(Settings.APPTAG, e.getMessage());
-        }
-
-        String[] listArray = new String[mNearbyList.size()];
-        listArray = mNearbyList.toArray(listArray);
-
-        return listArray;
     }
 
 }

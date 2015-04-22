@@ -7,7 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -42,8 +46,28 @@ public class EventListAdapter extends ParseQueryAdapter<MassEvent> {
 
         super.getItemView(massEvent, v, parent);
 
+        // Set event image
+        ParseImageView eventImageView = (ParseImageView) v.findViewById(R.id.event_image);
+        ParseFile eventImage = massEvent.getEventImage();
+
+        if (eventImage != null) {
+            eventImageView.setParseFile(eventImage);
+            eventImageView.loadInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] data, ParseException e) {
+                    // nothing to do
+                }
+            });
+        }
+
+        // Set event name
         TextView eventName = (TextView) v.findViewById(R.id.event_name);
         eventName.setText(massEvent.getLocationName());
+
+        // Set event size
+        TextView eventSize = (TextView) v.findViewById(R.id.event_size);
+        eventSize.setText(massEvent.getEventSize());
+
         return v;
 
     }
