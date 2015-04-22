@@ -39,9 +39,12 @@ import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,
+public class MapsActivity extends FragmentActivity
+        implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMarkerClickListener {
 
     public static MapsHandler mapsHandler;
     // Made static so that other activity can access location.
@@ -267,26 +270,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         mCurrentLocation = getLocation();
 
-//<<<<<<< HEAD
-//
-//        anonymousUserLogin(); // Helper function to log in the user anonymously if not already logged in
-//
-//        // set up mMassUser
-//        mMassUser.setUser(ParseUser.getCurrentUser());
-//        Log.d(Settings.APPTAG, "Current massuser is " + mMassUser);
-//        if(mCurrentLocation == null){
-//            Log.d(Settings.APPTAG, "mCurrentlocation is null");
-//            mMassUser.setLocation(null);
-//        } else {
-//            Log.d(Settings.APPTAG, "mCurrentlocation is NOT null");
-//            mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
-//        }
-//
-//        Log.i(Settings.APPTAG, "Object Id of current user is " + ParseUser.getCurrentUser().getObjectId());
-//        mMassUser.setUser(ParseUser.getCurrentUser());
-//        updateUserLocation(mMassUser.getLocation());
-//
-//=======
         if (mCurrentLocation==null){
             mCurrentLocation = Settings.getDefaultLocation();
         }
