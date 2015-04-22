@@ -4,22 +4,17 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-
-import android.widget.ArrayAdapter;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseImageView;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -32,7 +27,6 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class EventActivity extends Activity {
 
     private String eventObjectId;
-    private int mEventSize;
 
     private String messageBody;
     private String locationName;
@@ -73,10 +67,10 @@ public class EventActivity extends Activity {
             mEventIcon = mass.getEventImage();
 
             if (locationName == null) {
-            locationName = mass.getLocationName();
+                locationName = mass.getLocationName();
             }
 
-        }   catch (ParseException e) {
+        } catch (ParseException e) {
             Log.e(Settings.APPTAG, e.getMessage());
         }
 
@@ -91,7 +85,7 @@ public class EventActivity extends Activity {
         });
 
         mTitleTextView.setText(locationName);
-        mEventSizeView.setText("Size: "+String.valueOf(eventSize));
+        mEventSizeView.setText("Size: " + String.valueOf(eventSize));
 
         if (Application.networkConnected(this)) {
             // Populating event comments
@@ -125,7 +119,6 @@ public class EventActivity extends Activity {
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
     }
-
 
 
     private void setSendMessageB() {
@@ -163,8 +156,12 @@ public class EventActivity extends Activity {
                     });
                 }
 
-                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                try {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                } catch (Exception e) {
+                    Log.d(Settings.APPTAG, e.getMessage());
+                }
             }
         });
     }
