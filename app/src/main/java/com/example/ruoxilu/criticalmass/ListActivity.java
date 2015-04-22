@@ -28,11 +28,13 @@ public class ListActivity extends Activity {
 
     ArrayAdapter<String> mAdapter;
     List<MassEvent> parseObjects;
+    private EventListAdapter mEventListAdapter;
     private SwipeRefreshLayout mScrollList;
-    private ArrayList<String> mNearbyList;
     private ListView mActivityOne;
-    private String[] mListArray;
     private ParseGeoPoint userLocationPoint;
+
+    private ArrayList<String> mNearbyList;
+    private String[] mListArray;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +44,7 @@ public class ListActivity extends Activity {
             setContentView(R.layout.activity_list);
             userLocationPoint = getLocationPoint();
             mActivityOne = (ListView) findViewById(R.id.event_list);
-            mListArray = getEventInfo();
+            //mListArray = getEventInfo();
 
             mScrollList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
             mScrollList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -56,7 +58,9 @@ public class ListActivity extends Activity {
 
             // Bind data from adapter to ListView.
             mAdapter = new ListActivityAdapter(this, mListArray);
-            mActivityOne.setAdapter(mAdapter);
+
+            mEventListAdapter = new EventListAdapter(this, userLocationPoint);
+            mActivityOne.setAdapter(mEventListAdapter);
 
 
             // Load EventActivity when user clicks on a mass in the
@@ -78,9 +82,9 @@ public class ListActivity extends Activity {
 
     private void refreshContent() {
         userLocationPoint = getLocationPoint();
-        mListArray = getEventInfo();
-        mAdapter = new ListActivityAdapter(this, mListArray);
-        mActivityOne.setAdapter(mAdapter);
+        //mListArray = getEventInfo();
+        //mAdapter = new ListActivityAdapter(this, mListArray);
+        //mActivityOne.setAdapter(mAdapter);
 
 
         mScrollList.setRefreshing(false);
@@ -94,7 +98,9 @@ public class ListActivity extends Activity {
         Location userLocation;
         if (MapsActivity.mCurrentLocation == null) {
             Log.i(Settings.APPTAG, "the current location is null");
-            userLocation = MapsActivity.mLastLocation;
+
+            userLocation = (MapsActivity.mLastLocation == null) ?
+                    Settings.getDefaultLocation() : MapsActivity.mLastLocation;
         } else {
             userLocation = MapsActivity.mCurrentLocation;
         }
@@ -106,30 +112,30 @@ public class ListActivity extends Activity {
     }
 
 
-    protected String[] getEventInfo() {
-
-        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
-
-        eventsQuery.whereNear("location", userLocationPoint);
-        eventsQuery.setLimit(Settings.MAX_EVENT_NUMBER);
-
-        ArrayList<String> mNearbyList = new ArrayList<String>();
-
-        try {
-            // Use find instead of findInBackground because of a potential thread problem.
-            parseObjects = eventsQuery.find();
-            for (MassEvent mass : parseObjects) {
-                String locationName = mass.getLocationName();
-                mNearbyList.add(locationName);
-            }
-        } catch (ParseException e) {
-            Log.d(Settings.APPTAG, e.getMessage());
-        }
-
-        String[] listArray = new String[mNearbyList.size()];
-        listArray = mNearbyList.toArray(listArray);
-
-        return listArray;
-    }
+//    protected String[] getEventInfo() {
+//
+//        ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
+//
+//        eventsQuery.whereNear("location", userLocationPoint);
+//        eventsQuery.setLimit(Settings.MAX_EVENT_NUMBER);
+//
+//        ArrayList<String> mNearbyList = new ArrayList<String>();
+//
+//        try {
+//            // Use find instead of findInBackground because of a potential thread problem.
+//            parseObjects = eventsQuery.find();
+//            for (MassEvent mass : parseObjects) {
+//                String locationName = mass.getLocationName();
+//                mNearbyList.add(locationName);
+//            }
+//        } catch (ParseException e) {
+//            Log.d(Settings.APPTAG, e.getMessage());
+//        }
+//
+//        String[] listArray = new String[mNearbyList.size()];
+//        listArray = mNearbyList.toArray(listArray);
+//
+//        return listArray;
+//    }
 
 }

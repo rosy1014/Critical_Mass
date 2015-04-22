@@ -79,9 +79,7 @@ public class EventActivity extends Activity {
 
     private void getComments() {
 
-        final String finalId = eventObjectId;
-        queryEventComment = new CommentAdapter(this, finalId);
-
+        queryEventComment = new CommentAdapter(this, eventObjectId);
         queryEventComment.setTextKey("UserComment");
         mEventComments.setAdapter(queryEventComment);
     }
