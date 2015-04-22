@@ -111,7 +111,7 @@ public class ListActivity extends Activity {
         ParseQuery<MassEvent> eventsQuery = ParseQuery.getQuery("MassEvent");
 
         eventsQuery.whereNear("location", userLocationPoint);
-        eventsQuery.setLimit(10);
+        eventsQuery.setLimit(Settings.MAX_EVENT_NUMBER);
 
         ArrayList<String> mNearbyList = new ArrayList<String>();
 

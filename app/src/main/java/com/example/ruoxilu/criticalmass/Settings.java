@@ -50,6 +50,10 @@ public class Settings {
     public static final int POPSIZE4 = 100;
     public static final int POPSIZE5 = 500;
 
+    /* Maximum number of events displayed in event list*/
+    public static final int MAX_EVENT_NUMBER = 10;
+
+
     private static Location DEFAULT_LOCATION = new Location(" ");
 
     private static void setDefaultLocation() {
