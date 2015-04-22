@@ -63,7 +63,7 @@ public class EventListAdapter extends ParseQueryAdapter<MassEvent> {
 
         // Set event size
         TextView eventSize = (TextView) v.findViewById(R.id.event_size);
-        eventSize.setText(massEvent.getEventSize());
+        eventSize.setText("Size:" + massEvent.getEventSize());
 
         return v;
 
