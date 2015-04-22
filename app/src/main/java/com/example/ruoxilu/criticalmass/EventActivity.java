@@ -41,8 +41,7 @@ public class EventActivity extends Activity {
     private ListView mEventComments;
 
     private CommentAdapter queryEventComment;
-    private String fontPath = "fonts/Nunito-Bold.ttf";
-    // TODO move fontpath to settings.java
+    private String fontPath = Settings.EVENT_NAME_FONT;
 
 
     @Override

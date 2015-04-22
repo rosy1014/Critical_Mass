@@ -33,6 +33,8 @@ public class LoginSignupActivity extends Activity {
     EditText username;
     TextView mAppName;
 
+    String fontPath = Settings.APP_NAME_FONT;
+
     /**
      * Called when the activity is first created.
      */
@@ -42,7 +44,6 @@ public class LoginSignupActivity extends Activity {
         // Get the view from main.xml
         setContentView(R.layout.loginsignup);
 
-        String fontPath = "fonts/GloriaHallelujah.ttf";
         mAppName = (TextView) findViewById(R.id.app_name);
 //        mAppName.setText("Set in Java!");
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
