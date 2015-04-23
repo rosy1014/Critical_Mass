@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -47,26 +48,50 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
-
-    public static MapsHandler mapsHandler;
+    private MapsHandler mapsHandler;
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
-
-    private static GoogleMap mMap;
     // Fields for helping process the map and location changes
-    protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
-
-    private GoogleApiClient mGoogleApiClient;
-    private int mostRecentMapUpdate;
-
     private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
     private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
-    public static Map<Marker, String> markerNames = new HashMap<>();
+    private static Map<Marker, String> markerNames = new HashMap<>();
+    private static ViewGroup mViewGroup;
+    private static LinearLayout mMainScreen;
+    protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
+
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    // private LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private String mEventID;
+    // Fields for the map radius in feet
+    private float radius;
+    private float lastRadius;
+    //  private String selectedPostObjectId;
+    private int mostRecentMapUpdate;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private String[] mDrawerButtons;
+//    private MapsHandler mapsHandler;
+//    // Made static so that other activity can access location.
+//    public static Location mCurrentLocation = Settings.getDefaultLocation();
+//    public static Location mLastLocation = Settings.getDefaultLocation();
+//
+//    private static GoogleMap mMap;
+//    // Fields for helping process the map and location changes
+//    protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
+//
+//    private GoogleApiClient mGoogleApiClient;
+//    private int mostRecentMapUpdate;
+//
+//    private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
+//    private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
+//    private static Map<Marker, String> markerNames = new HashMap<>();
+//
+//    private DrawerLayout mDrawerLayout;
+//    private ListView mDrawerList;
+//    private String[] mDrawerButtons;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +103,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
         setContentView(R.layout.activity_maps);
-
         mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -93,10 +117,40 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         setUpMapIfNeeded();
 
+//        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+//        startActivity(intent);
         checkLoginStatus();
 
 
     }
+//    protected void onCreate(Bundle savedInstanceState) {
+//        Log.i(Settings.APPTAG, "onCreate");
+//        super.onCreate(savedInstanceState);
+//        mapsHandler = new MapsHandler(this);
+//
+//        MapsHandler.initLocationRequest(); // Helper function to initiate location request
+//        initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
+//
+//        setContentView(R.layout.activity_maps);
+//
+//        mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
+//        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+//
+//
+//        // set a custom shadow that overlays the main content when the drawer opens
+//        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+//        // set up the drawer's list view with items and click listener
+//        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+//                R.layout.drawer_list_item, mDrawerButtons));
+//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+//
+//        setUpMapIfNeeded();
+//
+//        checkLoginStatus();
+//
+//
+//    }
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
@@ -471,28 +525,28 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 ////        HashSet<MassEvent> nearbyEvents = ParseHandler.queryNearbyEvent(myLoc);
 //        ParseHandler.queryNearbyEvent(myLoc);
 //    }
-    public static void updateMarkers(HashSet<MassEvent> eventList) {
-        HashSet<String> eventIdsToKeep = new HashSet<String>();
-        for (MassEvent event : eventList) {
-            if (event.getEventSize() > 10) {
-                eventIdsToKeep.add(event.getObjectId());
-                Marker marker = mMap.addMarker(MapsHandler.createMarkerOpt(event));
-                mapMarkers.put(event.getObjectId(), marker);
-                markerIDs.put(marker, event.getObjectId());
-                markerNames.put(marker, event.getLocationName());
-            }
-        }
-        for(String objId: new HashSet<>(mapMarkers.keySet())){
-            if (!eventIdsToKeep.contains(objId)){
-                Marker marker= mapMarkers.get(objId);
-                markerIDs.remove(marker);
-                markerNames.remove(marker);
-                marker.remove();
-                mapMarkers.get(objId).remove();
-
-            }
-        }
-    }
+//    public static void updateMarkers(HashSet<MassEvent> eventList) {
+//        HashSet<String> eventIdsToKeep = new HashSet<String>();
+//        for (MassEvent event : eventList) {
+//            if (event.getEventSize() > 10) {
+//                eventIdsToKeep.add(event.getObjectId());
+//                Marker marker = mMap.addMarker(MapsHandler.createMarkerOpt(event));
+//                mapMarkers.put(event.getObjectId(), marker);
+//                markerIDs.put(marker, event.getObjectId());
+//                markerNames.put(marker, event.getLocationName());
+//            }
+//        }
+//        for(String objId: new HashSet<>(mapMarkers.keySet())){
+//            if (!eventIdsToKeep.contains(objId)){
+//                Marker marker= mapMarkers.get(objId);
+//                markerIDs.remove(marker);
+//                markerNames.remove(marker);
+//                marker.remove();
+//                mapMarkers.get(objId).remove();
+//
+//            }
+//        }
+//    }
     /*
      * Remove markers that are not in the Hashmap markersToKeep
      */
