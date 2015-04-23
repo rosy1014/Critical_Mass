@@ -10,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -81,12 +82,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mapsHandler = new MapsHandler(this);
 
+        mapsHandler = new MapsHandler(this);
+        setContentView(R.layout.activity_maps);
+        setUpMapIfNeeded();
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
-        setContentView(R.layout.activity_maps);
+
         mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -98,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 R.layout.drawer_list_item, mDrawerButtons));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         checkLoginStatus();
-        setUpMapIfNeeded();
+//        setUpMapIfNeeded();
 
     }
 
@@ -114,7 +117,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
-
     protected void checkLoginStatus() {
         // determine whether the current user is an anonymous user and
         // if the user has previously signed up and logged into the application
@@ -178,7 +180,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mGoogleApiClient.disconnect();
 
         super.onStop();
-        setUpMapIfNeeded();
 
     }
 
@@ -291,7 +292,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private ParseGeoPoint geoPointFromLocation(Location location) {
         return new ParseGeoPoint(location.getLatitude(), location.getLongitude());
     }
-
     /*
      * private helper functions
      */
@@ -455,9 +455,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     public void onClick(SweetAlertDialog sDialog) {
                         ParseHandler.deleteMassUser(mMassUser);
                         ParseUser.logOut();
+                        sDialog.dismiss();
                         Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
+                        finish();
                     }
                 })
                 .show();
@@ -494,6 +496,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
         }
+    }
+    @Override
+    public void finish() {
+        ViewGroup view = (ViewGroup) getWindow().getDecorView();
+        view.removeAllViews();
+        Log.d(Settings.APPTAG, "called finish");
+        super.finish();
     }
 
 }
