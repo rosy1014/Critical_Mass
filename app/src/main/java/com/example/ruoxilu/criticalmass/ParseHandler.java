@@ -204,7 +204,7 @@ public class ParseHandler {
         String pid = puser.getObjectId();
         Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + pid);
         if (pid == null) {
-//            Log.d(Settings.APPTAG, " In anonymousUserLogin, in if!!!!");
+
             ParseAnonymousUtils.logInInBackground();
             Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + ParseUser.getCurrentUser().getObjectId());
 
