@@ -162,6 +162,8 @@ public class EventActivity extends Activity {
                 } catch (Exception e) {
                     Log.d(Settings.APPTAG, e.getMessage());
                 }
+
+                mEventComments.smoothScrollToPosition(0);
             }
         });
     }

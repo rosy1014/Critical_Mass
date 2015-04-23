@@ -21,7 +21,7 @@ public class CommentAdapter extends ParseQueryAdapter<Comment> {
             public ParseQuery<Comment> create() {
                 ParseQuery queryEventComment = new ParseQuery("EventComment");
                 queryEventComment.whereEqualTo("EventId", eventObjectId);
-                queryEventComment.orderByDescending("creatAt");
+                queryEventComment.orderByAscending("creatAt");
                 return queryEventComment;
             }
         });
