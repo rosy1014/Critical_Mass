@@ -15,11 +15,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by RuoxiLu on 4/17/15.
  */
 public class MapsHandler {
-    public static Context mContext;
+    public Context mContext;
 
     public static LocationRequest mLocationRequest;
-
-    private int mostRecentMapUpdate = 0;
 
     public MapsHandler(Context context){
         this.mContext = context;
@@ -94,13 +92,10 @@ public class MapsHandler {
 
 
     private static MarkerOptions setMarkerOpt(MassEvent mEvent) {
-
-        MarkerOptions markerOpt = new MarkerOptions().position(
+        return new MarkerOptions().position(
                 new LatLng(mEvent.getLocation().getLatitude(), mEvent
                         .getLocation().getLongitude()))
                 .title("Location: " + mEvent.getLocationName()).snippet("Size: " + mEvent.getEventSize());
-
-        return markerOpt;
     }
 
 }
