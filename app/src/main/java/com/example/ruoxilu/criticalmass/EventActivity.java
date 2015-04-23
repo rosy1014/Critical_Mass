@@ -3,6 +3,7 @@ package com.example.ruoxilu.criticalmass;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -39,6 +40,7 @@ public class EventActivity extends Activity {
     private Button mSendMessageButton;
     private EditText mMessageBodyField;
     private ListView mEventComments;
+    private SwipeRefreshLayout mCommentScrollList;
 
     private CommentAdapter queryEventComment;
     private String fontPath = Settings.EVENT_NAME_FONT;
@@ -111,6 +113,24 @@ public class EventActivity extends Activity {
         mSendMessageButton = (Button) findViewById(R.id.send_button);
         mMessageBodyField = (EditText) findViewById(R.id.messageBodyField);
         mEventComments = (ListView) findViewById(R.id.event_comments);
+
+        mCommentScrollList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mCommentScrollList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshEventInfo();
+            }
+        });
+    }
+
+    private void refreshEventInfo() {
+
+        // Get updated comments
+        getComments();
+
+        // Reset the ParseQueryAapter using the new location
+        mCommentScrollList.setRefreshing(false);
+
     }
 
     private void getComments() {

@@ -49,19 +49,28 @@
 
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/event_comments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/relSendMessage"
-        android:layout_below="@id/event_brief"
-        android:divider="@null"
-        android:footerDividersEnabled="true"
-        android:headerDividersEnabled="true"
-        android:orientation="vertical"
-        >
 
-    </ListView>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/event_brief"
+        android:layout_marginBottom="48dp"
+        android:background="#ffffffff">
+
+        <ListView
+            android:id="@+id/event_comments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:footerDividersEnabled="true"
+            android:headerDividersEnabled="true"
+            android:orientation="vertical"
+            >
+
+        </ListView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <RelativeLayout
         android:id="@+id/relSendMessage"
