@@ -150,6 +150,13 @@ public class ParseHandler {
                         Log.d(Settings.APPTAG, "decrement event size");
                         massEvent.setEventSize(size);
                         massEvent.saveInBackground();
+                        mMassUser.setEvent(null);
+                        mMassUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                Log.d(Settings.APPTAG, "update user event error: " + e);
+                            }
+                        });
 
                         // search for new event, if any,  that includes the user
                         double maxDistance = 5;
@@ -187,38 +194,6 @@ public class ParseHandler {
         });
     }
 
-//    public static void queryNearbyEvent(Location location) {
-//        Log.d(Settings.APPTAG, "in queryNearbyEvent, " + location);
-//        if (location == null) {
-//            Log.d(Settings.APPTAG, "No events found");
-//        } else {
-//            final ParseGeoPoint myPoint = ParseHandler.geoPointFromLocation(location);
-//            //final HashMap<String, MarkerOptions> toKeep = new HashMap<String, MarkerOptions>();
-//            ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
-//            mapQuery.whereWithinKilometers("location", myPoint, Settings.SEARCH_DISTANCE);
-//            // 5
-//            mapQuery.orderByDescending("EventSize");
-//            // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
-//
-//            final HashSet<MassEvent> nearbyEvents;
-//            mapQuery.findInBackground(new FindCallback<MassEvent>() {
-//                @Override
-//                public void done(List<MassEvent> massEvents, ParseException e) {
-//                    HashSet<MassEvent> events = new HashSet<MassEvent>();
-//                    HashSet<String> eventIds = new HashSet<String>();
-//                    for (MassEvent event: massEvents){
-//                        events.add(event);
-//                        Log.d(Settings.APPTAG,"in nearbyEvents " + event.getLocationName());
-//                    }
-//                    MapsActivity.updateMarkers(events);
-////                    MapsActivity.cleanUpMarkers(eventIds);
-//                }
-//            });
-//            nearbyEvents.addAll(eventList);
-//            Log.d(Settings.APPTAG, "in nearbyEvents, number of events " + nearbyEvents.size() );
-//            return nearbyEvents;
-//        }
-//    }
 
 
     protected static void anonymousUserLogin() {

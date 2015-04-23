@@ -43,7 +43,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
-    private MapsHandler mapsHandler;
+
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
@@ -52,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected static Map<Marker, String> markerIDs = new HashMap<>(); // find Event ID associated with marker
     protected static Map<Marker, String> markerNames = new HashMap<>();
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
-
+    private MapsHandler mapsHandler;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private GoogleApiClient mGoogleApiClient;
     private int mostRecentMapUpdate;
@@ -60,6 +60,22 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private String[] mDrawerButtons;
+
+    /*
+     * Remove markers that are not in the Hashmap markersToKeep
+     */
+    public static void cleanUpMarkers(HashSet<String> markersToKeep) {
+        for (String objId : new HashSet<>(mapMarkers.keySet())) {
+            if (!markersToKeep.contains(objId)) {
+                Marker marker = mapMarkers.get(objId);
+                markerIDs.remove(marker);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+                mapMarkers.remove(objId);
+                markerNames.remove(objId);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +100,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         checkLoginStatus();
         setUpMapIfNeeded();
 
-
-
     }
 
     private void selectItem(int position) {
@@ -100,6 +114,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
+
     protected void checkLoginStatus() {
         // determine whether the current user is an anonymous user and
         // if the user has previously signed up and logged into the application
@@ -125,7 +140,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /*
      * Helper function for onCreate
      * Initialize the Goolge Api Client for maps activity
-     *
      */
     protected void initGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -154,7 +168,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
         }
-
     }
 
     @Override
@@ -168,11 +181,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         setUpMapIfNeeded();
 
     }
+
     @Override
     // Must call super.onDestroy() at the end.
     protected void onDestroy() {
         super.onDestroy();
     }
+
     /**
      * Sets up the map if it is possible to do so
      */
@@ -240,7 +255,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         ParseHandler.updateUserEvent(geoPointFromLocation(mCurrentLocation), mMassUser);
     }
 
-
     @Override
     public void onConnectionSuspended(int i) {
 
@@ -277,6 +291,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private ParseGeoPoint geoPointFromLocation(Location location) {
         return new ParseGeoPoint(location.getLatitude(), location.getLongitude());
     }
+
     /*
      * private helper functions
      */
@@ -374,60 +389,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         // update markerIDs hash map and mapMarkers hash map.
                         markerIDs.put(marker, mEvent.getObjectId());
                         mapMarkers.put(mEvent.getObjectId(), marker);
-                        markerNames.put(marker,mEvent.getLocationName());
+                        markerNames.put(marker, mEvent.getLocationName());
                     }
                 }
                 cleanUpMarkers(toKeep);
                 Log.d(Settings.APPTAG, "After clean up markers");
             }
         });
-    }
-
-    // display events by markers on the map
-//    private void doMapQuery() {
-//        Log.d(Settings.APPTAG, "in doMapQuery");
-//        final int myUpdateNumber = ++mostRecentMapUpdate;
-//
-//        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-////        HashSet<MassEvent> nearbyEvents = ParseHandler.queryNearbyEvent(myLoc);
-//        ParseHandler.queryNearbyEvent(myLoc);
-//    }
-//    public static void updateMarkers(HashSet<MassEvent> eventList) {
-//        HashSet<String> eventIdsToKeep = new HashSet<String>();
-//        for (MassEvent event : eventList) {
-//            if (event.getEventSize() > 10) {
-//                eventIdsToKeep.add(event.getObjectId());
-//                Marker marker = mMap.addMarker(MapsHandler.createMarkerOpt(event));
-//                mapMarkers.put(event.getObjectId(), marker);
-//                markerIDs.put(marker, event.getObjectId());
-//                markerNames.put(marker, event.getLocationName());
-//            }
-//        }
-//        for(String objId: new HashSet<>(mapMarkers.keySet())){
-//            if (!eventIdsToKeep.contains(objId)){
-//                Marker marker= mapMarkers.get(objId);
-//                markerIDs.remove(marker);
-//                markerNames.remove(marker);
-//                marker.remove();
-//                mapMarkers.get(objId).remove();
-//
-//            }
-//        }
-//    }
-    /*
-     * Remove markers that are not in the Hashmap markersToKeep
-     */
-    public static void cleanUpMarkers(HashSet<String> markersToKeep) {
-        for (String objId : new HashSet<>(mapMarkers.keySet())) {
-            if (!markersToKeep.contains(objId)) {
-                Marker marker = mapMarkers.get(objId);
-                markerIDs.remove(marker);
-                marker.remove();
-                mapMarkers.get(objId).remove();
-                mapMarkers.remove(objId);
-                markerNames.remove(objId);
-            }
-        }
     }
 
     private void showErrorDialog(int errorCode) {
