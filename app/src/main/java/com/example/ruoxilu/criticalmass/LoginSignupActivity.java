@@ -23,6 +23,7 @@ import com.parse.SignUpCallback;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginSignupActivity extends Activity {
+
     // Declare Variables
     Button loginbutton;
     Button signup;
@@ -31,6 +32,8 @@ public class LoginSignupActivity extends Activity {
     EditText password;
     EditText username;
     TextView mAppName;
+
+    String fontPath = Settings.APP_NAME_FONT;
 
     /**
      * Called when the activity is first created.
@@ -41,7 +44,6 @@ public class LoginSignupActivity extends Activity {
         // Get the view from main.xml
         setContentView(R.layout.loginsignup);
 
-        String fontPath = "fonts/GloriaHallelujah.ttf";
         mAppName = (TextView) findViewById(R.id.app_name);
 //        mAppName.setText("Set in Java!");
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
@@ -60,11 +62,8 @@ public class LoginSignupActivity extends Activity {
         loginbutton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
-                // Retrieve the text entered from the EditText
-                usernametxt = username.getText().toString();
-                passwordtxt = password.getText().toString();
 
-                if ( Application.networkConnected(loginSignupContext) ) {
+                if (Application.networkConnected(loginSignupContext)) {
                     verifyLogin();
                 }
             }
@@ -75,11 +74,8 @@ public class LoginSignupActivity extends Activity {
         signup.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
-                // Retrieve the text entered from the EditText
-                usernametxt = username.getText().toString();
-                passwordtxt = password.getText().toString();
 
-                if ( Application.networkConnected(loginSignupContext) ) {
+                if (Application.networkConnected(loginSignupContext)) {
                     signup();
                 }
 
