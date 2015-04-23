@@ -84,7 +84,8 @@ public class EventActivity extends Activity {
         });
 
         mTitleTextView.setText(locationName);
-        mEventSizeView.setText("Size: " + String.valueOf(eventSize));
+
+        mEventSizeView.setText(String.valueOf("Size: " + eventSize));
 
         if (Application.networkConnected(this)) {
             // Populating event comments

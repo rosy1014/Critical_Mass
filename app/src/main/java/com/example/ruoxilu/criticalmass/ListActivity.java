@@ -50,11 +50,14 @@ public class ListActivity extends Activity {
             });
 
             // Load EventActivity when user clicks on a mass in the
-            mEventListView.setOnItemClickListener(new OnItemClickListener() {
+            mEventListView.setOnItemClickListener(
+                    new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    String locationName = mParseObjects.get(position).getLocationName();
+                    MassEvent event = mEventListAdapter.getItem(position);
+
+                    String locationName = event.getLocationName();
 
                     android.content.ClipboardManager clipboard =
                             (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -65,7 +68,7 @@ public class ListActivity extends Activity {
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
 
-                    String eventId = mParseObjects.get(position).getObjectId();
+                    String eventId = event.getObjectId();
                     eventDetailIntent.putExtra("objectId", eventId);
                     eventDetailIntent.putExtra("location", locationName);
 
@@ -73,7 +76,9 @@ public class ListActivity extends Activity {
 
                     startActivity(eventDetailIntent);
                 }
-            });
+                    }
+
+            );
         }
     }
 
