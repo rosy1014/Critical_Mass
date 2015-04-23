@@ -4,7 +4,6 @@ import android.location.Location;
 import android.util.Log;
 
 import com.parse.DeleteCallback;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
@@ -12,9 +11,6 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * Created by RuoxiLu on 4/17/15.
@@ -154,6 +150,13 @@ public class ParseHandler {
                         Log.d(Settings.APPTAG, "decrement event size");
                         massEvent.setEventSize(size);
                         massEvent.saveInBackground();
+                        mMassUser.setEvent(null);
+                        mMassUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                Log.d(Settings.APPTAG, "update user event error: " + e);
+                            }
+                        });
 
                         // search for new event, if any,  that includes the user
                         double maxDistance = 5;
@@ -191,45 +194,6 @@ public class ParseHandler {
         });
     }
 
-    public static void queryNearbyEvent(Location location) {
-        Log.d(Settings.APPTAG, "in queryNearbyEvent, " + location);
-        if (location == null) {
-            Log.d(Settings.APPTAG, "No events found");
-        } else {
-            final ParseGeoPoint myPoint = ParseHandler.geoPointFromLocation(location);
-            //final HashMap<String, MarkerOptions> toKeep = new HashMap<String, MarkerOptions>();
-            ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
-            mapQuery.whereWithinKilometers("location", myPoint, Settings.SEARCH_DISTANCE);
-            // 5
-            //mapQuery.include("objectId");
-            mapQuery.orderByDescending("EventSize");
-            // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
-            // 6
-//            mapQuery.getFirstInBackground(new GetCallback<MassEvent>() {
-//                @Override
-//                public void done(MassEvent massEvent, ParseException e) {
-//                    Log.d(Settings.APPTAG, "First item in map query is " + massEvent.getObjectId());
-//                }
-//            });
-//            List<MassEvent> eventList = (ArrayList)mapQuery.findInBackground().getResult();
-//            Log.d(Settings.APPTAG, "First item in event list is " + eventList.size());
-            final HashSet<MassEvent> nearbyEvents;
-            mapQuery.findInBackground(new FindCallback<MassEvent>() {
-                @Override
-                public void done(List<MassEvent> massEvents, ParseException e) {
-                    HashSet<MassEvent> events = new HashSet<MassEvent>();
-                    for (MassEvent event: massEvents){
-                        events.add(event);
-                        Log.d(Settings.APPTAG,"in nearbyEvents " + event.getLocationName());
-                    }
-                    MapsActivity.mapsHandler.updateMarkers(events);
-                }
-            });
-//            nearbyEvents.addAll(eventList);
-//            Log.d(Settings.APPTAG, "in nearbyEvents, number of events " + nearbyEvents.size() );
-//            return nearbyEvents;
-        }
-    }
 
 
     protected static void anonymousUserLogin() {

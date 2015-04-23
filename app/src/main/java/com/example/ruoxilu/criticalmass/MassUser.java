@@ -35,7 +35,13 @@ public class MassUser extends ParseObject {
     }
 
     public void setEvent(MassEvent value) {
-        put("event", value.getObjectId());
+
+        if (value == null) {
+            put("event", "");
+        } else {
+            put("event", value.getObjectId());
+        }
+
     }
 
     // User Location
