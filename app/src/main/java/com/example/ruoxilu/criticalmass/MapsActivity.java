@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,9 +33,6 @@ import com.parse.ParseAnonymousUtils;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MapsActivity extends FragmentActivity implements LocationListener,
@@ -49,20 +45,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public static Location mLastLocation = Settings.getDefaultLocation();
 
     // Fields for helping process the map and location changes
-    private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
-    private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
-    private static ViewGroup mViewGroup;
-    private static LinearLayout mMainScreen;
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-   // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private String mEventID;
-    // Fields for the map radius in feet
-    private float radius;
-    private float lastRadius;
-    //  private String selectedPostObjectId;
     private int mostRecentMapUpdate;
 
     private DrawerLayout mDrawerLayout;
@@ -94,8 +79,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         setUpMapIfNeeded();
 
-//        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
-//        startActivity(intent);
         checkLoginStatus();
 
 
@@ -127,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
-// TODO repeat the functionality of the dispatchActivity
+    // TODO repeat the functionality of the dispatchActivity
     protected void checkLoginStatus() {
 
         //(Xin)
@@ -204,7 +187,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * call {@link #setUpMap()} once when mapsHandler.map is not null.
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
@@ -232,7 +215,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /**
      * This is where we can add markers or lines, add listeners or move the camera.
      * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     * This should only be called once and when we are sure that mapsHandler.mMap is not null.
      */
     private void setUpMap() {
         mapsHandler.mMap.setMyLocationEnabled(true);
@@ -287,11 +270,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 //        updateUserLocation(mMassUser.getLocation());
 //
 //=======
-        if (mCurrentLocation==null){
+        if (mCurrentLocation == null) {
             mCurrentLocation = Settings.getDefaultLocation();
         }
-        if(mMassUser == null){
-            mMassUser= ParseHandler.getDefaultMassUser();
+        if (mMassUser == null) {
+            mMassUser = ParseHandler.getDefaultMassUser();
         }
 
         starterPeriodicLocationUpdates();// connect googleFused api services
@@ -300,7 +283,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 //>>>>>>> origin/master
 
         // update MassEvent
-        ParseHandler.updateUserEvent(geoPointFromLocation(mCurrentLocation),mMassUser);
+        ParseHandler.updateUserEvent(geoPointFromLocation(mCurrentLocation), mMassUser);
     }
 
 
@@ -319,7 +302,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return;
         }
         mLastLocation = location;
-        ParseHandler.updateUserLocation(ParseHandler.geoPointFromLocation(location),mMassUser);
+        ParseHandler.updateUserLocation(ParseHandler.geoPointFromLocation(location), mMassUser);
         updateZoom(location);
         doMapQuery();
         ParseHandler.updateUserEvent(ParseHandler.geoPointFromLocation(mCurrentLocation), mMassUser);//helper function to update event as location changes

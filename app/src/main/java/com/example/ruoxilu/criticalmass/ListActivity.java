@@ -23,7 +23,7 @@ import java.util.List;
 public class ListActivity extends Activity {
 
     List<MassEvent> mParseObjects;
-    
+
     private EventListAdapter mEventListAdapter;
     private SwipeRefreshLayout mScrollList;
     private ListView mEventListView;
@@ -104,10 +104,9 @@ public class ListActivity extends Activity {
 
         }
 
-        ParseGeoPoint geoPoint = new ParseGeoPoint(userLocation.getLatitude(),
+        return new ParseGeoPoint(userLocation.getLatitude(),
                 userLocation.getLongitude());
 
-        return geoPoint;
     }
 
 

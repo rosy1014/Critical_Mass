@@ -63,7 +63,7 @@ public class LoginSignupActivity extends Activity {
 
             public void onClick(View arg0) {
 
-                if ( Application.networkConnected(loginSignupContext) ) {
+                if (Application.networkConnected(loginSignupContext)) {
                     verifyLogin();
                 }
             }
@@ -75,7 +75,7 @@ public class LoginSignupActivity extends Activity {
 
             public void onClick(View arg0) {
 
-                if ( Application.networkConnected(loginSignupContext) ) {
+                if (Application.networkConnected(loginSignupContext)) {
                     signup();
                 }
 
