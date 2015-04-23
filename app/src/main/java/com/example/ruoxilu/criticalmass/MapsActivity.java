@@ -1,22 +1,19 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -51,9 +48,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
     // Fields for helping process the map and location changes
-    private static Map<String, Marker> mapMarkers = new HashMap<String, Marker>(); // find marker based on Event ID
-    private static Map<Marker, String> markerIDs = new HashMap<Marker, String>(); // find Event ID associated with marker
-    private static Map<Marker, String> markerNames = new HashMap<>();
+    protected static Map<String, Marker> mapMarkers = new HashMap<>(); // find marker based on Event ID
+    protected static Map<Marker, String> markerIDs = new HashMap<>(); // find Event ID associated with marker
+    protected static Map<Marker, String> markerNames = new HashMap<>();
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -78,11 +75,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, mDrawerButtons));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         checkLoginStatus();
@@ -173,7 +169,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
     @Override
-    //TODO
     // Must call super.onDestroy() at the end.
     protected void onDestroy() {
         super.onDestroy();
@@ -269,20 +264,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, Settings.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-            }
-        } else {
+        if (connectionResult.hasResolution()) try {
+            connectionResult.startResolutionForResult(this, Settings.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+        } catch (IntentSender.SendIntentException ignored) {
+        }
+        else {
             showErrorDialog(connectionResult.getErrorCode());
         }
 
     }
 
     private ParseGeoPoint geoPointFromLocation(Location location) {
-        ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        return geoPoint;
+        return new ParseGeoPoint(location.getLatitude(), location.getLongitude());
     }
     /*
      * private helper functions
@@ -327,31 +320,22 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             cleanUpMarkers(new HashSet<String>());
             return;
         }
-        Log.d(Settings.APPTAG, "myloc is " + myLoc);
         final ParseGeoPoint myPoint = ParseHandler.geoPointFromLocation(myLoc);
-
         ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
-
         mapQuery.whereWithinKilometers("location", myPoint, Settings.SEARCH_DISTANCE);
-
         mapQuery.orderByDescending("createdAt");
-
         mapQuery.findInBackground(new FindCallback<MassEvent>() {
             @Override
             public void done(List<MassEvent> objects, ParseException e) {
                 if (e != null) {
                     Log.d(Settings.APPTAG, "An error occurred while querying for map posts.", e);
                     return;
-                } else {
-                    Log.d(Settings.APPTAG, "Find Mass Event " + e);
-
                 }
-
                 if (myUpdateNumber != mostRecentMapUpdate) {
                     return;
                 }
                 // Handle the results
-                HashSet<String> toKeep = new HashSet<String>();
+                HashSet<String> toKeep = new HashSet<>();
                 for (final MassEvent mEvent : objects) {
                     // check if the event size exceeds the threshold, tentatively set to 0
                     if (mEvent.getEventSize() > 10) {
@@ -434,7 +418,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Remove markers that are not in the Hashmap markersToKeep
      */
     public static void cleanUpMarkers(HashSet<String> markersToKeep) {
-        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
+        for (String objId : new HashSet<>(mapMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
                 Marker marker = mapMarkers.get(objId);
                 markerIDs.remove(marker);
@@ -445,7 +429,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             }
         }
     }
-
 
     private void showErrorDialog(int errorCode) {
         Dialog errorDialog
@@ -526,7 +509,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             eventDetailIntent.putExtra("objectId", eventId);
             eventDetailIntent.putExtra("location", locationName);
             startActivity(eventDetailIntent);
-        } else {
         }
     }
 
@@ -535,50 +517,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         marker.showInfoWindow();
         return true;
 
-    }
-
-    /**
-     * Fragment that appears in the "content_frame", shows a planet
-     */
-    public static class EventListFragment extends Fragment {
-        public static final String ARG_MENU_OPTION = "menu_option";
-
-        public EventListFragment() {
-            // Empty constructor required for fragment subclasses
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-
-
-            View rootView = inflater.inflate(R.layout.activity_list, container, false);
-
-            return rootView;
-        }
-    }
-
-
-    public static class ErrorDialogFragment extends DialogFragment {
-        /*
-         * Show user a message if Google Play services are not enabled on the
-         * device.
-         */
-        private Dialog mDialog;
-
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
     }
 
     /* The click listener for ListView in the navigation drawer */

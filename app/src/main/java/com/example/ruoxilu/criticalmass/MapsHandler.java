@@ -38,7 +38,7 @@ public class MapsHandler {
 
     }
 
-    public static Location initialMapLocation(){
+    public Location initialMapLocation(){
         LocationManager mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         // Create a criteria object to retrieve provider
