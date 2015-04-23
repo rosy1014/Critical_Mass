@@ -201,28 +201,21 @@ public class ParseHandler {
             ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
             mapQuery.whereWithinKilometers("location", myPoint, Settings.SEARCH_DISTANCE);
             // 5
-            //mapQuery.include("objectId");
             mapQuery.orderByDescending("EventSize");
             // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
-            // 6
-//            mapQuery.getFirstInBackground(new GetCallback<MassEvent>() {
-//                @Override
-//                public void done(MassEvent massEvent, ParseException e) {
-//                    Log.d(Settings.APPTAG, "First item in map query is " + massEvent.getObjectId());
-//                }
-//            });
-//            List<MassEvent> eventList = (ArrayList)mapQuery.findInBackground().getResult();
-//            Log.d(Settings.APPTAG, "First item in event list is " + eventList.size());
+
             final HashSet<MassEvent> nearbyEvents;
             mapQuery.findInBackground(new FindCallback<MassEvent>() {
                 @Override
                 public void done(List<MassEvent> massEvents, ParseException e) {
                     HashSet<MassEvent> events = new HashSet<MassEvent>();
+                    HashSet<String> eventIds = new HashSet<String>();
                     for (MassEvent event: massEvents){
                         events.add(event);
                         Log.d(Settings.APPTAG,"in nearbyEvents " + event.getLocationName());
                     }
-                    MapsActivity.mapsHandler.updateMarkers(events);
+                    MapsActivity.updateMarkers(events);
+//                    MapsActivity.cleanUpMarkers(eventIds);
                 }
             });
 //            nearbyEvents.addAll(eventList);
