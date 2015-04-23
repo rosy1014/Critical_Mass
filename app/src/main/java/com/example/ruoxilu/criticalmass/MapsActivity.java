@@ -29,12 +29,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.FindCallback;
 import com.parse.ParseAnonymousUtils;
+import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -180,7 +185,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         setUpMapIfNeeded();
 
     }
-
+    @Override
+    //TODO
+    // Must call super.onDestroy() at the end.
+    protected void onDestroy() {
+        super.onDestroy();
+    }
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
@@ -218,7 +228,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.setMyLocationEnabled(true);
         // Get LocationManager object from System Service LOCATION_SERVICE
         mCurrentLocation = mapsHandler.initialMapLocation();
-        Log.d(Settings.APPTAG, "in setUpMap, mCurrentLocation is " + mCurrentLocation );
         updateZoom(mCurrentLocation);
 
         // Get longitude of the current location
@@ -238,6 +247,30 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mMap.setOnInfoWindowClickListener(this);
         mMap.setOnMarkerClickListener(this);
     }
+//    private void setUpMap() {
+//        mMap.setMyLocationEnabled(true);
+//        // Get LocationManager object from System Service LOCATION_SERVICE
+//        mCurrentLocation = mapsHandler.initialMapLocation();
+//        Log.d(Settings.APPTAG, "in setUpMap, mCurrentLocation is " + mCurrentLocation );
+//        updateZoom(mCurrentLocation);
+//
+//        // Get longitude of the current location
+//        double longitude = mCurrentLocation.getLongitude();
+//        double latitude = mCurrentLocation.getLatitude();
+//        Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
+//        // Create a LatLng object for the current location
+//        LatLng latLng = new LatLng(latitude, longitude);
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+//        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+//            @Override
+//            public void onCameraChange(CameraPosition cameraPosition) {
+//                doMapQuery();
+//            }
+//        });
+//        mMap.setOnInfoWindowClickListener(this);
+//        mMap.setOnMarkerClickListener(this);
+//    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -336,16 +369,108 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Move the camera to the location in interest and zoom to appropriate level
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, Settings.ZOOM_LEVEL));
     }
+    private void doMapQuery() {
+        final int myUpdateNumber = ++mostRecentMapUpdate;
+        // 1
+        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+        if (myLoc == null) {
+            cleanUpMarkers(new HashSet<String>());
+            return;
+        }
+        // 2
+        Log.d(Settings.APPTAG, "myloc is " + myLoc);
+        final ParseGeoPoint myPoint = ParseHandler.geoPointFromLocation(myLoc);
+        // 3
+        ParseQuery<MassEvent> mapQuery = MassEvent.getQuery();
+        // 4
+        mapQuery.whereWithinKilometers("location", myPoint, Settings.SEARCH_DISTANCE);
+        // 5
+        //mapQuery.include("objectId");
+        mapQuery.orderByDescending("createdAt");
+        // mapQuery.setLimit(MAX_MARKER_SEARCH_RESULTS);
+        // 6
+        mapQuery.findInBackground(new FindCallback<MassEvent>() {
+            @Override
+            public void done(List<MassEvent> objects, ParseException e) {
+                if (e != null) {
+                    Log.d(Settings.APPTAG, "An error occurred while querying for map posts.", e);
+                    return;
+                } else {
+                    Log.d(Settings.APPTAG, "Find Mass Event " + e);
+                    //  Log.d(Settings.APPTAG, "Find Mass Event " + objects.get(0).getObjectId());
+                }
+
+                if (myUpdateNumber != mostRecentMapUpdate) {
+                    return;
+                }
+                // Handle the results
+                HashSet<String> toKeep = new HashSet<String>();
+                // 2
+                for (final MassEvent mEvent : objects) {
+                    // 3 check if the event size exceeds the threshold, tentatively set to 0
+                    if (mEvent.getEventSize() > 10) {
+                        //Log.d(Settings.APPTAG, "valid mass event"+mEvent.getEventSize());
+
+                        toKeep.add(mEvent.getObjectId());
+                        // 4
+                        Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
+                        // 5
+                        MarkerOptions markerOpts = MapsHandler.createMarkerOpt(mEvent);
+                        // 6
+                        if (mEvent.getLocation().distanceInKilometersTo(myPoint) > Settings.RADIUS * Settings.METERS_PER_FEET
+                                / Settings.METERS_PER_KILOMETER) {
+                            // Set up an out-of-range marker
+                            // Check for an existing out of range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() == null) {
+                                    // Out of range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now out of range, needs to be refreshed
+                                    oldMarker.remove();
+//                                    Log.d(Settings.APPTAG, "Removed oldmarker: " + oldMarker);
+                                }
+                            }
+
+                        } else {
+                            // Set up an in-range marker
+                            // Check for an existing in range marker
+                            if (oldMarker != null) {
+                                if (oldMarker.getSnippet() != null) {
+                                    // In range marker already exists, skip adding it
+                                    continue;
+                                } else {
+                                    // Marker now in range, needs to be refreshed
+                                    oldMarker.remove();
+                                }
+                            }
+                        }
+                        // 7
+                        Marker marker = mMap.addMarker(markerOpts);
+                        // update markerIDs hash map and mapMarkers hash map.
+                        markerIDs.put(marker, mEvent.getObjectId());
+                        mapMarkers.put(mEvent.getObjectId(), marker);
+                        markerNames.put(marker,mEvent.getLocationName());
+
+                    }
+                }
+
+                // 9
+                cleanUpMarkers(toKeep);
+                Log.d(Settings.APPTAG, "After clean up markers");
+            }
+        });
+    }
 
     // display events by markers on the map
-    private void doMapQuery() {
-        Log.d(Settings.APPTAG, "in doMapQuery");
-        final int myUpdateNumber = ++mostRecentMapUpdate;
-
-        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
-//        HashSet<MassEvent> nearbyEvents = ParseHandler.queryNearbyEvent(myLoc);
-        ParseHandler.queryNearbyEvent(myLoc);
-    }
+//    private void doMapQuery() {
+//        Log.d(Settings.APPTAG, "in doMapQuery");
+//        final int myUpdateNumber = ++mostRecentMapUpdate;
+//
+//        Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
+////        HashSet<MassEvent> nearbyEvents = ParseHandler.queryNearbyEvent(myLoc);
+//        ParseHandler.queryNearbyEvent(myLoc);
+//    }
     public static void updateMarkers(HashSet<MassEvent> eventList) {
         HashSet<String> eventIdsToKeep = new HashSet<String>();
         for (MassEvent event : eventList) {
@@ -372,17 +497,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Remove markers that are not in the Hashmap markersToKeep
      */
     // SIGN_MARKER_OBJECT
-//    public static void cleanUpMarkers(HashSet<String> markersToKeep) {
-//        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
-//            if (!markersToKeep.contains(objId)) {
-//                Marker marker = mapMarkers.get(objId);
-//                markerIDs.remove(marker);
-//                marker.remove();
-//                mapMarkers.get(objId).remove();
-//                mapMarkers.remove(objId);
-//            }
-//        }
-//    }
+    public static void cleanUpMarkers(HashSet<String> markersToKeep) {
+        for (String objId : new HashSet<String>(mapMarkers.keySet())) {
+            if (!markersToKeep.contains(objId)) {
+                Marker marker = mapMarkers.get(objId);
+                markerIDs.remove(marker);
+                marker.remove();
+                mapMarkers.get(objId).remove();
+                mapMarkers.remove(objId);
+                markerNames.remove(objId);
+            }
+        }
+    }
 
 
     private void showErrorDialog(int errorCode) {

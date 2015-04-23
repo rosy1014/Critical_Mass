@@ -20,9 +20,12 @@ public class Settings {
     public static final int FAST_INTERVAL_CEILING_IN_SECONDS = 1;
     public static final int FAST_INTERVAL_CEILING_IN_MILLLISECONDS =
             FAST_INTERVAL_CEILING_IN_SECONDS * MILLISECONDS_PER_SECOND;
+    public static final int METERS_PER_KILOMETER = 1000;
+    public static final float METERS_PER_FEET = 0.3048f;
     public static final double UPDATE_PIVOT = 0.005; //update if move more than 5 meters
     public static final int SEARCH_DISTANCE = 5;
     public static final int ZOOM_LEVEL = 17; //city level
+    public static final float RADIUS= (float) 0.5f;
 
     public static final String APPTAG = "CriticalMass";
 
