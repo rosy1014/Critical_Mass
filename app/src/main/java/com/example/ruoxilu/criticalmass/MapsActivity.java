@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -90,9 +89,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         setUpMapIfNeeded();
 
 
-        LatLng latLng = new LatLng(Settings.getDefaultLocation().getLatitude(), Settings.getDefaultLocation().getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
 
     }
 
