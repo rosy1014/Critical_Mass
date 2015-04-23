@@ -280,8 +280,6 @@ public class MapsActivity extends FragmentActivity
         starterPeriodicLocationUpdates();// connect googleFused api services
         ParseHandler.updateUserLocation(mMassUser.getLocation(), mMassUser);
 
-//>>>>>>> origin/master
-
         // update MassEvent
         ParseHandler.updateUserEvent(geoPointFromLocation(mCurrentLocation),mMassUser);
     }
