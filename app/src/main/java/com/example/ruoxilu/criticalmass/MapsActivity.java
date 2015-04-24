@@ -1,18 +1,22 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.Dialog;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -45,17 +49,25 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
+    public static MapsHandler mapsHandler;
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
+
     // Fields for helping process the map and location changes
     protected static Map<String, Marker> mapMarkers = new HashMap<>(); // find marker based on Event ID
     protected static Map<Marker, String> markerIDs = new HashMap<>(); // find Event ID associated with marker
     protected static Map<Marker, String> markerNames = new HashMap<>();
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
-    private MapsHandler mapsHandler;
+
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+   // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
+    private String mEventID;
+    // Fields for the map radius in feet
+    private float radius;
+    private float lastRadius;
+    //  private String selectedPostObjectId;
     private int mostRecentMapUpdate;
 
     private DrawerLayout mDrawerLayout;
@@ -82,13 +94,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
-
         mapsHandler = new MapsHandler(this);
-        setContentView(R.layout.activity_maps);
-        setUpMapIfNeeded();
+
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
 
+        setContentView(R.layout.activity_maps);
 
         mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -101,6 +112,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, mDrawerButtons));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        setUpMapIfNeeded();
+
         checkLoginStatus();
 
 
@@ -108,17 +122,34 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
+
         if (position == 1) {
             confirmLogOut();
+
         } else {
+
             Intent i = new Intent(MapsActivity.this, ListActivity.class);
             startActivityForResult(i, 0);
+
+
+//            android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_fragment);
+//            Bundle args = new Bundle();
+//            args.putInt(EventListFragment.ARG_MENU_OPTION, position);
+//            fragment.setArguments(args);
+//
+//            FragmentManager fragmentManager = getFragmentManager();
+//            fragmentManager.beginTransaction().replace(R.id.map, fragment).commit();
+
             // update selected item and title, then close the drawer
             mDrawerList.setItemChecked(position, true);
             mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
+
+// TODO repeat the functionality of the dispatchActivity
     protected void checkLoginStatus() {
+
+        //(Xin)
         // determine whether the current user is an anonymous user and
         // if the user has previously signed up and logged into the application
         if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
@@ -143,6 +174,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /*
      * Helper function for onCreate
      * Initialize the Goolge Api Client for maps activity
+     * TODO refactor to MapHandler
      */
     protected void initGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -150,6 +182,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+//        Log.i(Settings.APPTAG, "GOOGLE API CLIENT CREATED");
     }
 
     @Override
@@ -171,6 +204,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
         }
+
     }
 
     @Override
@@ -185,18 +219,12 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
-    @Override
-    // Must call super.onDestroy() at the end.
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     /**
      * Sets up the map if it is possible to do so
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        //if (mapsHandler.mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
@@ -204,13 +232,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             if (mMap != null) {
                 setUpMap();
             }
-        }
+        //}
     }
 
     /**
      * This is where we can add markers or lines, add listeners or move the camera.
      * <p/>
-     * This should only be called once and when we are sure that #mMap is not null.
+     * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
@@ -221,10 +249,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Get longitude of the current location
         double longitude = mCurrentLocation.getLongitude();
         double latitude = mCurrentLocation.getLatitude();
+        Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
         // Create a LatLng object for the current location
         LatLng latLng = new LatLng(latitude, longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+        
+        // CHECKPOINT
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -238,6 +269,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     @Override
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
+
+        starterPeriodicLocationUpdates();// connect googleFused api services
+        setUpMapIfNeeded();
+
         mCurrentLocation = getLocation();
 
 
@@ -248,13 +283,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mMassUser = ParseHandler.getDefaultMassUser();
         }
 
-        starterPeriodicLocationUpdates();// connect googleFused api services
+        //starterPeriodicLocationUpdates();// connect googleFused api services
         ParseHandler.updateUserLocation(mMassUser.getLocation(), mMassUser);
 
 
         // update MassEvent
         ParseHandler.updateUserEvent(geoPointFromLocation(mCurrentLocation), mMassUser);
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -295,6 +331,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /*
      * private helper functions
      */
+
     private void starterPeriodicLocationUpdates() {
         LocationServices.FusedLocationApi
                 .requestLocationUpdates(mGoogleApiClient, MapsHandler.mLocationRequest, this);
@@ -330,6 +367,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
 
+
+        // 1
         Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
         if (myLoc == null) {
             cleanUpMarkers(new HashSet<String>());
@@ -415,6 +454,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
+    // SIGN_BACKGROUND_SERVICE
     private boolean servicesConnected() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
@@ -436,6 +476,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     /*
      * Show a dialog returned by Google Play services for the connection error code
      */
+
     public void confirmLogOut() {
 
         new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
@@ -467,9 +508,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     }
 
     @Override
-    /*
-    * Click on marker info window redirects user to eventActivity
-    */
     public void onInfoWindowClick(Marker marker) {
         if (markerIDs.containsKey(marker)) {
             Intent eventDetailIntent = new Intent();
