@@ -456,7 +456,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         ParseHandler.deleteMassUser(mMassUser);
                         ParseUser.logOut();
                         sDialog.dismiss();
-                        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
+                        Intent intent = new Intent(MapsActivity.this, LoginSignupActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
