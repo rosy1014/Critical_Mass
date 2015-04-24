@@ -28,7 +28,9 @@ public class WelcomeActivity extends Activity {
         TextView content = (TextView) findViewById(R.id.content);
 
         // Set the tutorial content into TextView
-        content.setText("The map displays your current location as well as nearby critical mass. You can click on the marker or the top middle button to view event details. Press top left button to log out.");
+        content.setText("The map displays your current location as well as nearby critical mass. " +
+                "You can click on the marker or the top middle button to view event details. " +
+                "Press top left button to log out.");
         content.setTextSize(30);
 
         GoToApp = (Button) findViewById(R.id.gotoapp);
