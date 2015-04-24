@@ -52,30 +52,24 @@ public class ListActivity extends Activity {
             // Load EventActivity when user clicks on a mass in the
             mEventListView.setOnItemClickListener(
                     new OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                    MassEvent event = mEventListAdapter.getItem(position);
+                            MassEvent event = mEventListAdapter.getItem(position);
 
-                    String locationName = event.getLocationName();
+                            String locationName = event.getLocationName();
 
-                    android.content.ClipboardManager clipboard =
-                            (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    android.content.ClipData clip =
-                            android.content.ClipData.newPlainText("Location:", locationName);
-                    clipboard.setPrimaryClip(clip);
+                            Intent eventDetailIntent = new Intent();
+                            eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
 
-                    Intent eventDetailIntent = new Intent();
-                    eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
+                            String eventId = event.getObjectId();
+                            eventDetailIntent.putExtra("objectId", eventId);
+                            eventDetailIntent.putExtra("location", locationName);
 
-                    String eventId = event.getObjectId();
-                    eventDetailIntent.putExtra("objectId", eventId);
-                    eventDetailIntent.putExtra("location", locationName);
+                            Log.d(Settings.APPTAG, "event object id is " + id);
 
-                    Log.d(Settings.APPTAG, "event object id is " + id);
-
-                    startActivity(eventDetailIntent);
-                }
+                            startActivity(eventDetailIntent);
+                        }
                     }
 
             );

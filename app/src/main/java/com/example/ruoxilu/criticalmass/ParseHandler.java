@@ -69,8 +69,9 @@ public class ParseHandler {
         query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
-                final String objectId = massUser.getObjectId();
+
                 if (e == null) {
+                    final String objectId = massUser.getObjectId();
                     ParseQuery<MassUser> query1 = MassUser.getQuery();
                     query1.getInBackground(objectId, new GetCallback<MassUser>() {
                         @Override
@@ -83,7 +84,7 @@ public class ParseHandler {
                             Log.d(Settings.APPTAG, "updated mass user location ", e);
                         }
                     });
-                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND){
+                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
                     mMassUser.saveInBackground();
                 }
             }
