@@ -94,6 +94,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
+
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
@@ -101,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 R.layout.drawer_list_item, mDrawerButtons));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         checkLoginStatus();
-//        setUpMapIfNeeded();
+
 
     }
 
@@ -180,6 +181,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mGoogleApiClient.disconnect();
 
         super.onStop();
+        setUpMapIfNeeded();
 
     }
 
@@ -236,8 +238,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     @Override
     public void onConnected(Bundle bundle) {
         mGoogleApiClient.connect();
-        setUpMapIfNeeded();
-
         mCurrentLocation = getLocation();
 
 
