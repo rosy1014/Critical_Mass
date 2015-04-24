@@ -75,12 +75,6 @@ public class ListActivity extends Activity {
 
                     String locationName = mParseObjects.get(position).getLocationName();
 
-                    android.content.ClipboardManager clipboard =
-                            (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    android.content.ClipData clip =
-                            android.content.ClipData.newPlainText("Location:", locationName);
-                    clipboard.setPrimaryClip(clip);
-
                     Intent eventDetailIntent = new Intent();
                     eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
 
@@ -93,16 +87,6 @@ public class ListActivity extends Activity {
                     startActivity(eventDetailIntent);
                 }
             });
-
-//            mActivityOne.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//                @Override
-//                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//
-////                    TextView titleTextView = (TextView) view.findViewById(R.id.title_text);
-////                    titleTextView.setTextIsSelectable(true);
-//                    return true;
-//                }
-//            });
 
         }
     }

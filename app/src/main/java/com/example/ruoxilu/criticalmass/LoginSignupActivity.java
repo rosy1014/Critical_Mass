@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -38,6 +39,8 @@ public class LoginSignupActivity extends Activity {
      */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(Settings.APPTAG, "Zoom Issue: LoginSignupActivity intent: onCreate");
 
         // Get the view from main.xml
         setContentView(R.layout.loginsignup);
@@ -106,10 +109,16 @@ public class LoginSignupActivity extends Activity {
                     public void done(ParseUser user, ParseException e) {
                         if (e == null) {
 
+                            Log.d(Settings.APPTAG, "Zoom Issue: LoginSignupActivity logInBackground normal");
+
+
                             // If user exist and authenticated, send user to MapsActivity.class
                             Intent intent = new Intent(
                                     LoginSignupActivity.this,
                                     MapsActivity.class);
+
+                            Log.d(Settings.APPTAG, "Zoom Issue: LoginSignupActivity intent: MapsActivity");
+
                             startActivity(intent);
                             finish();
 

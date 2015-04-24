@@ -55,6 +55,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/relSendMessage"
         android:layout_below="@id/event_brief"
+        android:divider="@null"
         android:footerDividersEnabled="true"
         android:headerDividersEnabled="true"
         android:orientation="vertical"
