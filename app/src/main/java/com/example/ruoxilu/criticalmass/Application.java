@@ -16,6 +16,8 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class Application extends android.app.Application {
 
+
+    // Return true if network is connected.
     public static boolean networkConnected(Context c) {
         ConnectivityManager conManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = conManager.getActiveNetworkInfo();
@@ -29,7 +31,8 @@ public class Application extends android.app.Application {
         return networkConnected;
     }
 
-    public static void internetAlert (Context c) {
+    // If network is not connected, alert user with an alert dialog.
+    public static void internetAlert(Context c) {
 
         final Context specificContext = c;
 
@@ -90,5 +93,6 @@ public class Application extends android.app.Application {
         Log.d("CriticalMassApplication", " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getUsername());
 
     }
+
 }
 
