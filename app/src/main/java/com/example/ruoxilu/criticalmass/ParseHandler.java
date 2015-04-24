@@ -10,7 +10,6 @@ import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 /**
  * Created by RuoxiLu on 4/17/15.
@@ -54,61 +53,41 @@ public class ParseHandler {
         MassUser massUser = new MassUser();
         massUser.setUser(ParseUser.getCurrentUser());
         massUser.setLocation(geoPointFromLocation(Settings.getDefaultLocation()));
-        massUser.saveInBackground();
         return massUser;
 
     }
 
     public static ParseGeoPoint geoPointFromLocation(Location location) {
         ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        // Log.i(Settings.APPTAG, "geoPoint is " + geoPoint);
         return geoPoint;
     }
 
-
-    public static void updateUserLocation(ParseGeoPoint value, MassUser mMassUser) {
-        final ParseGeoPoint geoPointValue = value; // need "final" type to pass in the callback function
+    public static void updateUserLocation(ParseGeoPoint value, final MassUser mMassUser){
+        final ParseGeoPoint geoPointValue = value;
         ParseQuery<MassUser> query = MassUser.getQuery();
         query.whereEqualTo("user", mMassUser.getUser());
-        Log.d(Settings.APPTAG, "in UpdateUserLocation, user is " + mMassUser.getUser());
-        Log.d(Settings.APPTAG, "in UpdateUserLocation, user is " + geoPointValue);
         query.getFirstInBackground(new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
-                Log.d(Settings.APPTAG, "Done with getFirstInBackground loc " + e);
-
+                final String objectId = massUser.getObjectId();
                 if (e == null) {
-                    // no error exception, the user is found in the cloud, update the location in the cloud
-                    massUser.setLocation(geoPointValue);
-                    massUser.saveInBackground(new SaveCallback() {
+                    ParseQuery<MassUser> query1 = MassUser.getQuery();
+                    query1.getInBackground(objectId, new GetCallback<MassUser>() {
+                        @Override
+                        public void done(MassUser massUser, ParseException e) {
+                            if (e == null) {
+                                massUser.setLocation(geoPointValue);
+                                massUser.saveInBackground();
+                            }
 
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                Log.d(Settings.APPTAG, "MassUser update saved successfully");
-                            } else {
-                                Log.d(Settings.APPTAG, "MassUser update were not saved");
-                            }
+                            Log.d(Settings.APPTAG, "updated mass user location ", e);
                         }
                     });
-                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                    // The user has not been saved into the cloud, save it with current location
-                    massUser.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                Log.d(Settings.APPTAG, "New MassUser saved successfully");
-                            } else {
-                                Log.d(Settings.APPTAG, "New MassUser were not saved");
-                            }
-                        }
-                    });
-                } else {
-                    // Do nothing
+                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND){
+                    mMassUser.saveInBackground();
                 }
             }
         });
-        return;
     }
 
     // helper function to update the user's event by event type data(Xin)
@@ -150,11 +129,14 @@ public class ParseHandler {
                         Log.d(Settings.APPTAG, "decrement event size");
                         massEvent.setEventSize(size);
                         massEvent.saveInBackground();
-                        mMassUser.setEvent(null);
-                        mMassUser.saveInBackground(new SaveCallback() {
+
+                        ParseQuery<MassUser> query4 = MassUser.getQuery();
+                        query4.whereEqualTo("user", mMassUser.getUser());
+                        query4.getFirstInBackground(new GetCallback<MassUser>() {
                             @Override
-                            public void done(ParseException e) {
-                                Log.d(Settings.APPTAG, "update user event error: " + e);
+                            public void done(MassUser massUser, ParseException e) {
+                                massUser.setEvent(null);
+                                massUser.saveInBackground();
                             }
                         });
 
@@ -167,27 +149,26 @@ public class ParseHandler {
                         // Since the user can only be in one event at a time, use getFirstInBackground
                         query2.getFirstInBackground(new GetCallback<MassEvent>() {
                             @Override
-                            public void done(MassEvent massEvent, ParseException e) {
+                            public void done(final MassEvent massEvent, ParseException e) {
                                 if (e == null) {
                                     Log.i(Settings.APPTAG, "the current massevent is " + massEvent.getObjectId());
                                     int size = massEvent.getEventSize();
                                     size = size + 1;
                                     massEvent.setEventSize(size);
                                     massEvent.saveInBackground();
-                                    mMassUser.setEvent(massEvent);
-                                    mMassUser.saveInBackground(new SaveCallback() {
+                                    ParseQuery<MassUser> query3 = MassUser.getQuery();
+                                    query3.whereEqualTo("user", mMassUser.getUser());
+                                    query3.getFirstInBackground(new GetCallback<MassUser>() {
                                         @Override
-                                        public void done(ParseException e) {
-                                            Log.d(Settings.APPTAG, "update user event error: " + e);
+                                        public void done(MassUser massUser, ParseException e) {
+                                            massUser.setEvent(massEvent);
+                                            massUser.saveInBackground();
                                         }
                                     });
-                                } else {
-                                    // No new event found
-                                    Log.i(Settings.APPTAG, "new event not found ");
+
                                 }
                             }
                         });
-                        return;
                     }
                 }
             }
@@ -198,19 +179,11 @@ public class ParseHandler {
 
     protected static void anonymousUserLogin() {
         ParseUser.enableAutomaticUser();
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is null? " + ParseUser.getCurrentUser().getObjectId());
-
         ParseUser puser = ParseUser.getCurrentUser();
         String pid = puser.getObjectId();
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + pid);
         if (pid == null) {
-//            Log.d(Settings.APPTAG, " In anonymousUserLogin, in if!!!!");
             ParseAnonymousUtils.logInInBackground();
-            Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + ParseUser.getCurrentUser().getObjectId());
-
         }
-        Log.d(Settings.APPTAG, " In anonymousUserLogin, ParseUser is " + ParseUser.getCurrentUser().getObjectId());
     }
-
 
 }
