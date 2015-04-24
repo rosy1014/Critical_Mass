@@ -25,7 +25,9 @@ public class Settings {
     public static final double UPDATE_PIVOT = 0.005; //update if move more than 5 meters
     public static final int SEARCH_DISTANCE = 5;
     public static final int ZOOM_LEVEL = 17; //city level
-    public static final float RADIUS= (float) 0.5f;
+    public static final float RADIUS = 0.05f;
+    public static final double MAX_DISTANCE = 0.1;
+
 
     public static final String APPTAG = "CriticalMass";
 

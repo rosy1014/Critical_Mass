@@ -15,8 +15,6 @@ import com.parse.ParseUser;
  * Created by RuoxiLu on 4/17/15.
  */
 public class ParseHandler {
- //   public static ParseUser mUser = ParseUser.getCurrentUser();
-    public static double radius = 1.0;
 
     public static void deleteMassUser(MassUser user){
         ParseQuery<MassUser> query = MassUser.getQuery();
@@ -58,8 +56,7 @@ public class ParseHandler {
     }
 
     public static ParseGeoPoint geoPointFromLocation(Location location) {
-        ParseGeoPoint geoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-        return geoPoint;
+        return new ParseGeoPoint(location.getLatitude(), location.getLongitude());
     }
 
     public static void updateUserLocation(ParseGeoPoint value, final MassUser mMassUser){
@@ -123,7 +120,7 @@ public class ParseHandler {
                     double distance = currentLocation
                             .distanceInKilometersTo(massEvent.getLocation());
                     // the user is no longer inside the old event
-                    if (distance > massEvent.getRadius()) {
+                    if (distance > Settings.RADIUS) {
                         // decrement the old event size as the user is no longer there
                         int size = massEvent.getEventSize();
                         size = size - 1;
@@ -141,11 +138,8 @@ public class ParseHandler {
                             }
                         });
 
-                        // search for new event, if any,  that includes the user
-                        double maxDistance = 5;
-
                         // finding objects in "event" near the point given and within the maximum distance given.
-                        query2.whereWithinKilometers("location", currentLocation, maxDistance);
+                        query2.whereWithinKilometers("location", currentLocation, Settings.MAX_DISTANCE);
 
                         // Since the user can only be in one event at a time, use getFirstInBackground
                         query2.getFirstInBackground(new GetCallback<MassEvent>() {
