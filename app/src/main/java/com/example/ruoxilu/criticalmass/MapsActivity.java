@@ -1,22 +1,18 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -497,6 +493,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         ParseHandler.deleteMassUser(mMassUser);
                         ParseUser.logOut();
                         sDialog.dismiss();
+                        mGoogleApiClient.disconnect();
                         Intent intent = new Intent(MapsActivity.this, LoginSignupActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
@@ -527,6 +524,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
+    @Override
+    public void finish() {
+        ViewGroup view = (ViewGroup) getWindow().getDecorView();
+        view.removeAllViews();
+        Log.d(Settings.APPTAG, "called finish");
+        super.finish();
+    }
+
     /* The click listener for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
 
@@ -534,13 +539,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
         }
-    }
-    @Override
-    public void finish() {
-        ViewGroup view = (ViewGroup) getWindow().getDecorView();
-        view.removeAllViews();
-        Log.d(Settings.APPTAG, "called finish");
-        super.finish();
     }
 
 }
