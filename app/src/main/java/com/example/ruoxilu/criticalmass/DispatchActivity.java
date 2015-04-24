@@ -3,6 +3,7 @@ package com.example.ruoxilu.criticalmass;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.parse.ParseUser;
 
@@ -18,9 +19,13 @@ public class DispatchActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         if(ParseUser.getCurrentUser()!=null){
+            Log.d(Settings.APPTAG, "Zoom Issue: Dispatch Activity intent: MapsActivity");
+
             startActivity(new Intent(this, MapsActivity.class));
         }
         else {
+
+            Log.d(Settings.APPTAG, "Zoom Issue: Dispatch Activity intent: LoginSignupActivity");
             startActivity(new Intent(this, LoginSignupActivity.class));
         }
 

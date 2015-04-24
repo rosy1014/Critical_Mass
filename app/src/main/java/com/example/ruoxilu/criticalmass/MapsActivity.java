@@ -36,6 +36,7 @@ import com.parse.ParseUser;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -74,7 +75,9 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(Settings.APPTAG, "onCreate");
+
+        Log.d(Settings.APPTAG, "Zoom Issue: MapsActivity onCreate");
+
         super.onCreate(savedInstanceState);
         mapsHandler = new MapsHandler(this);
 
@@ -97,8 +100,6 @@ public class MapsActivity extends FragmentActivity
 
         setUpMapIfNeeded();
 
-//        Intent intent = new Intent(MapsActivity.this, DispatchActivity.class);
-//        startActivity(intent);
         checkLoginStatus();
 
 
@@ -172,6 +173,9 @@ public class MapsActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        Log.d(Settings.APPTAG, "Zoom Issue: MapsActivity onResume");
+
         mGoogleApiClient.connect();
         if (mCurrentLocation != null) {
 
@@ -180,20 +184,26 @@ public class MapsActivity extends FragmentActivity
 
             // Get longitude of the current location
             double longitude = mCurrentLocation.getLongitude();
-            Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
+            Log.d(Settings.APPTAG, "Zoom Issue: onResume: my LatLng is " + latitude + ", " + longitude);
             // Create a LatLng object for the current location
             LatLng latLng = new LatLng(latitude, longitude);
 
             // Move the camera to the place in interest
+
             mapsHandler.mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mapsHandler.mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
-            //Log.d(Settings.APPTAG, "update camera on resume");
+            Log.d(Settings.APPTAG, "Zoom Issue: onResume: update camera on resume");
+            Log.d(Settings.APPTAG, "Zoom Issue: onResume: Settings.ZOOM_LEVEL: "+Settings.ZOOM_LEVEL);
+
         }
 
     }
 
     @Override
     protected void onStop() {
+
+        Log.d(Settings.APPTAG, "Zoom Issue: MapsActivity onStop");
+
         if (mGoogleApiClient.isConnected()) {
             stopPeriodicLocationUpdates();
         }
@@ -221,15 +231,26 @@ public class MapsActivity extends FragmentActivity
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mapsHandler.mMap == null) {
+//        if (mapsHandler.mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             mapsHandler.mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            Log.d(Settings.APPTAG, "Zoom Issue: setUpMapIfNeeded: support map fragment added");
             // Check if we were successful in obtaining the map.
             if (mapsHandler.mMap != null) {
+
+                Log.d(Settings.APPTAG, "Zoom Issue: setUpMapIfNeeded calls setUpMap since mMap is null");
+
                 setUpMap();
             }
-        }
+//        }
+//        else {
+//            mapsHandler.mMap.setMyLocationEnabled(true);
+//            Log.d(Settings.APPTAG, "Zoom Issue: updateZoom(mCurrentLocation)");
+//
+//            mCurrentLocation = mapsHandler.initialMapLocation();
+//            updateZoom(mCurrentLocation);
+//        }
     }
 
     /**
@@ -238,6 +259,9 @@ public class MapsActivity extends FragmentActivity
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
+
+        Log.d(Settings.APPTAG, "Zoom Issue: MapsActivity setupMap");
+
         mapsHandler.mMap.setMyLocationEnabled(true);
         // Get LocationManager object from System Service LOCATION_SERVICE
         mCurrentLocation = mapsHandler.initialMapLocation();
@@ -249,8 +273,8 @@ public class MapsActivity extends FragmentActivity
         Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
         // Create a LatLng object for the current location
         LatLng latLng = new LatLng(latitude, longitude);
-        mapsHandler.mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mapsHandler.mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+//        mapsHandler.mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        mapsHandler.mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
         mapsHandler.mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -266,6 +290,7 @@ public class MapsActivity extends FragmentActivity
         mGoogleApiClient.connect();
 
         starterPeriodicLocationUpdates();// connect googleFused api services
+        Log.d(Settings.APPTAG, "Zoom Issue: onConnected calls setUpMapIfNeeded");
         setUpMapIfNeeded();
 
         mCurrentLocation = getLocation();
@@ -293,6 +318,8 @@ public class MapsActivity extends FragmentActivity
     @Override
     // passes in the user current location as input
     public void onLocationChanged(Location location) {
+
+        Log.d(Settings.APPTAG, "Zoom Issue: onLocationChanged");
         mCurrentLocation = location;
         if (mLastLocation != null
                 && ParseHandler.geoPointFromLocation(location)
