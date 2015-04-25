@@ -104,7 +104,7 @@ public class ParseHandler {
         final ParseQuery<MassEvent> query2 = MassEvent.getQuery();
 
         // check if the user's old event exists
-        query1.whereEqualTo("event", mEventID);
+        query1.whereEqualTo("objectID", mEventID);
 
         Log.i(Settings.APPTAG, "Mass User in updateUserEvent is " + mEventID);
 
@@ -133,20 +133,27 @@ public class ParseHandler {
                         query4.getFirstInBackground(new GetCallback<MassUser>() {
                             @Override
                             public void done(MassUser massUser, ParseException e) {
-                                massUser.setEvent(null);
-                                massUser.saveInBackground();
+
+                                Log.d(Settings.APPTAG, "in UpdateUserEvent done " + e.getMessage());
+                                if (e == null) {
+                                    massUser.setEvent(null);
+                                    massUser.saveInBackground();
+                                } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+                                    massUser.saveInBackground();
+                                }
+
                             }
                         });
 
                         // finding objects in "event" near the point given and within the maximum distance given.
-                        query2.whereWithinKilometers("location", currentLocation, Settings.MAX_DISTANCE);
+                        query2.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
 
                         // Since the user can only be in one event at a time, use getFirstInBackground
                         query2.getFirstInBackground(new GetCallback<MassEvent>() {
                             @Override
                             public void done(final MassEvent massEvent, ParseException e) {
                                 if (e == null) {
-                                    Log.i(Settings.APPTAG, "the current massevent is " + massEvent.getObjectId());
+                                    Log.i(Settings.APPTAG, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
                                     int size = massEvent.getEventSize();
                                     size = size + 1;
                                     massEvent.setEventSize(size);
@@ -160,7 +167,6 @@ public class ParseHandler {
                                             massUser.saveInBackground();
                                         }
                                     });
-
                                 }
                             }
                         });

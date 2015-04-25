@@ -264,6 +264,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public void onConnected(Bundle bundle) {
+
         mGoogleApiClient.connect();
 
         starterPeriodicLocationUpdates();// connect googleFused api services
@@ -271,13 +272,18 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         mCurrentLocation = getLocation();
 
+        Log.d(Settings.APPTAG, "onConnected " + "lat: " + mCurrentLocation.getLatitude() + "lng: " + mCurrentLocation.getLongitude());
 
         if (mCurrentLocation == null) {
             mCurrentLocation = Settings.getDefaultLocation();
         }
+
         if (mMassUser == null) {
             mMassUser = ParseHandler.getDefaultMassUser();
         }
+
+        // 20150425
+        mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));
 
         //starterPeriodicLocationUpdates();// connect googleFused api services
         ParseHandler.updateUserLocation(mMassUser.getLocation(), mMassUser);
@@ -303,6 +309,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             return;
         }
         mLastLocation = location;
+
+        mMassUser.setLocation(geoPointFromLocation(location));
+
         ParseHandler.updateUserLocation(ParseHandler.geoPointFromLocation(location), mMassUser);
         updateZoom(location);
         doMapQuery();
