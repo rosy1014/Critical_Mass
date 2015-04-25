@@ -1,11 +1,8 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.parse.GetDataCallback;
@@ -13,7 +10,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseImageView;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -21,8 +17,6 @@ import com.parse.ParseQueryAdapter;
  * Created by tingyu on 4/21/15.
  */
 public class EventListAdapter extends ParseQueryAdapter<MassEvent> {
-
-    ParseQueryAdapter<MassEvent> mMassEventList;
 
     public EventListAdapter(Context c, final ParseGeoPoint userLocationPoint) {
 

@@ -13,8 +13,8 @@ import com.parse.ParseQueryAdapter;
  */
 public class CommentAdapter extends ParseQueryAdapter<Comment> {
 
-    String username_;
-    String comment_;
+    String mUsername;
+    String mComment;
 
     public CommentAdapter(Context c, final String eventObjectId) {
         super(c, new ParseQueryAdapter.QueryFactory<Comment>() {
@@ -26,8 +26,8 @@ public class CommentAdapter extends ParseQueryAdapter<Comment> {
             }
         });
 
-        username_ = "";
-        comment_ = "";
+        mUsername = "";
+        mComment = "";
 
     }
 

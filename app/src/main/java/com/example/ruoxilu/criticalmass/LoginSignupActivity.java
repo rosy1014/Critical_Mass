@@ -26,15 +26,16 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class LoginSignupActivity extends Activity {
 
     // Declare Variables
-    Button loginbutton;
-    Button signup;
-    String usernametxt;
-    String passwordtxt;
-    EditText password;
-    EditText username;
+    Button mLoginButton;
+    Button mSignup;
+    EditText mPasswordInput;
+    EditText mUsernameInput;
     TextView mAppName;
 
-    String fontPath = Settings.APP_NAME_FONT;
+    String mUsernameText;
+    String mPasswordText;
+
+    String mFontPath = Settings.APP_NAME_FONT;
 
     /**
      * Called when the activity is first created.
@@ -49,12 +50,12 @@ public class LoginSignupActivity extends Activity {
 
         mAppName = (TextView) findViewById(R.id.app_name);
 //        mAppName.setText("Set in Java!");
-        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+        Typeface tf = Typeface.createFromAsset(getAssets(), mFontPath);
         mAppName.setTypeface(tf);
 
         // Locate EditTexts in main.xml
-        username = (EditText) findViewById(R.id.username);
-        password = (EditText) findViewById(R.id.password);
+        mUsernameInput = (EditText) findViewById(R.id.username);
+        mPasswordInput = (EditText) findViewById(R.id.password);
 
         initViewParts();
 
@@ -62,7 +63,7 @@ public class LoginSignupActivity extends Activity {
         final Context loginSignupContext = this;
 
         // Login Button Click Listener
-        loginbutton.setOnClickListener(new OnClickListener() {
+        mLoginButton.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
 
@@ -74,7 +75,7 @@ public class LoginSignupActivity extends Activity {
 
 
         // Sign up Button Click Listener
-        signup.setOnClickListener(new OnClickListener() {
+        mSignup.setOnClickListener(new OnClickListener() {
 
             public void onClick(View arg0) {
 
@@ -90,22 +91,22 @@ public class LoginSignupActivity extends Activity {
 
     protected void initViewParts() {
         // Locate EditTexts in main.xml
-        username = (EditText) findViewById(R.id.username);
-        password = (EditText) findViewById(R.id.password);
+        mUsernameInput = (EditText) findViewById(R.id.username);
+        mPasswordInput = (EditText) findViewById(R.id.password);
 
         // Locate Buttons in main.xml
-        loginbutton = (Button) findViewById(R.id.login);
-        signup = (Button) findViewById(R.id.signup);
+        mLoginButton = (Button) findViewById(R.id.login);
+        mSignup = (Button) findViewById(R.id.signup);
     }
 
 
     protected void verifyLogin() {
         // Retrieve the text entered from the EditText
-        usernametxt = username.getText().toString();
-        passwordtxt = password.getText().toString();
+        mUsernameText = mUsernameInput.getText().toString();
+        mPasswordText = mPasswordInput.getText().toString();
 
         // Send data to Parse.com for verification
-        ParseUser.logInInBackground(usernametxt, passwordtxt,
+        ParseUser.logInInBackground(mUsernameText, mPasswordText,
                 new LogInCallback() {
                     public void done(ParseUser user, ParseException e) {
                         if (e == null) {
@@ -138,11 +139,11 @@ public class LoginSignupActivity extends Activity {
 
     protected void signup() {
         // Retrieve the text entered from the EditText
-        usernametxt = username.getText().toString();
-        passwordtxt = password.getText().toString();
+        mUsernameText = mUsernameInput.getText().toString();
+        mPasswordText = mPasswordInput.getText().toString();
 
         // Force user to fill up the form
-        if (usernametxt.equals("") && passwordtxt.equals("")) {
+        if (mUsernameText.equals("") && mPasswordText.equals("")) {
 
             new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
                     .setTitleText("Oops...")
@@ -152,8 +153,8 @@ public class LoginSignupActivity extends Activity {
         } else {
             // Save new user data into Parse.com Data Storage
             ParseUser user = new ParseUser();
-            user.setUsername(usernametxt);
-            user.setPassword(passwordtxt);
+            user.setUsername(mUsernameText);
+            user.setPassword(mPasswordText);
 
             user.signUpInBackground(new SignUpCallback() {
                 public void done(ParseException e) {

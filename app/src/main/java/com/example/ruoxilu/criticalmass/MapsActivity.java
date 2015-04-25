@@ -45,26 +45,23 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
-    public static MapsHandler mapsHandler;
+    public static MapsHandler mMapsHandler;
     // Made static so that other activity can access location.
     public static Location mCurrentLocation = Settings.getDefaultLocation();
     public static Location mLastLocation = Settings.getDefaultLocation();
 
     // Fields for helping process the map and location changes
-    protected static Map<String, Marker> mapMarkers = new HashMap<>(); // find marker based on Event ID
-    protected static Map<Marker, String> markerIDs = new HashMap<>(); // find Event ID associated with marker
-    protected static Map<Marker, String> markerNames = new HashMap<>();
+    protected static Map<String, Marker> mMapMarkers = new HashMap<>(); // find marker based on Event ID
+    protected static Map<Marker, String> mMarkerIDs = new HashMap<>(); // find Event ID associated with marker
+    protected static Map<Marker, String> mMarkerNames = new HashMap<>();
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-   // private LocationRequest mLocationRequest;
+    // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private String mEventID;
-    // Fields for the map radius in feet
-    private float radius;
-    private float lastRadius;
-    //  private String selectedPostObjectId;
-    private int mostRecentMapUpdate;
+
+    // private String selectedPostObjectId;
+    private int mMostRecentMapUpdate;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -74,14 +71,14 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      * Remove markers that are not in the Hashmap markersToKeep
      */
     public static void cleanUpMarkers(HashSet<String> markersToKeep) {
-        for (String objId : new HashSet<>(mapMarkers.keySet())) {
+        for (String objId : new HashSet<>(mMapMarkers.keySet())) {
             if (!markersToKeep.contains(objId)) {
-                Marker marker = mapMarkers.get(objId);
-                markerIDs.remove(marker);
+                Marker marker = mMapMarkers.get(objId);
+                mMarkerIDs.remove(marker);
                 marker.remove();
-                mapMarkers.get(objId).remove();
-                mapMarkers.remove(objId);
-                markerNames.remove(objId);
+                mMapMarkers.get(objId).remove();
+                mMapMarkers.remove(objId);
+                mMarkerNames.remove(objId);
             }
         }
     }
@@ -90,7 +87,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mapsHandler = new MapsHandler(this);
+        mMapsHandler = new MapsHandler(this);
 
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
@@ -142,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
-// TODO repeat the functionality of the dispatchActivity
+    // TODO repeat the functionality of the dispatchActivity
     protected void checkLoginStatus() {
 
         //(Xin)
@@ -220,15 +217,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        //if (mapsHandler.mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
-        //}
+        // Try to obtain the map from the SupportMapFragment.
+        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                .getMap();
+        // Check if we were successful in obtaining the map.
+        if (mMap != null) {
+            setUpMap();
+        }
     }
 
     /**
@@ -239,7 +234,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private void setUpMap() {
         mMap.setMyLocationEnabled(true);
         // Get LocationManager object from System Service LOCATION_SERVICE
-        mCurrentLocation = mapsHandler.initialMapLocation();
+        mCurrentLocation = mMapsHandler.initialMapLocation();
         updateZoom(mCurrentLocation);
 
         // Get longitude of the current location
@@ -247,11 +242,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         double latitude = mCurrentLocation.getLatitude();
         Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
         // Create a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude, longitude);
-        
-        // CHECKPOINT
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
+
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -370,7 +361,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      *  Query MassEvent and add map markers
      */
     private void doMapQuery() {
-        final int myUpdateNumber = ++mostRecentMapUpdate;
+        final int myUpdateNumber = ++mMostRecentMapUpdate;
 
 
         // 1
@@ -390,7 +381,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     Log.d(Settings.APPTAG, "An error occurred while querying for map posts.", e);
                     return;
                 }
-                if (myUpdateNumber != mostRecentMapUpdate) {
+                if (myUpdateNumber != mMostRecentMapUpdate) {
                     return;
                 }
                 // Handle the results
@@ -399,7 +390,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     // check if the event size exceeds the threshold, tentatively set to 0
                     if (mEvent.getEventSize() > 10) {
                         toKeep.add(mEvent.getObjectId());
-                        Marker oldMarker = mapMarkers.get(mEvent.getObjectId());
+                        Marker oldMarker = mMapMarkers.get(mEvent.getObjectId());
                         MarkerOptions markerOpts = MapsHandler.createMarkerOpt(mEvent);
 
                         if (mEvent.getLocation().distanceInKilometersTo(myPoint) > Settings.RADIUS * Settings.METERS_PER_FEET
@@ -430,10 +421,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                             }
                         }
                         Marker marker = mMap.addMarker(markerOpts);
-                        // update markerIDs hash map and mapMarkers hash map.
-                        markerIDs.put(marker, mEvent.getObjectId());
-                        mapMarkers.put(mEvent.getObjectId(), marker);
-                        markerNames.put(marker, mEvent.getLocationName());
+
+                        mMarkerIDs.put(marker, mEvent.getObjectId());
+                        mMapMarkers.put(mEvent.getObjectId(), marker);
+                        mMarkerNames.put(marker, mEvent.getLocationName());
                     }
                 }
                 cleanUpMarkers(toKeep);
@@ -515,11 +506,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if (markerIDs.containsKey(marker)) {
+        if (mMarkerIDs.containsKey(marker)) {
             Intent eventDetailIntent = new Intent();
             eventDetailIntent.setClass(getApplicationContext(), EventActivity.class);
-            String locationName = markerNames.get(marker);
-            String eventId = markerIDs.get(marker);
+            String locationName = mMarkerNames.get(marker);
+            String eventId = mMarkerIDs.get(marker);
             eventDetailIntent.putExtra("objectId", eventId);
             eventDetailIntent.putExtra("location", locationName);
             startActivity(eventDetailIntent);

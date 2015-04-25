@@ -5,7 +5,7 @@
     <string name="Username">Username</string>
     <string name="Password">Password</string>
     <string name="LoginBtn">Login</string>
-    <string name="SignupBtn">Sign Up</string>
+    <string name="signup_btn">Sign Up</string>
     <string name="LogoutBtn">Log Out</string>
     <string name="Welcome">Welcome!</string>
 
@@ -33,8 +33,6 @@
         </string>
 
     <string name="hint_enter_comment">Share your thoughts on this event!</string>
-
-    <string name="empty"></string>
 
     <string-array name="drawer_buttons">
         <item>List</item>

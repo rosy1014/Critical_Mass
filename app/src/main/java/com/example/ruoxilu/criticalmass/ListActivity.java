@@ -13,16 +13,12 @@ import android.widget.ListView;
 
 import com.parse.ParseGeoPoint;
 
-import java.util.List;
-
 /**
  * Created by tingyu on 2/23/15.
  * The ListActivity class displays a list of masses nearby. ListActivity fetches data from parse
  * through the ParseQueryAdapter and bind it to the ListView.
  */
 public class ListActivity extends Activity {
-
-    List<MassEvent> mParseObjects;
 
     private EventListAdapter mEventListAdapter;
     private SwipeRefreshLayout mScrollList;

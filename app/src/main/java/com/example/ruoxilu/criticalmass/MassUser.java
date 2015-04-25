@@ -13,7 +13,7 @@ import com.parse.ParseUser;
 public class MassUser extends ParseObject {
 
     public MassUser() {
-
+        // Nothing to do
     }
 
     public static ParseQuery<MassUser> getQuery() {
