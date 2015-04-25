@@ -167,10 +167,42 @@ public class ParseHandler {
                                             massUser.saveInBackground();
                                         }
                                     });
+                                } else {
+                                    Log.d(Settings.APPTAG, e.getMessage() + "testing for onconnect, query3 callback");
                                 }
                             }
                         });
                     }
+                } else {
+
+                    // finding objects in "event" near the point given and within the maximum distance given.
+                    query2.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
+
+                    // Since the user can only be in one event at a time, use getFirstInBackground
+                    query2.getFirstInBackground(new GetCallback<MassEvent>() {
+                        @Override
+                        public void done(final MassEvent massEvent, ParseException e) {
+                            if (e == null) {
+                                Log.i(Settings.APPTAG, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
+                                int size = massEvent.getEventSize();
+                                size = size + 1;
+                                massEvent.setEventSize(size);
+                                massEvent.saveInBackground();
+                                ParseQuery<MassUser> query3 = MassUser.getQuery();
+                                query3.whereEqualTo("user", mMassUser.getUser());
+                                query3.getFirstInBackground(new GetCallback<MassUser>() {
+                                    @Override
+                                    public void done(MassUser massUser, ParseException e) {
+                                        massUser.setEvent(massEvent);
+                                        massUser.saveInBackground();
+                                    }
+                                });
+                            } else {
+                                Log.d(Settings.APPTAG, e.getMessage() + "testing for onconnect, query3 callback");
+                            }
+                        }
+                    });
+
                 }
             }
         });
