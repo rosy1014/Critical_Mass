@@ -4,7 +4,6 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -23,10 +22,13 @@ public class MapsHandler {
         this.mContext = context;
     }
 
+    /**
+     * Initialize the location request
+     */
     public static void initLocationRequest() {
         // Create a new global location parameters object
         mLocationRequest = LocationRequest.create();
-        Log.i(Settings.APPTAG, "LOCATION REQUEST CREATED");
+
         // Set the update interval
         mLocationRequest.setInterval(Settings.UPDATE_INTERVAL_IN_MILLISECONDS);
 
@@ -36,6 +38,9 @@ public class MapsHandler {
 
     }
 
+    /**
+     * Get the initial location
+     */
     public Location initialMapLocation(){
         LocationManager mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
@@ -57,19 +62,18 @@ public class MapsHandler {
     /*
      * Create map markers based on location and size
      * Size Criterion:
-     *      10-20:
-     *      20-50:
-     *      50-100:
-     *      100-500:
-     *      >500:
+     *      10-20: marker2
+     *      20-50: marker3
+     *      50-100: marker4
+     *      100-500: marker5
+     *      >500: marker6
      */
-    // SIGN_MARKER_OBJECT
     public static MarkerOptions createMarkerOpt(MassEvent mEvent) {
 
         int size = mEvent.getEventSize();
         MarkerOptions markerOpt;
 
-        if (size < Settings.POPSIZE2) {
+        if (size < Settings.POPSIZE2 && size > Settings.POPSIZE1) {
             markerOpt = setMarkerOpt(mEvent);
             markerOpt.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2));
         } else if (size < Settings.POPSIZE3) {
@@ -91,6 +95,9 @@ public class MapsHandler {
     }
 
 
+    /**
+     * Helper functions for creating marker options for given event
+     */
     private static MarkerOptions setMarkerOpt(MassEvent mEvent) {
         return new MarkerOptions().position(
                 new LatLng(mEvent.getLocation().getLatitude(), mEvent
