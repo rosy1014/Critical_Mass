@@ -69,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(Settings.APPTAG, "onCreate");
+
         super.onCreate(savedInstanceState);
         mMapsHandler = new MapsHandler(this);
 
@@ -167,7 +167,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
             // Get longitude of the current location
             double longitude = mCurrentLocation.getLongitude();
-            Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
+
             // Create a LatLng object for the current location
             LatLng latLng = new LatLng(latitude, longitude);
 
@@ -214,12 +214,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         mCurrentLocation = mMapsHandler.initialMapLocation();
         updateZoom(mCurrentLocation);
 
-        // Get longitude of the current location
-        double longitude = mCurrentLocation.getLongitude();
-        double latitude = mCurrentLocation.getLatitude();
-        Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
-        // Create a LatLng object for the current location
-
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -239,8 +233,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         setUpMapIfNeeded();
 
         mCurrentLocation = getLocation();
-
-        Log.d(Settings.APPTAG, "onConnected " + "lat: " + mCurrentLocation.getLatitude() + "lng: " + mCurrentLocation.getLongitude());
 
         if (mCurrentLocation == null) {
             mCurrentLocation = Settings.getDefaultLocation();
