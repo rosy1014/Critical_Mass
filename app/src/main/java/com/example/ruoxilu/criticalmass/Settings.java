@@ -30,7 +30,7 @@ public class Settings {
 
 
     public static final String APPTAG = "CriticalMass";
-
+    public static final String PARSEHANDLER = "ParseHandler";
     /* Constants for population level */
     public static final int POPSIZE1 = 10;
     public static final int POPSIZE2 = 20;

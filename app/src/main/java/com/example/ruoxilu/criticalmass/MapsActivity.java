@@ -54,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected static Map<String, Marker> mMapMarkers = new HashMap<>(); // find marker based on Event ID
     protected static Map<Marker, String> mMarkerIDs = new HashMap<>(); // find Event ID associated with marker
     protected static Map<Marker, String> mMarkerNames = new HashMap<>();
-    protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
+    protected MassUser mMassUser = Application.mMassUser;  // Each user (i.e. application) only has one MassUser object.
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     // private LocationRequest mLocationRequest;
@@ -268,10 +268,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         if (mCurrentLocation == null) {
             mCurrentLocation = Settings.getDefaultLocation();
         }
-
-        if (mMassUser == null) {
-            mMassUser = ParseHandler.getDefaultMassUser();
-        }
+//
+//        if (mMassUser == null) {
+//            Log.d(Settings.APPTAG,"in Maps Activity, mMassUser is null");
+////            mMassUser = ParseHandler.getDefaultMassUser();
+//        }
 
         // 20150425
         mMassUser.setLocation(geoPointFromLocation(mCurrentLocation));

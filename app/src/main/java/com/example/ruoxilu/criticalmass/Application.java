@@ -16,7 +16,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class Application extends android.app.Application {
 
-
+    public static MassUser mMassUser;
     // Return true if network is connected.
     public static boolean networkConnected(Context c) {
         ConnectivityManager conManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -69,7 +69,7 @@ public class Application extends android.app.Application {
         ParseUser.enableAutomaticUser();
         Log.d("CriticalMassApplication", "On start the currentuser is " + ParseUser.getCurrentUser());
         ParseUser.getCurrentUser().saveInBackground();
-
+        mMassUser = ParseHandler.getDefaultMassUser();
         setParseACL();
     }
 
