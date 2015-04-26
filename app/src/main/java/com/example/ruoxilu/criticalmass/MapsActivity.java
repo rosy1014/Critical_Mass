@@ -99,7 +99,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     /**
      * Handles clicks on the drawer view
-     * @param position
      */
     private void selectItem(int position) {
         // update the main content by replacing fragments
@@ -354,10 +353,10 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                         Marker oldMarker = mMapMarkers.get(mEvent.getObjectId());
                         MarkerOptions markerOpts = MapsHandler.createMarkerOpt(mEvent);
 
+                        // Set up an out-of-range marker
+                        // Check for an existing out of range marker
                         if (mEvent.getLocation().distanceInKilometersTo(myPoint) > Settings.RADIUS * Settings.METERS_PER_FEET
                                 / Settings.METERS_PER_KILOMETER) {
-                            // Set up an out-of-range marker
-                            // Check for an existing out of range marker
                             if (oldMarker != null) {
                                 if (oldMarker.getSnippet() == null) {
                                     // Out of range marker already exists, skip adding it
@@ -366,18 +365,17 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                                     // Marker now out of range, needs to be refreshed
                                     oldMarker.remove();
                                 }
-                            }
-
-                        } else {
-                            // Set up an in-range marker
-                            // Check for an existing in range marker
-                            if (oldMarker != null) {
-                                if (oldMarker.getSnippet() != null) {
-                                    // In range marker already exists, skip adding it
-                                    continue;
-                                } else {
-                                    // Marker now in range, needs to be refreshed
-                                    oldMarker.remove();
+                            } else {
+                                // Set up an in-range marker
+                                // Check for an existing in range marker
+                                if (oldMarker != null) {
+                                    if (oldMarker.getSnippet() != null) {
+                                        // In range marker already exists, skip adding it
+                                        continue;
+                                    } else {
+                                        // Marker now in range, needs to be refreshed
+                                        oldMarker.remove();
+                                    }
                                 }
                             }
                         }
@@ -490,7 +488,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     /**
      * Clicking on the info window of a marker directs to event activty.
-     * @param marker
      */
     @Override
     public void onInfoWindowClick(Marker marker) {
@@ -507,7 +504,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     /**
      * Click Marker shows the info window
-     * @param marker
      * @return true for the window to persist
      */
     @Override
