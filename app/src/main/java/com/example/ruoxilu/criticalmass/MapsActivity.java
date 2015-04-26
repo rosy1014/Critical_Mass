@@ -75,7 +75,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
-
+        if(mMassUser != null){
+            ParseHandler.checkMassUser(mMassUser);
+        } else{
+            mMassUser = ParseHandler.getDefaultMassUser();
+        }
         setContentView(R.layout.activity_maps);
 
         mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);

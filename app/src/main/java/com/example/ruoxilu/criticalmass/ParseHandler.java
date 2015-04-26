@@ -67,12 +67,7 @@ public class ParseHandler {
         MassUser massUser = new MassUser();
         massUser.setUser(ParseUser.getCurrentUser());
         massUser.setLocation(geoPointFromLocation(Settings.getDefaultLocation()));
-        massUser.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                Log.d(Settings.APPTAG, "in save in background for getdefault mass user, error is: " + e);
-            }
-        });
+        massUser.saveInBackground();
         return massUser;
 
     }
@@ -240,6 +235,22 @@ public class ParseHandler {
 
         }
 
+    }
+
+    /**
+     * Check whether
+     * @param user
+     */
+    public static void checkMassUser(final MassUser user){
+        ParseQuery<MassUser> query = MassUser.getQuery();
+        query.getInBackground(user.getObjectId(),new GetCallback<MassUser>() {
+            @Override
+            public void done(MassUser massUser, ParseException e) {
+                if(e.getCode() == ParseException.OBJECT_NOT_FOUND){
+                    user.saveInBackground();
+                }
+            }
+        });
     }
 
 

@@ -69,7 +69,6 @@ public class Application extends android.app.Application {
         ParseUser.enableAutomaticUser();
         Log.d("CriticalMassApplication", "On start the currentuser is " + ParseUser.getCurrentUser());
         ParseUser.getCurrentUser().saveInBackground();
-        mMassUser = ParseHandler.getDefaultMassUser();
         setParseACL();
     }
 
