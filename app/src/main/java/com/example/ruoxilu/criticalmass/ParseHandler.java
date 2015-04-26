@@ -18,10 +18,12 @@ import com.parse.SaveCallback;
 public class ParseHandler {
 
     public static void deleteMassUser(MassUser user){
-        ParseQuery<MassUser> query = MassUser.getQuery();
+        ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
+        ParseQuery<MassEvent> massEventQuery = MassEvent.getQuery();
         final String objId = user.getObjectId();
+        final String eventId = user.getEvent();
 
-        query.getInBackground(objId, new GetCallback<MassUser>() {
+        massUserQuery.getInBackground(objId, new GetCallback<MassUser>() {
             @Override
             public void done(MassUser massUser, ParseException e) {
                 if (e == null) {
@@ -40,6 +42,20 @@ public class ParseHandler {
                 }
             }
         });
+        if(eventId != null){
+            massEventQuery.getInBackground(eventId, new GetCallback<MassEvent>() {
+                @Override
+                public void done(MassEvent massEvent, ParseException e) {
+                    Log.d(Settings.PARSEHANDLER, "in get in background mass event, error is: " + e);
+                    if(e == null){
+                        int size = massEvent.getEventSize();
+                        size = size - 1;
+                        massEvent.setEventSize(size);
+                        massEvent.saveInBackground();
+                    }
+                }
+            });
+        }
     }
 
 
