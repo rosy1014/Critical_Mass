@@ -127,15 +127,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             Intent i = new Intent(MapsActivity.this, ListActivity.class);
             startActivityForResult(i, 0);
 
-
-//            android.support.v4.app.Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list_fragment);
-//            Bundle args = new Bundle();
-//            args.putInt(EventListFragment.ARG_MENU_OPTION, position);
-//            fragment.setArguments(args);
-//
-//            FragmentManager fragmentManager = getFragmentManager();
-//            fragmentManager.beginTransaction().replace(R.id.map, fragment).commit();
-
             // update selected item and title, then close the drawer
             mDrawerList.setItemChecked(position, true);
             mDrawerLayout.closeDrawer(mDrawerList);
@@ -167,10 +158,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
-    /*
+    /**
      * Helper function for onCreate
      * Initialize the Goolge Api Client for maps activity
-     * TODO refactor to MapHandler
      */
     protected void initGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -178,7 +168,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-//        Log.i(Settings.APPTAG, "GOOGLE API CLIENT CREATED");
     }
 
     @Override
@@ -220,15 +209,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        //if (mapsHandler.mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
+        // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
             }
-        //}
     }
 
     /**
@@ -241,17 +228,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Get LocationManager object from System Service LOCATION_SERVICE
         mCurrentLocation = mapsHandler.initialMapLocation();
         updateZoom(mCurrentLocation);
-
-        // Get longitude of the current location
-        double longitude = mCurrentLocation.getLongitude();
-        double latitude = mCurrentLocation.getLatitude();
-        Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
-        // Create a LatLng object for the current location
-        LatLng latLng = new LatLng(latitude, longitude);
         
         // CHECKPOINT
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.ZOOM_LEVEL));
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -450,7 +428,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     }
 
-    // SIGN_BACKGROUND_SERVICE
     private boolean servicesConnected() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
