@@ -57,13 +57,9 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     protected MassUser mMassUser;  // Each user (i.e. application) only has one MassUser object.
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-   // private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private String mEventID;
-    // Fields for the map radius in feet
-    private float radius;
-    private float lastRadius;
-    //  private String selectedPostObjectId;
+
     private int mostRecentMapUpdate;
 
     private DrawerLayout mDrawerLayout;
@@ -71,7 +67,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private String[] mDrawerButtons;
 
     /*
-     * Remove markers that are not in the Hashmap markersToKeep
+     * Remove markers that are not in the HashSet markersToKeep
      */
     public static void cleanUpMarkers(HashSet<String> markersToKeep) {
         for (String objId : new HashSet<>(mapMarkers.keySet())) {
@@ -88,7 +84,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(Settings.APPTAG, "onCreate");
         super.onCreate(savedInstanceState);
         mapsHandler = new MapsHandler(this);
 
@@ -133,10 +128,8 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         }
     }
 
-// TODO repeat the functionality of the dispatchActivity
-    protected void checkLoginStatus() {
 
-        //(Xin)
+    protected void checkLoginStatus() {
         // determine whether the current user is an anonymous user and
         // if the user has previously signed up and logged into the application
         if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
@@ -181,7 +174,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
             // Get longitude of the current location
             double longitude = mCurrentLocation.getLongitude();
-            Log.i(Settings.APPTAG, "my LatLng is " + latitude + ", " + longitude);
             // Create a LatLng object for the current location
             LatLng latLng = new LatLng(latitude, longitude);
 
@@ -257,7 +249,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mMassUser = ParseHandler.getDefaultMassUser();
         }
 
-        //starterPeriodicLocationUpdates();// connect googleFused api services
         ParseHandler.updateUserLocation(mMassUser.getLocation(), mMassUser);
 
 
@@ -340,8 +331,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
      */
     private void doMapQuery() {
         final int myUpdateNumber = ++mostRecentMapUpdate;
-
-
         // 1
         Location myLoc = (mCurrentLocation == null) ? mLastLocation : mCurrentLocation;
         if (myLoc == null) {
@@ -406,7 +395,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                     }
                 }
                 cleanUpMarkers(toKeep);
-                Log.d(Settings.APPTAG, "After clean up markers");
             }
         });
     }
