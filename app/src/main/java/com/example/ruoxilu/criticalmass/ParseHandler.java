@@ -77,8 +77,6 @@ public class ParseHandler {
                                 massUser.setLocation(geoPointValue);
                                 massUser.saveInBackground();
                             }
-
-                            Log.d(Settings.APPTAG, "updated mass user location ", e);
                         }
                     });
                 } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
@@ -109,7 +107,6 @@ public class ParseHandler {
         query1.getFirstInBackground(new GetCallback<MassEvent>() {
             @Override
             public void done(MassEvent massEvent, ParseException e) {
-                Log.i(Settings.APPTAG, "Done with getFirstInBackground loc " + e);
                 // the event ID is found
                 if (e == null) {
                     // check if the user is still within the event radius
