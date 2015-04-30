@@ -122,15 +122,13 @@ public class ParseHandler {
                             if (e == null) {
                                 massUser.setEvent(massEvent);
                                 massUser.saveInBackground();
-                                Log.d(Settings.PARSEHANDLER, "after save in query 2");
+
                             } else {
                                 mMassUser.saveInBackground();
                             }
 
                         }
                     });
-                } else {
-                    Log.d(Settings.PARSEHANDLER, e.getMessage() + "testing for onconnect, query3 callback");
                 }
             }
         });
