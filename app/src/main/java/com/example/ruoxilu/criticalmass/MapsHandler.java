@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -28,7 +29,6 @@ public class MapsHandler {
     public static void initLocationRequest() {
         // Create a new global location parameters object
         mLocationRequest = LocationRequest.create();
-
         // Set the update interval
         mLocationRequest.setInterval(Settings.UPDATE_INTERVAL_IN_MILLISECONDS);
 
@@ -68,6 +68,7 @@ public class MapsHandler {
      *      100-500: marker5
      *      >500: marker6
      */
+    // SIGN_MARKER_OBJECT
     public static MarkerOptions createMarkerOpt(MassEvent mEvent) {
 
         int size = mEvent.getEventSize();

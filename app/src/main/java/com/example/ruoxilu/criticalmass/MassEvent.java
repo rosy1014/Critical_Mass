@@ -45,5 +45,4 @@ public class MassEvent extends ParseObject {
         return getParseFile("image");
     }
 
-
 }

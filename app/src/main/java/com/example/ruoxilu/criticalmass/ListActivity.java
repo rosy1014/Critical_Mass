@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -61,8 +60,6 @@ public class ListActivity extends Activity {
                             String eventId = event.getObjectId();
                             eventDetailIntent.putExtra("objectId", eventId);
                             eventDetailIntent.putExtra("location", locationName);
-
-                            Log.d(Settings.APPTAG, "event object id is " + id);
 
                             startActivity(eventDetailIntent);
                         }
