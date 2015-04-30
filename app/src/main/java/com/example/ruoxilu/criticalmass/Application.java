@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -67,7 +66,6 @@ public class Application extends android.app.Application {
 
         Parse.initialize(this, "ADIzf9tA1P4KQFL1AyyAKoCjLKhgaCmaZTmp96CL", "PcefekoiDoE3uR2yUd932HRbPPqrEGJyaE61aPVF");
         ParseUser.enableAutomaticUser();
-        Log.d("CriticalMassApplication", "On start the currentuser is " + ParseUser.getCurrentUser());
         ParseUser.getCurrentUser().saveInBackground();
 
         setParseACL();
@@ -87,10 +85,6 @@ public class Application extends android.app.Application {
         ParseACL postACL = new ParseACL(ParseUser.getCurrentUser());
         postACL.setPublicReadAccess(true);
         postACL.setPublicWriteAccess(true);
-
-        Log.d("CriticalMassApplication", " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getObjectId());
-        Log.d("CriticalMassApplication", " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getCreatedAt());
-        Log.d("CriticalMassApplication", " In anonymousUserLogin, ParseUser is null?" + ParseUser.getCurrentUser().getUsername());
 
     }
 
