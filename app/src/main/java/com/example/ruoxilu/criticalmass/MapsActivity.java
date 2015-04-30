@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -40,7 +40,7 @@ import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class MapsActivity extends FragmentActivity implements LocationListener,
+public class MapsActivity extends ActionBarActivity implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
@@ -68,6 +68,19 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private ListView mDrawerList;
     private String[] mDrawerButtons;
 
+    public static void cleanUpMarkers(HashSet<String> markersToKeep) {
+        for (String objId : new HashSet<>(mMapMarkers.keySet())) {
+            if (!markersToKeep.contains(objId)) {
+                Marker marker = mMapMarkers.get(objId);
+                mMarkerIDs.remove(marker);
+                marker.remove();
+                mMapMarkers.get(objId).remove();
+                mMapMarkers.remove(objId);
+                mMarkerNames.remove(objId);
+            }
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,13 +89,13 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
 
         MapsHandler.initLocationRequest(); // Helper function to initiate location request
         initGoogleApiClient(); // Helper function to initiate Google Api Client to "listen to" location change
-        
-        if(mMassUser != null){
+
+        if (mMassUser != null) {
             ParseHandler.checkMassUser(mMassUser);
-        } else{
+        } else {
             mMassUser = ParseHandler.getDefaultMassUser();
         }
-        
+
         setContentView(R.layout.activity_maps);
 
         mDrawerButtons = getResources().getStringArray(R.array.drawer_buttons);
@@ -120,7 +133,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
             mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
-
 
     protected void checkLoginStatus() {
         // determine whether the current user is an anonymous user and
@@ -195,11 +207,11 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
+        mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                .getMap();
+        // Check if we were successful in obtaining the map.
+        if (mMap != null) {
+            setUpMap();
             }
     }
 
@@ -212,7 +224,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // Get LocationManager object from System Service LOCATION_SERVICE
         mCurrentLocation = mMapsHandler.initialMapLocation();
         updateZoom(mCurrentLocation);
-        
+
         mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -247,7 +259,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
         // update MassEvent
         ParseHandler.updateUserEvent(ParseHandler.geoPointFromLocation(mCurrentLocation), mMassUser);
     }
-
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -285,7 +296,7 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
     private ParseGeoPoint geoPointFromLocation(Location location) {
         return new ParseGeoPoint(location.getLatitude(), location.getLongitude());
     }
-    
+
     /*
      * private helper functions
      */
@@ -390,20 +401,6 @@ public class MapsActivity extends FragmentActivity implements LocationListener,
                 cleanUpMarkers(toKeep);
             }
         });
-    }
-
-    public static void cleanUpMarkers(HashSet<String> markersToKeep) {
-        for (String objId : new HashSet<>(mMapMarkers.keySet())) {
-            if (!markersToKeep.contains(objId)) {
-                Marker marker = mMapMarkers.get(objId);
-                mMarkerIDs.remove(marker);
-                marker.remove();
-                mMapMarkers.get(objId).remove();
-                mMapMarkers.remove(objId);
-                mMarkerNames.remove(objId);
-            }
-        }
-
     }
 
     private boolean servicesConnected() {
