@@ -66,7 +66,7 @@ public class MapsHandler {
         int size = mEvent.getEventSize();
         MarkerOptions markerOpt;
 
-        if (size < Settings.POPSIZE2) {
+        if (size < Settings.POPSIZE2 && size > Settings.POPSIZE1) {
             markerOpt = setMarkerOpt(mEvent);
             markerOpt.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2));
         } else if (size < Settings.POPSIZE3) {
