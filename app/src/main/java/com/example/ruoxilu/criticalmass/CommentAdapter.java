@@ -1,6 +1,7 @@
 package com.example.ruoxilu.criticalmass;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -44,13 +45,19 @@ public class CommentAdapter extends ParseQueryAdapter<Comment> {
 
         TextView usernameText = (TextView) v.findViewById(R.id.comment_username);
         if (comment.getUserName() == null) {
-            usernameText.setText("Anon: ");
+            usernameText.setText("Nobody: ");
         } else {
             usernameText.setText(comment.getUserName() + ": ");
         }
+
         TextView commentText = (TextView) v
                 .findViewById(R.id.comment_content);
         commentText.setText(comment.getUserComment());
+
+        TextView timeText = (TextView) v.findViewById(R.id.comment_time);
+        timeText.setText(comment.getUpdateTime());
+        Log.d(Settings.APPTAG, "getUpdateTime returns " + comment.getUpdateTime());
+
         return v;
 
     }

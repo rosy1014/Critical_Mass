@@ -46,5 +46,9 @@ public class Comment extends ParseObject {
         put("UserId", userId);
     }
 
+    public String getUpdateTime() {
+        return getUpdatedAt().toString();
+    }
+
 
 }

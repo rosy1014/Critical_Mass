@@ -52,4 +52,5 @@ public class MassUser extends ParseObject {
     public void setLocation(ParseGeoPoint value) {
         put("location", value);
     }
+
 }

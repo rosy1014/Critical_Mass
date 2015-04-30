@@ -109,7 +109,7 @@ public class ParseHandler {
 
     // helper function to update the user's event by event type data
     // pass in the current location
-    public static void updateUserEvent(ParseGeoPoint value, MassUser mMassUser) {
+    public static void updateUserEvent(ParseGeoPoint value, final MassUser mMassUser) {
         // Find by ID the user's last event
         String EventId = mMassUser.getEvent();
 
@@ -118,122 +118,165 @@ public class ParseHandler {
         // the user current location
         final ParseGeoPoint currentLocation = value;
 
-        //This is the first query to validate the user's last event
-        ParseQuery<MassEvent> eventQuery= MassEvent.getQuery();
 
-        // check if the user's old event exists
+        ParseQuery newEventQuery = MassEvent.getQuery();
 
-        Log.i(Settings.PARSEHANDLER, "Mass Event in updateUserEvent is " + EventId);
+        // finding objects in "event" near the point given and within the maximum distance given.
+        newEventQuery.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
 
-        // The user was previously in a Mass Event, update the size of the event first,
-        // then check if the user has moved to a new mass event.
-        if(EventId != null){
-            eventQuery.getInBackground(EventId, new GetCallback<MassEvent>() {
-                @Override
-                public void done(MassEvent massEvent, ParseException e) {
-                    Log.i(Settings.PARSEHANDLER, "Done with getFirstInBackground loc " + e);
-                    // the event ID is found
-                    if (e == null) {
-                        Log.i(Settings.PARSEHANDLER, "massevent in updateUserLocation after query is " + massEvent.getObjectId());
-                        // check if the user is still within the event radius
-                        double distance = currentLocation
-                                .distanceInKilometersTo(massEvent.getLocation());
-                        // the user is no longer inside the old event
-                        if (distance > Settings.RADIUS) {
-                            // decrement the old event size as the user is no longer there
-                            int size = massEvent.getEventSize();
-                            size = size - 1;
-                            Log.d(Settings.PARSEHANDLER, "decrement event size");
-                            massEvent.setEventSize(size);
-                            massEvent.saveInBackground();
+        // Since the user can only be in one event at a time, use getFirstInBackground
+        newEventQuery.getFirstInBackground(new GetCallback<MassEvent>() {
+            @Override
+            public void done(final MassEvent massEvent, ParseException e) {
+                if (e == null) {
+//                    Log.i(Settings.PARSEHANDLER, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
+//                    int size = massEvent.getEventSize();
+//                    size = size + 1;
+//                    massEvent.setEventSize(size);
+//                    massEvent.saveInBackground();
+//                    mMassUser.setEvent(massEvent);
+//                    mMassUser.saveInBackground();
 
-                            ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
-                            massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
-                                @Override
-                                public void done(MassUser massUser, ParseException e) {
+                    ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
+                    massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
+                        @Override
+                        public void done(MassUser massUser, ParseException e) {
 
-                                    Log.d(Settings.PARSEHANDLER, "in UpdateUserEvent done " + e.getMessage());
-                                    if (e == null) {
-                                        massUser.setEvent(null);
-                                        massUser.saveInBackground();
-                                    } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
-                                        massUser.saveInBackground();
-                                    }
-                                }
-                            });
-
-                            ParseQuery newEventQuery = MassEvent.getQuery();
-
-                            // finding objects in "event" near the point given and within the maximum distance given.
-                            newEventQuery.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
-
-                            // Since the user can only be in one event at a time, use getFirstInBackground
-                            newEventQuery.getFirstInBackground(new GetCallback<MassEvent>() {
-                                @Override
-                                public void done(final MassEvent massEvent, ParseException e) {
-                                    if (e == null) {
-                                        Log.i(Settings.PARSEHANDLER, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
-                                        int size = massEvent.getEventSize();
-                                        size = size + 1;
-                                        massEvent.setEventSize(size);
-                                        massEvent.saveInBackground();
-                                        ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
-                                        massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
-                                            @Override
-                                            public void done(MassUser massUser, ParseException e) {
-                                                massUser.setEvent(massEvent);
-                                                massUser.saveInBackground();
-                                                Log.d(Settings.PARSEHANDLER, "after save in query 2");
-                                            }
-                                        });
-                                    } else {
-                                        Log.d(Settings.PARSEHANDLER, e.getMessage() + "testing for onconnect, query3 callback");
-                                    }
-                                }
-                            });
-                        }
-                    } else {
-
-                    }
-                }
-            });
-        } else {
-            // The user was not in a Mass Event, go ahead and check if the user is now
-            // in a Mass Event
-            ParseQuery newEventQuery = MassEvent.getQuery();
-
-            // finding objects in "event" near the point given and within the maximum distance given.
-            newEventQuery.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
-
-            // Since the user can only be in one event at a time, use getFirstInBackground
-            newEventQuery.getFirstInBackground(new GetCallback<MassEvent>() {
-                @Override
-                public void done(final MassEvent massEvent, ParseException e) {
-                    if (e == null) {
-                        Log.i(Settings.PARSEHANDLER, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
-                        int size = massEvent.getEventSize();
-                        size = size + 1;
-                        massEvent.setEventSize(size);
-                        massEvent.saveInBackground();
-                        ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
-                        massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
-                            @Override
-                            public void done(MassUser massUser, ParseException e) {
-                                Log.d(Settings.PARSEHANDLER, "after save in query 2," + e);
-                                if(e == null){
-                                    massUser.setEvent(massEvent);
-                                    massUser.saveInBackground();
-                                    Log.d(Settings.PARSEHANDLER, "after save in query 2");
-                                }
+                            if (e == null) {
+                                massUser.setEvent(massEvent);
+                                massUser.saveInBackground();
+                                Log.d(Settings.PARSEHANDLER, "after save in query 2");
+                            } else {
+                                mMassUser.saveInBackground();
                             }
-                        });
-                    } else {
-                        Log.d(Settings.PARSEHANDLER, e.getMessage() + "testing for onconnect, query3 callback");
-                    }
-                }
-            });
 
-        }
+                        }
+                    });
+                } else {
+                    Log.d(Settings.PARSEHANDLER, e.getMessage() + "testing for onconnect, query3 callback");
+                }
+            }
+        });
+
+
+//
+//
+//        //This is the first query to validate the user's last event
+//        ParseQuery<MassEvent> eventQuery= MassEvent.getQuery();
+//
+//        // check if the user's old event exists
+//
+//        Log.i(Settings.PARSEHANDLER, "Mass Event in updateUserEvent is " + EventId);
+//
+//        // The user was previously in a Mass Event, update the size of the event first,
+//        // then check if the user has moved to a new mass event.
+//        if(EventId != null){
+//            eventQuery.getInBackground(EventId, new GetCallback<MassEvent>() {
+//                @Override
+//                public void done(MassEvent massEvent, ParseException e) {
+//                    Log.i(Settings.PARSEHANDLER, "Done with getFirstInBackground loc " + e);
+//                    // the event ID is found
+//                    if (e == null) {
+//                        Log.i(Settings.PARSEHANDLER, "massevent in updateUserLocation after query is " + massEvent.getObjectId());
+//                        // check if the user is still within the event radius
+//                        double distance = currentLocation
+//                                .distanceInKilometersTo(massEvent.getLocation());
+//                        // the user is no longer inside the old event
+//                        if (distance > Settings.RADIUS) {
+//                            // decrement the old event size as the user is no longer there
+//                            int size = massEvent.getEventSize();
+//                            size = size - 1;
+//                            Log.d(Settings.PARSEHANDLER, "decrement event size");
+//                            massEvent.setEventSize(size);
+//                            massEvent.saveInBackground();
+//
+//                            ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
+//                            massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
+//                                @Override
+//                                public void done(MassUser massUser, ParseException e) {
+//
+//                                    Log.d(Settings.PARSEHANDLER, "in UpdateUserEvent done " + e.getMessage());
+//                                    if (e == null) {
+//                                        massUser.setEvent(null);
+//                                        massUser.saveInBackground();
+//                                    } else if (e.getCode() == ParseException.OBJECT_NOT_FOUND) {
+//                                        massUser.saveInBackground();
+//                                    }
+//                                }
+//                            });
+//
+//                            ParseQuery newEventQuery = MassEvent.getQuery();
+//
+//                            // finding objects in "event" near the point given and within the maximum distance given.
+//                            newEventQuery.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
+//
+//                            // Since the user can only be in one event at a time, use getFirstInBackground
+//                            newEventQuery.getFirstInBackground(new GetCallback<MassEvent>() {
+//                                @Override
+//                                public void done(final MassEvent massEvent, ParseException e) {
+//                                    if (e == null) {
+//                                        Log.i(Settings.PARSEHANDLER, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
+//                                        int size = massEvent.getEventSize();
+//                                        size = size + 1;
+//                                        massEvent.setEventSize(size);
+//                                        massEvent.saveInBackground();
+//                                        ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
+//                                        massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
+//                                            @Override
+//                                            public void done(MassUser massUser, ParseException e) {
+//                                                massUser.setEvent(massEvent);
+//                                                massUser.saveInBackground();
+//                                                Log.d(Settings.PARSEHANDLER, "after save in query 2");
+//                                            }
+//                                        });
+//                                    } else {
+//                                        Log.d(Settings.PARSEHANDLER, e.getMessage() + "testing for onconnect, query3 callback");
+//                                    }
+//                                }
+//                            });
+//                        }
+//                    } else {
+//
+//                    }
+//                }
+//            });
+//        } else {
+//            // The user was not in a Mass Event, go ahead and check if the user is now
+//            // in a Mass Event
+//            ParseQuery newEventQuery = MassEvent.getQuery();
+//
+//            // finding objects in "event" near the point given and within the maximum distance given.
+//            newEventQuery.whereWithinKilometers("location", currentLocation, Settings.RADIUS);
+//
+//            // Since the user can only be in one event at a time, use getFirstInBackground
+//            newEventQuery.getFirstInBackground(new GetCallback<MassEvent>() {
+//                @Override
+//                public void done(final MassEvent massEvent, ParseException e) {
+//                    if (e == null) {
+//                        Log.i(Settings.PARSEHANDLER, "the current massevent is " + massEvent.getObjectId() + "testing for onconnect");
+//                        int size = massEvent.getEventSize();
+//                        size = size + 1;
+//                        massEvent.setEventSize(size);
+//                        massEvent.saveInBackground();
+//                        ParseQuery<MassUser> massUserQuery = MassUser.getQuery();
+//                        massUserQuery.getInBackground(massUserId, new GetCallback<MassUser>() {
+//                            @Override
+//                            public void done(MassUser massUser, ParseException e) {
+//                                Log.d(Settings.PARSEHANDLER, "after save in query 2," + e);
+//                                if(e == null){
+//                                    massUser.setEvent(massEvent);
+//                                    massUser.saveInBackground();
+//                                    Log.d(Settings.PARSEHANDLER, "after save in query 2");
+//                                }
+//                            }
+//                        });
+//                    } else {
+//                        Log.d(Settings.PARSEHANDLER, e.getMessage() + "testing for onconnect, query3 callback");
+//                    }
+//                }
+//            });
+//
+//        }
 
     }
 
