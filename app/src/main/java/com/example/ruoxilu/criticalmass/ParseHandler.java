@@ -106,16 +106,12 @@ public class ParseHandler {
         // check if the user's old event exists
         query1.whereEqualTo("event", mEventID);
 
-        Log.i(Settings.APPTAG, "Mass User in updateUserEvent is " + mEventID);
-
         query1.getFirstInBackground(new GetCallback<MassEvent>() {
             @Override
             public void done(MassEvent massEvent, ParseException e) {
                 Log.i(Settings.APPTAG, "Done with getFirstInBackground loc " + e);
                 // the event ID is found
                 if (e == null) {
-                    Log.i(Settings.APPTAG, "massevent in updateUserLocation after query is " + massEvent.getObjectId());
-
                     // check if the user is still within the event radius
                     double distance = currentLocation
                             .distanceInKilometersTo(massEvent.getLocation());
@@ -124,7 +120,6 @@ public class ParseHandler {
                         // decrement the old event size as the user is no longer there
                         int size = massEvent.getEventSize();
                         size = size - 1;
-                        Log.d(Settings.APPTAG, "decrement event size");
                         massEvent.setEventSize(size);
                         massEvent.saveInBackground();
 
@@ -146,7 +141,6 @@ public class ParseHandler {
                             @Override
                             public void done(final MassEvent massEvent, ParseException e) {
                                 if (e == null) {
-                                    Log.i(Settings.APPTAG, "the current massevent is " + massEvent.getObjectId());
                                     int size = massEvent.getEventSize();
                                     size = size + 1;
                                     massEvent.setEventSize(size);
