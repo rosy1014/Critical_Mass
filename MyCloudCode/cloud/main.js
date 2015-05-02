@@ -1,102 +1,75 @@
-// Use Parse.Cloud.define to define as many cloud functions as you want.
-// For example:
-Parse.Cloud.define("hello", function(request, response) {
-  response.success("Hello world!");
+// Created by Tingyu, April 18, 2015
+
+
+// Before info a mass user is changed
+// get the old event of the user and decrement the size
+Parse.Cloud.beforeSave("MassUser", function (request) {
+
+    var MassUser = Parse.Object.extend("MassUser");
+    var queryUsers = new Parse.Query(MassUser);
+    queryUsers.equalTo("user", request.user.id);
+    queryUsers.first({
+        success: function (massUser) {
+            if (massUser != undefined) {
+                var oldEvent = massUser.get("event");
+                var queryEvents = new Parse.Query("MassEvent");
+                queryEvents.get(oldEvent, {
+                    success: function (massEvent) {
+                        var size = massEvent.get("EventSize");
+                        size--;
+                        massEvent.set("EventSize", size);
+                        massEvent.save();
+                        console.log("Decremented size of event " + massEvent.get("locationName") + " to " + size);
+                    },
+                    error: function (error) {
+                        console.error("No old event found in beforeSave!" + "Got an error " + error.code + " : " + error.message);
+                    }
+                });
+            } else {
+                console.log("sb else case");
+            }
+        },
+        error: function (error) {
+            console.error("No current user found in beforeSave! " + "Got an error " + error.code + " : " + "error.message");
+        }
+    });
+    console.log("About to change mass user");
+
 });
- 
-//static var EVENT_RADIUS = 0.2;
-/*
- * Update a user's location if the location has changed 
- * differs from the last location by more than 0.01 km
- * https://www.parse.com/questions/handling-duplicate-records-in-parse
- * Handling Duplicates
- */
- 
- Parse.Cloud.define("updateEventSize", function(request, status) {
-    Parse.Cloud.useMasterKey();
 
-    var query = new Parse.Query("MassEvent");
-    query.each( function(event){
-    	console.log(event.get("objectId"));
-    	query2 = new Parse.Query("MassUser");
-    		query2.withinKilometers("location", event.get('location'), 0.2);
-    		query2.count({
-    			success: function(count){
-    				event.set("EventSize", count);
-    				
 
-    				status.success("updated sizes of event " + event.id + "to size " + count);
 
-    			//event.save();
-    				//status.success("new event size is " + count);
-    			},
-    			error: function(error){
-    				//status.error("failed to updateEventSize");
-    				alert("Error: " + error.code + " failed to updateEventSize "+ event.get('objectId'));
-    			}
-    		});
-    		event.save();
+// After the info a mass user is changed
+// get the new event of the mass user and increment the size
+Parse.Cloud.afterSave("MassUser", function (request, response) {
+    console.log("in afterSave");
 
-    	}).then(function(){
-    		status.success("Updated sizes of event");
-    	}, function(error){
-    		status.error("failed to update event size, Error: " + error.code);
 
+    var eventID = request.object.get("event");
+
+    var MassEvent = Parse.Object.extend("MassEvent");
+    var query = new Parse.Query(MassEvent);
+    console.log("event id for query is " + eventID);
+    query.get(eventID, {
+        success: function (massEvent) {
+
+            if (massEvent != undefined) {
+
+                console.log("request.object.id is " + request.object.id);
+                var size = massEvent.get("EventSize");
+                size++;
+                massEvent.set("EventSize", size);
+                massEvent.save();
+                console.log("Incremented size of event " + massEvent.get("locationName") + " to " + size);
+
+
+            } else {
+                console.log("mass event undefined? " + massEvent);
+            }
+
+        },
+        error: function (error) {
+            console.error("No old event found in afterSave! " + "Got an error " + error.code + " : " + error.message);
+        }
     });
 });
-
- Parse.Cloud.define("updateEventSize2", function(request, status) {
-    Parse.Cloud.useMasterKey();
-
-    var query = new Parse.Query("MassEvent");
-    //query.equalTo("objectId", "jHgaxJAyMd");
-    query.find({
-    	success: function(events){
-    		var ids = " ";
-    		for(var i = 0; i < events.length; i++){
-    		// // 	query2 = new Parse.Query("MassUser");
-    		// // 	query2.withinKilometers("location", events[i].get("location"), 0.2);
-    		// // 	query2.count({
-    		// // 		success:function(count){
-    		// // 			event[i].set("EventSize", count);
-    		// // 		});
-    		// // },
-    		// 	})
-				var objId = events[i].id;
-				ids = ids + objId + " ";
-				events[i].set("EventSize", 40);
-				events[i].save();
-    			query2 = new Parse.Query("MassEvent");
-    			query2.equalTo("objectId", objId);
-    			query2.first({
-    				success:function(mEvent){
-    					mEvent.set("EventSize", 30);
-    					mEvent.save();
-    				},
-    				error: function(){
-    					console.log(error.code);
-    				}
-    			});
-    		// 	ids = ids + "old event size " + events[i].get("EventSize") + " ";
-    		// 	events[i].set("EventSize", 100);
-    		// 	events[i].save();
-    		// 	ids = ids + events[i].id + " " + events[i].get("EventSize") + " ";
-    		// 	ids = ids + "old event size " + events[i].get("EventSize") + " ";
-    		// 	events[i].set("EventSize", 100);
-    		// 	events[i].save();
-    		// 	ids = ids + events[i].id + " " + events[i].get("EventSize") + " ";
-
-    		// event.set("EventSize", 1);
-    		// event.save()	
-    		// ids = ids + event.get("EventSize");
-    	}
-    		
-    		status.success("updated event size, with " + ids + " events ");
-    	},
-    	error: function(error){
-    		status.error("Oops, error "+ error.code);
-    	}
-    });
-});
-
-
